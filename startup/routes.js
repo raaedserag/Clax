@@ -15,7 +15,6 @@ module.exports = function(app) {
   // in development mode only
   if(app.get('env') === 'development')
   {
-    console.log("test")
     app.use(morgan("tiny"));
   }
   

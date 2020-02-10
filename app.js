@@ -1,10 +1,11 @@
 //Modules
+const configuration = require("./startup/config")
 const startDebugger = require("debug")("app:start"); //create a 'start' debugger
 const express = require("express");
 const app = express();
 
-//get connectionString, port, jwtKeys
-const {connectionString, port, jwtKeys} = require("./startup/config")();
+//load environment variables
+require("dotenv").config();
 
 //Data Base
 const dataBase = require("./models/db") //{connect, close}
@@ -14,4 +15,5 @@ require("./startup/routes")(app);
 
 
 // Initiate the server on the selected PORT
+const port = configuration.port();
 app.listen(port, () => startDebugger(`Listening on port ${port}`));
