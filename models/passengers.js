@@ -12,7 +12,6 @@ const passengerSchema = new mongoose.Schema({
   _currentTrip:{type: mongoose.ObjectId, ref: 'CurrentTrips'},
   _pastTrips: [{type: mongoose.ObjectId, ref: 'PastTrips'}],
   _complains: [{type: mongoose.ObjectId, ref: 'Complains'}]
-
 });
 const Passengers = mongoose.model("Passengers", passengerSchema);
 
