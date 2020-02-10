@@ -2,13 +2,13 @@ const config = require("config");
 
 //Determine Jwt Keys from the environment file
 module.exports.jwtKeys = function() {
-  const userJwt = process.env.JWTUSER
+  const passengerJwt = process.env.JWTPASSENGER
   const driverJwt = process.env.JWTDRIVER
   const adminJwt = process.env.JWTADMIN
   if (!(userJwt && driverJwt && adminJwt)) {
     throw new Error("FATAL ERROR: jwtPrivateKey is not defined.");
   } 
-  return {userJwt, driverJwt, adminJwt};
+  return {passengerJwt, driverJwt, adminJwt};
 };
 
 //get port from the configuration file
