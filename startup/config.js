@@ -22,7 +22,7 @@ return port;
 
 //get connection string from the environment file
 module.exports.connectionString = function() {
-connectionString = process.env.URI
+const connectionString = process.env.URI
 if (!(connectionString)) {
   throw new Error("FATAL ERROR: connectionString is not defined.");
 }
