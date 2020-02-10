@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 // CurrentTrips Model
 const currentTripSchema = new mongoose.Schema({
-    start: {type: Date},
+    start: {type: Date, default: Date.now},
     _line: {type: mongoose.ObjectId, ref: 'Lines'},
     _driver: {type: mongoose.ObjectId, ref: 'Drivers'},
     _passengers: {type: mongoose.ObjectId, ref: 'Passengers'},
