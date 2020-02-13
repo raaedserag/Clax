@@ -5,7 +5,7 @@ module.exports.jwtKeys = function() {
   const passengerJwt = process.env.JWTPASSENGER
   const driverJwt = process.env.JWTDRIVER
   const adminJwt = process.env.JWTADMIN
-  if (!(userJwt && driverJwt && adminJwt)) {
+  if (!(passengerJwt && driverJwt && adminJwt)) {
     throw new Error("FATAL ERROR: jwtPrivateKey is not defined.");
   } 
   return {passengerJwt, driverJwt, adminJwt};
@@ -26,5 +26,4 @@ const connectionString = process.env.URI
 if (!(connectionString)) {
   throw new Error("FATAL ERROR: connectionString is not defined.");
 }
-return connectionString;
-}
+return connectionString;}
