@@ -25,18 +25,18 @@ const complainSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    from_passenger: {
+    from_passenger: { 
         type: Boolean,
-        default: true
+        default: true   // true if the complain was introduced from a passenger, false => driver
     },
     status: {
         type: String, 
         enum: ['pending', 'taken', 'resolved'], 
         default: 'pending'
         },
+    _passenger: {type: mongoose.ObjectId, ref: 'Passengers'},
     _trip: {type: mongoose.ObjectId, ref: 'PastTrips'}
-    
-    
+    // driver _id can be returned from _trip collection
 });
 
 
@@ -54,8 +54,9 @@ const validationSchema = Joi.object().keys({
     .min(4)
     .max(500),
     date: Joi.date(),
-    status: Joi.string(),
-    //.enum(['pending', 'taken', 'resolved']),
+    status: Joi.string()
+    .valid('pending', 'taken', 'resolved'),
+    _passenger: Joi.objectId(),
     _trip: Joi.objectId(),
   });
 
