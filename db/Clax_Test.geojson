@@ -1,0 +1,16 @@
+{
+"type": "FeatureCollection",
+"name": "Samanoud - Tanta",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Name": "Tanta Taxi Stations Complex", "description": null }, "geometry": { "type": "Point", "coordinates": [ 31.0065079, 30.8226488 ] } },
+{ "type": "Feature", "properties": { "Name": "Carrefour Tanta", "description": null }, "geometry": { "type": "Point", "coordinates": [ 31.0228006, 30.8044496 ] } },
+{ "type": "Feature", "properties": { "Name": "Ragdya", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 31.0479012, 30.8321123 ], [ 31.0460129, 30.8299381 ], [ 31.0462489, 30.8298183 ], [ 31.0481372, 30.8320386 ], [ 31.0479012, 30.8321123 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Shabsheer", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 31.0723186, 30.8605735 ], [ 31.0675121, 30.8549369 ], [ 31.067834, 30.8547711 ], [ 31.0727692, 30.8604077 ], [ 31.0723186, 30.8605735 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Mahalet Rouh", "description": null }, "geometry": { "type": "Point", "coordinates": [ 31.0813915, 30.8795279 ] } },
+{ "type": "Feature", "properties": { "Name": "Saft Torab", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 31.099865, 30.895813 ], [ 31.1039848, 30.900011 ], [ 31.1019249, 30.9006738 ], [ 31.0985775, 30.8967704 ], [ 31.099865, 30.895813 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "El Mahalla", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 31.138134, 30.9549807 ], [ 31.2006187, 30.9732332 ], [ 31.201477, 30.9751466 ], [ 31.191349, 30.9860374 ], [ 31.1810493, 30.990305 ], [ 31.1619949, 30.9935425 ], [ 31.1559868, 30.9936896 ], [ 31.1530685, 30.9907465 ], [ 31.1510086, 30.9832412 ], [ 31.138134, 30.9549807 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Al Rahbeen", "description": null }, "geometry": { "type": "Point", "coordinates": [ 31.2109184, 30.9694064 ] } },
+{ "type": "Feature", "properties": { "Name": "Samanoud", "description": null }, "geometry": { "type": "Point", "coordinates": [ 31.2396473, 30.9675053 ] } }
+]
+}
