@@ -4,6 +4,9 @@ const morgan = require("morgan");
 const offers = require("../routes/offers");
 const passengers = require("../routes/passengers");
 const passengerLogin = require("../routes/passenger-login");
+const transaction = require("../routes/transactions");
+const pastTrips = require("../routes/past-trips");
+const family = require("../routes/family");
 // Middlewares
 const error = require("../middlewares/error");
 
@@ -21,5 +24,8 @@ module.exports = function(app) {
   app.use("/api/offers", offers);
   app.use("/api/passengers", passengers);
   app.use("/api/login", passengerLogin);
+  app.use("/api/transactions", transaction);
+  app.use("/api/past-trips", pastTrips);
+  app.use("/api/family", family);
   app.use(error);
 };

@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get("/me", authentication, async (req, res) => {
   const passenger = await Passengers.findById(req.passenger._id).select(
-    "-pass"
+    "name mail phone"
   );
   res.send(passenger);
 });

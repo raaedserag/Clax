@@ -26,6 +26,7 @@
     "mongoose": "^5.8.11",
     "morgan": "^1.9.1",
     "pug": "^2.0.4",
+    "stripe": "^8.22.0",
     "winston": "^3.2.1",
     "winston-mongodb": "^5.0.1"
   }

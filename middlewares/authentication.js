@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const config = require("config");
 const jwtPassengerKey = require("../startup/config.js").jwtKeys().passengerJwt;
 function authorize(req, res, next) {
   const token = req.header("x-login-token");

@@ -13,20 +13,21 @@ router.post("/", authentication, async (req, res) => {
 
   // check if code exists.
   let offer = await Offers.findOne({ code: req.body.code });
-  if (!offer) return res.status(404).send("Code doesn't exist.");
+  if (!offer) return res.status(404).send("هذا العرض غير متاح حالياً.");
 
   //check if passenger already used the code.
-  const passenger = offer._passengers.id(req.passenger._id);
 
-  if (passenger) return res.status(400).send("You already used the offer.");
+  const passengerId = offer._passengers.find(x => x == req.passenger._id);
+
+  if (passengerId) return res.status(400).send("لقد استخدمت هذا العرض مسبقاً.");
 
   //push the passenger Id to the offer array.
-  offer._passengers.push(passenger._id);
+  offer._passengers.push(req.passenger._id);
   //save offer to the database.
   await offer.save();
 
   //send Ok Status to user.
-  res.status(200).send("Successful redemption.");
+  res.status(200).send("تم تفعيل العرض.");
 });
 
 module.exports = router;

@@ -117,7 +117,8 @@ const passengerSchema = new mongoose.Schema({
   _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips" },
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
-  _complains: [{ type: mongoose.ObjectId, ref: "Complains" }]
+  _complains: [{ type: mongoose.ObjectId, ref: "Complains" }],
+  _family: [{ type: mongoose.ObjectId, ref: "Passengers" }]
 });
 
 // JWT generation method
@@ -173,7 +174,8 @@ const validationSchema = Joi.object().keys({
   _currentTrip: Joi.objectId(),
   _pastTrips: Joi.array().items(Joi.objectId()),
   _offers: Joi.array().items(Joi.objectId()),
-  _complains: Joi.array().items(Joi.objectId())
+  _complains: Joi.array().items(Joi.objectId()),
+  _family: Joi.array().items(Joi.objectId())
 });
 const validatePassenger = function(passenger) {
   return validationSchema.validate(passenger);
