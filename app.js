@@ -8,7 +8,7 @@ const app = express();
 require("dotenv").config();
 
 //Data Base
-const dataBase = require("./db/db").connect(); //{connect, close}
+require("./db/db").connect(); //{connect, close}
 
 //Routes
 require("./startup/routes")(app);
