@@ -27,14 +27,8 @@ module.exports = function(app) {
     
     // Apply MiddleWares
     app.use(error);
-
-    // Apply Middlewares in development mode only
-    if(app.get('env') === 'development')
-    {
-        app.use(morgan("tiny"));
-        startDebugger('Morgan Enabled')
-    }
-
+    app.use(morgan("tiny"));
+    
     // Apply Routes
     app.use("/api/user",complaintRoute);
     app.use("/",transRoute);
