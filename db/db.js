@@ -5,8 +5,8 @@ const uri = require("../startup/config").connectionString();
 
 //Opening connection, debugged with app:db
 //Use => call it with async-await before read or write to database, the connection stills open till closing it.
-module.exports.connect = () => {
-  mongoose
+module.exports.connect = async () => {
+  await mongoose
     .connect(uri, {
       useNewUrlParser: true,
       useFindAndModify: false,
@@ -19,8 +19,8 @@ module.exports.connect = () => {
 
 //Closing connection, debugged with app:db
 //Use => call it with async-await after finishing read or write to database.
-module.exports.close = () => {
-  mongoose.connection
+module.exports.close = async () => {
+  await mongoose.connection
     .close()
     .then(() => dbDebugger("DB closed..."))
     .catch(err => dbDebugger("DB clossing failed!!:\n", err));
