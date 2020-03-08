@@ -114,12 +114,12 @@ const passengerSchema = new mongoose.Schema({
       message: "maxLoan should be a positive value"
     }
   },
-  _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips" },
-  _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
+  _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips"},
+  _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips"}],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
   _complains: [{ type: mongoose.ObjectId, ref: "Complains" }],
-  _family: [{ type: mongoose.ObjectId, ref: "Passengers" }],
-  _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }]
+  _family: [{type: mongoose.ObjectId, ref: "Passengers"}],
+  _familyRequests: [{type: mongoose.ObjectId, ref: "Passengers"}]
 });
 
 // JWT generation method
@@ -137,7 +137,7 @@ const complexityOptions = {
   numeric: 1,
   requirementCount: 2
 };
-const passwordComplexity = PasswordComplexity(complexityOptions);
+const passwordComplexity = new PasswordComplexity(complexityOptions);
 const authRequirements = {
   password: passwordComplexity
 };
@@ -156,7 +156,7 @@ const validationSchema = Joi.object().keys({
     .lowercase()
     .min(6)
     .max(64),
-  pass: authRequirements.password.required(),
+  //pass: authRequirements.password.required(),
   phone: Joi.string()
     .required()
     .trim()
