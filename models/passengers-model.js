@@ -175,6 +175,7 @@ const validationSchema = Joi.object().keys({
   balance: Joi.number(),
   loanedAmount: Joi.number().min(0),
   maxLoan: Joi.number().min(0),
+  stripeId: Joi.string(),
   _currentTrip: Joi.objectId(),
   _pastTrips: Joi.array().items(Joi.objectId()),
   _offers: Joi.array().items(Joi.objectId()),
