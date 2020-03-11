@@ -114,6 +114,9 @@ const passengerSchema = new mongoose.Schema({
       message: "maxLoan should be a positive value"
     }
   },
+  stripeId: {
+    type: String, 
+    default: null}, 
   _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips"},
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips"}],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
