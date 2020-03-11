@@ -1,6 +1,5 @@
-// Strip app Related Info
-const stripeSecretKey = "sk_test_NYbMeSkwDvOTTnlwnHmpiati";
-// const stripePublicKey = "pk_test_2qZqP6ECz9bPsY72h7QUjAWU";
+// Stripe Secret Key
+const stripeSecretKey = require('../startup/config').stripeKey();
 
 // Stripe package installation
 const stripe = require("stripe")(stripeSecretKey);
@@ -14,15 +13,14 @@ const customerId = "cus_GpcoEM4aHSofi0";
 // const bankSource = "ba_1GHxa0FRbrLkbntUtW7EPkHF";
 // ---------------------------------------------------
 
-// Creates a Customer and prints the customer object.
-function createCustomer() {
+// Creates a Customer and respond the customer object.
+async function createCustomer(user) {
   var token;
   stripe.customers.create(
     {
-      name: "Kareem Allam",
-      email: "Python@gmail.com",
-      phone: "01024839933",
-      description: "My First Test Customer (created for API docs)"
+      name: user.name,
+      email: user.email,
+      phone: user.phone
     },
     function(err, customer) {
       // asynchronously called
