@@ -12,11 +12,20 @@ const RegExps = require("../db/regExps");
 // Schema
 const passengerSchema = new mongoose.Schema({
   name: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 4,
-    maxlength: 64
+    first: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 64
+    },
+    last: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 64
+    } 
   },
   mail: {
     type: String,
@@ -116,7 +125,7 @@ const passengerSchema = new mongoose.Schema({
   },
   stripeId: {
     type: String, 
-    default: null}, 
+    default: null},
   _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips"},
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips"}],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
@@ -147,11 +156,18 @@ const authRequirements = {
 
 // Set Validation Schema
 const validationSchema = Joi.object().keys({
-  name: Joi.string()
+  name: Joi.object({
+    first: Joi.string()
     .required()
     .trim()
-    .min(4)
+    .min(3)
     .max(64),
+    last: Joi.string()
+    .required()
+    .trim()
+    .min(3)
+    .max(64)
+  }),
   mail: Joi.string()
     .email()
     .required()
@@ -159,7 +175,7 @@ const validationSchema = Joi.object().keys({
     .lowercase()
     .min(6)
     .max(64),
-  //pass: authRequirements.password.required(),
+  pass: authRequirements.password.required(),
   phone: Joi.string()
     .required()
     .trim()
