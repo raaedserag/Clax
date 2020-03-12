@@ -1,55 +1,47 @@
+// Setup Error Debugger
+const stripeDebugger = require("debug")("app:stripeController");
 // Stripe Secret Key
 const stripeSecretKey = require('../startup/config').stripeKey();
-
 // Stripe package installation
 const stripe = require("stripe")(stripeSecretKey);
 
+
 // ---------------------------------------------------
 // Testing variables
-const customerId = "cus_GpcoEM4aHSofi0";
 // const cardToken = "tok_1GHxa0FRbrLkbntUNiXMLEH0";
 // const cardSource = "card_1GHxa0FRbrLkbntUwiR2tCcs";
 // const bankToken = "btok_1GHxa0FRbrLkbntUthXmhKB7";
 // const bankSource = "ba_1GHxa0FRbrLkbntUtW7EPkHF";
 // ---------------------------------------------------
 
-// Creates a Customer and respond the customer object.
-async function createCustomer(user) {
-  var token;
+// Creates a Customer and return the customer object.
+module.exports.createCustomer = function (user) {
+  if(! (user.name.first && user.name.last && user.mail && user.phone)) 
+    {return {message: "invalid user object"}}
+
   stripe.customers.create(
     {
-      name: user.name,
-      email: user.email,
+      name: user.name.first.concat(" ", user.name.last),
+      email: user.mail,
       phone: user.phone
-    },
-    function(err, customer) {
-      // asynchronously called
-      console.log(customer);
-      token = customer.id;
-    }
-  );
-  return token;
+    }, function(err, customer){
+      if(err) return err
+      return customer
+    })
 }
 
-// Creates a token using Card Info and prints the token object
-function createCardToken() {
-  stripe.tokens.create(
-    {
-      card: {
-        number: "4242424242424242",
-        exp_month: 3,
-        exp_year: 2021,
-        cvc: "314"
-      }
-    },
-    function(err, token) {
-      // asynchronously called
-      console.log(token);
-      return token;
-      1;
-    }
-  );
-}
+// Creates a token using Card Info and returns the token object
+module.exports.createCardToken = async function (newCard) {
+  try {
+    const cardToken = await stripe.tokens.create({card: newCard});
+    return {success: true, result: cardToken}
+  } 
+  catch (error) {
+    stripeDebugger(error.message)
+    return {success: false, result: error.message}
+  }
+  
+};
 
 // Creates a token using Bank Account Info and prints the token object
 function createBankToken() {
@@ -72,21 +64,30 @@ function createBankToken() {
   );
 }
 
-// Links a token with a customer and prints the result
-function createSource(customerId, token = "btok_1GHwo0FRbrLkbntUOEYfnTQp") {
-  stripe.customers.createSource(
-    customerId,
-    {
-      source: token
-    },
-    function(err, card) {
-      // asynchronously called
-      console.log(err);
-      console.log(card);
-      return card.id;
-    }
-  );
+// Links a token with a customer and returns the source object
+module.exports.createSource = async function (customerId, token) {
+  try{
+    const sourceToken = await stripe.customers.createSource(customerId, {source: token});
+    return {success: true, result: sourceToken}
+  }
+  catch (error) {
+    stripeDebugger(error.message)
+    return {success: false, result: error.message}
+  }
 }
+
+// Retreive all 3 cards (Maximum 3)
+module.exports.getCards = async function(clientId){
+  try {
+    const cardsQuery = await stripe.customers.listSources(clientId ,
+      {object: 'card', limit: 3})
+    return {success: true, result: cardsQuery}
+  } 
+  catch (error) {
+    stripeDebugger(error.message)
+    return {success: false, result: error.message}
+  }
+};
 
 // Updates user's balance manually
 function updateBalance(amountt) {
@@ -128,4 +129,17 @@ async function invoice() {
   );
 }
 
-invoice();
+module.exports.chargeBalance = async function(sourceId, chargeAmount){
+  try {
+    const charging = await stripe.charges.create({
+      amount: chargeAmount,
+      currency: 'usd',
+      source: sourceId
+    });
+    return {success: true, result: charging}
+  } 
+  catch (error) {
+    stripeDebugger(error.message)
+    return {success: false, result: error.message}  
+  }
+}

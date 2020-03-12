@@ -2,7 +2,7 @@
 const mongoose = require("mongoose");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
-const PasswordComplexity = require("joi-password-complexity");
+const passwordComplexity = require("joi-password-complexity");
 const jwt = require("jsonwebtoken");
 // Includes
 const jwtPassengerKey = require("../startup/config.js").jwtKeys().passengerJwt;
@@ -136,7 +136,10 @@ const passengerSchema = new mongoose.Schema({
 
 // JWT generation method
 passengerSchema.methods.generateToken = function(expiry) {
-  return jwt.sign({ _id: this._id }, jwtPassengerKey, { expiresIn: expiry });
+  return jwt.sign({
+     _id: this._id,
+     is_passenger: true 
+    }, jwtPassengerKey, { expiresIn: expiry });
 };
 
 ////****************** Passenger Validation  ******************
@@ -148,10 +151,6 @@ const complexityOptions = {
   upperCase: 1,
   numeric: 1,
   requirementCount: 2
-};
-const passwordComplexity = new PasswordComplexity(complexityOptions);
-const authRequirements = {
-  password: passwordComplexity
 };
 
 // Set Validation Schema
@@ -175,7 +174,7 @@ const validationSchema = Joi.object().keys({
     .lowercase()
     .min(6)
     .max(64),
-  pass: authRequirements.password.required(),
+  pass: passwordComplexity(complexityOptions),  
   phone: Joi.string()
     .required()
     .trim()
