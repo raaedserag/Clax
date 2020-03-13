@@ -4,13 +4,22 @@ const morgan = require("morgan");
 
 
 // Import Middlewares
-//const error = require("../middlewares/error");
+const error = require("../middlewares/error");
+const authentication = require("../middlewares/authentication")
 
 
 // Import Routes
-const stationRoute=require('../routes/stations');
-const linesRoute=require('../routes/lines');
-const driversRoute=require('../routes/driver');
+const complaintRoute=require('../routes/payment/complaints');
+const offers = require("../routes/home/offers");
+const passengers = require("../routes/home/passengers");
+const passengerLogin = require("../routes/home/passenger-login");
+const transaction = require("../routes/payment/transactions");
+const payment = require("../routes/payment/payment")
+const pastTrips = require("../routes/home/past-trips");
+const family = require("../routes/home/family")
+const pairing = require('../routes/pairing/pairing')
+
+
 
 module.exports = function(app) {
     // Apply Essential Middlewares
@@ -18,18 +27,18 @@ module.exports = function(app) {
     app.use(express.urlencoded({ extended: true })); // Reparse url to encoded url payload
     //app.use(express.static("public")); // For static files if needed
     
-    // Apply Middlewares in development mode only
-    if(app.get('env') === 'development')
-    {
-        console.log("Moorgan Enabled")
-        app.use(morgan("tiny"));
-    }
+    // Apply MiddleWares
+    app.use(error);
+    app.use(morgan("tiny"));
     
-
     // Apply Routes
-    app.use("/api/user",stationRoute);
-    app.use("/api/user",linesRoute);
-    app.use("/api/user",driversRoute); 
-
-
+    app.use("/api/user",complaintRoute);
+    app.use("/api/offers", offers);
+    app.use("/api/passengers", passengers);
+    app.use("/api/login", passengerLogin);
+    app.use("/api/transactions", transaction);
+    app.use("/api/payment", payment)
+    app.use("/api/past-trips", pastTrips);
+    app.use("/api/family", family);
+    app.use("/api/pairing",pairing);
 };

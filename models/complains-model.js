@@ -1,68 +1,69 @@
 // Modules
 const mongoose = require("mongoose");
 const Joi = require("@hapi/joi");
-Joi.objectId = require('joi-objectid')(Joi)
-
+Joi.objectId = require("joi-objectid")(Joi);
 
 //****************** Complain Model ******************
 // Schema
-const complainSchema = new mongoose.Schema({
-    title:{
-        type: String,
-        required: true,
-        trim: true,
-        minlength: 4,
-        maxlength: 32 
-    },
-    text: {
-        type: String,
-        required: true,
-        trim: true,
-        minlength: 4,
-        maxlength: 500
-    },
-    date: {
-        type: Date,
-        default: Date.now
-    },
-    from_passenger: { 
-        type: Boolean,
-        default: true   // true if the complain was introduced from a passenger, false => driver
-    },
-    status: {
-        type: String, 
-        enum: ['pending', 'taken', 'resolved'], 
-        default: 'pending'
-        },
-    _passenger: {type: mongoose.ObjectId, ref: 'Passengers'},
-    _trip: {type: mongoose.ObjectId, ref: 'PastTrips'}
-    // driver _id can be returned from _trip collection
+const complaintSchema = new mongoose.Schema({
+  response: {
+    type: String,
+    trim: true
+  },
+  code: {
+    type: Number,
+    required: true
+  },
+  text: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 4,
+    maxlength: 500
+  },
+  date: {
+    type: Date,
+    default: Date.now
+  },
+  image: {
+    type: String,
+    default: "https://www.driverg.com/work/images/driverimage.jpg"
+  },
+  from_passenger: {
+    type: Boolean,
+    default: true // true if the complain was introduced from a passenger, false => driver
+  },
+  status: {
+    type: String,
+    enum: ["pending", "taken", "resolved"],
+    default: "pending"
+  },
+  _passenger: { type: mongoose.ObjectId, ref: "Passengers" },
+  _trip: { type: mongoose.ObjectId, ref: "PastTrips" }
+  // driver _id can be returned from _trip collection
 });
-
+const Complains = mongoose.model("Complains", complaintSchema);
 
 ////****************** Complain Validation  ******************
-// Set Validation Schema 
+// Set Validation Schema
 const validationSchema = Joi.object().keys({
-    title: Joi.string()
-    .required()
-    .trim()
-    .min(4)
-    .max(32),
-    text: Joi.string()
+  response: Joi.string().trim(),
+  code: Joi.number(),
+  text: Joi.string()
     .required()
     .trim()
     .min(4)
     .max(500),
-    date: Joi.date(),
-    status: Joi.string()
-    .valid('pending', 'taken', 'resolved'),
-    _passenger: Joi.objectId(),
-    _trip: Joi.objectId(),
-  });
+  date: Joi.date().required(),
+  from_passenger: Joi.bool(),
+  status: Joi.string().valid("pending", "taken", "resolved"),
+  _passenger: Joi.objectId(),
+  _trip: Joi.objectId()
+});
 
-const validateComplain =function(complain){
-    return validationSchema.validate(complain);
+const validateComplaint = function(complaint) {
+  return validationSchema.validate(complaint);
 };
-  
-module.exports.Complains = mongoose.model("Complains", complainSchema);
-module.exports.validateComplain = validateComplain;
+
+module.exports.Complains = Complains;
+module.exports.validateComplaint = validateComplaint;

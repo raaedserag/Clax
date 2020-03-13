@@ -1,5 +1,5 @@
-const { Stations } = require('../models/stations-model');
-const { Lines } = require('../models/lines-model');
+const { Stations } = require('../../models/stations-model');
+const { Lines } = require('../../models/lines-model');
 
 let name = "";
 let lineView = [];
