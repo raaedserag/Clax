@@ -5,7 +5,7 @@ const {
   payOgra,
   ograSuccess,
   ograCancel
-} = require("../controllers/transactions");
+} = require("../../controllers/payment/transactions");
 
 router.post("/pay", payOgra);
 router.get("/success/:id/:amount", ograSuccess);

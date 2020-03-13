@@ -1,4 +1,4 @@
-const {Lines} = require('../models/lines-model');
+const {Lines} = require('../../models/lines-model');
 
 
 

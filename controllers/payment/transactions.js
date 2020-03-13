@@ -1,6 +1,6 @@
-const { Passengers } = require("../models/passengers-model");
+const { Passengers } = require("../../models/passengers-model");
 var paypal = require("paypal-rest-sdk");
-const port = require("../startup/config").port();
+const port = require("../../startup/config").port();
 
 paypal.configure({
   mode: "sandbox", //sandbox or live

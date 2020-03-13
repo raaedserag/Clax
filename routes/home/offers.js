@@ -1,5 +1,5 @@
-const { Offers, validateOfferCode } = require("../models/offers-model");
-const authentication = require("../middlewares/authentication");
+const { Offers, validateOfferCode } = require("../../models/offers-model");
+const authentication = require("../../middlewares/authentication");
 const express = require("express");
 const _ = require("lodash");
 

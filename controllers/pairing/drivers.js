@@ -1,4 +1,4 @@
-const { Drivers} = require('../models/drivers-model');
+const { Drivers} = require('../../models/drivers-model');
 let u_driver;
 
 let drivers = async(req, res) => {

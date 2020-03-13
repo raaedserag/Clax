@@ -1,7 +1,7 @@
 // Modules
 const Joi = require("@hapi/joi");
 // Models
-const Passengers = require("../models/passengers-model").Passengers;
+const Passengers = require("../../models/passengers-model").Passengers;
 // Setup Error Debugger
 const errorDebugger = require("debug")("app:error");
 

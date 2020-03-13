@@ -9,16 +9,15 @@ const authentication = require("../middlewares/authentication")
 
 
 // Import Routes
-const complaintRoute=require('../routes/complaints');
-const transRoute=require('../routes/transactions');
-const offers = require("../routes/offers");
-const passengers = require("../routes/passengers");
-const passengerLogin = require("../routes/passenger-login");
-const transaction = require("../routes/transactions");
-const payment = require("../routes/payment")
-const pastTrips = require("../routes/past-trips");
-const family = require("../routes/family");
-const pairing = require('../routes/pairing')
+const complaintRoute=require('../routes/payment/complaints');
+const offers = require("../routes/home/offers");
+const passengers = require("../routes/home/passengers");
+const passengerLogin = require("../routes/home/passenger-login");
+const transaction = require("../routes/payment/transactions");
+const payment = require("../routes/payment/payment")
+const pastTrips = require("../routes/home/past-trips");
+const family = require("../routes/home/family")
+const pairing = require('../routes/pairing/pairing')
 
 
 
@@ -34,7 +33,6 @@ module.exports = function(app) {
     
     // Apply Routes
     app.use("/api/user",complaintRoute);
-    app.use("/",transRoute);
     app.use("/api/offers", offers);
     app.use("/api/passengers", passengers);
     app.use("/api/login", passengerLogin);

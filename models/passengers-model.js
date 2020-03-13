@@ -125,7 +125,8 @@ const passengerSchema = new mongoose.Schema({
   },
   stripeId: {
     type: String, 
-    default: null},
+    default: null
+  },
   _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips"},
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips"}],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],

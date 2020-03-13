@@ -1,7 +1,7 @@
 // Setup Error Debugger
 const stripeDebugger = require("debug")("app:stripeController");
 // Stripe Secret Key
-const stripeSecretKey = require("../startup/config").stripeKey();
+const stripeSecretKey = require("../../startup/config").stripeKey();
 // Stripe package installation
 const stripe = require("stripe")(stripeSecretKey);
 

@@ -2,8 +2,8 @@
 const router = require("express").Router();
 const _ = require("lodash");
 // Controllers
-const paymentController = require("../controllers/payment");
-const stripeController = require("../controllers/stripe");
+const paymentController = require("../../controllers/payment/payment");
+const stripeController = require("../../controllers/payment/stripe");
 //-------------------------------------------------------------------------
 
 // Get balance
