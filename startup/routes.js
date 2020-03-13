@@ -2,13 +2,15 @@
 const express = require("express");
 const morgan = require("morgan");
 
+
 // Import Middlewares
 const error = require("../middlewares/error");
 const authentication = require("../middlewares/authentication")
 
+
 // Import Routes
-const complaintRoute = require("../routes/complaints");
-const transRoute = require("../routes/transactions");
+const complaintRoute=require('../routes/complaints');
+const transRoute=require('../routes/transactions');
 const offers = require("../routes/offers");
 const passengers = require("../routes/passengers");
 const passengerLogin = require("../routes/passenger-login");
@@ -16,6 +18,7 @@ const transaction = require("../routes/transactions");
 const payment = require("../routes/payment")
 const pastTrips = require("../routes/past-trips");
 const family = require("../routes/family");
+
 
 module.exports = function(app) {
     // Apply Essential Middlewares

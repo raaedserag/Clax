@@ -5,7 +5,7 @@ const uri = require("../startup/config").connectionString();
 
 //Opening connection, debugged with app:db
 //Use => call it with async-await before read or write to database, the connection stills open till closing it.
-const connect = async function() {
+ const connect = async function(){
   await mongoose
     .connect(uri, {
       useNewUrlParser: true,
@@ -15,9 +15,9 @@ const connect = async function() {
     })
     .then(() => console.log("DB connected..."))
     .catch(err => {
-      console.log(` DB connection failed: ${err} \n Reconnecting...`);
-      setTimeout(connect, 2000);
-    });
+      console.log(` DB connection failed: ${err} \n Reconnecting...`)
+      setTimeout(connect, 2000)
+      });
 };
 module.exports.connect = connect;
 

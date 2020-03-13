@@ -130,8 +130,8 @@ const passengerSchema = new mongoose.Schema({
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips"}],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
   _complains: [{ type: mongoose.ObjectId, ref: "Complains" }],
-  _family: [{ type: mongoose.ObjectId, ref: "Passengers" }],
-  _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }]
+  _family: [{type: mongoose.ObjectId, ref: "Passengers"}],
+  _familyRequests: [{type: mongoose.ObjectId, ref: "Passengers"}]
 });
 
 // JWT generation method
