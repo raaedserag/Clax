@@ -1,10 +1,9 @@
 // Setup Error Debugger
 const stripeDebugger = require("debug")("app:stripeController");
 // Stripe Secret Key
-const stripeSecretKey = require('../startup/config').stripeKey();
+const stripeSecretKey = require("../startup/config").stripeKey();
 // Stripe package installation
 const stripe = require("stripe")(stripeSecretKey);
-
 
 // ---------------------------------------------------
 // Testing variables
@@ -15,32 +14,33 @@ const stripe = require("stripe")(stripeSecretKey);
 // ---------------------------------------------------
 
 // Creates a Customer and return the customer object.
-module.exports.createCustomer = function (user) {
-  if(! (user.name.first && user.name.last && user.mail && user.phone)) 
-    {return {message: "invalid user object"}}
+module.exports.createCustomer = function(user) {
+  if (!(user.name.first && user.name.last && user.mail && user.phone)) {
+    return { message: "invalid user object" };
+  }
 
   stripe.customers.create(
     {
       name: user.name.first.concat(" ", user.name.last),
       email: user.mail,
       phone: user.phone
-    }, function(err, customer){
-      if(err) return err
-      return customer
-    })
-}
+    },
+    function(err, customer) {
+      if (err) return err;
+      return customer;
+    }
+  );
+};
 
 // Creates a token using Card Info and returns the token object
-module.exports.createCardToken = async function (newCard) {
+module.exports.createCardToken = async function(newCard) {
   try {
-    const cardToken = await stripe.tokens.create({card: newCard});
-    return {success: true, result: cardToken}
-  } 
-  catch (error) {
-    stripeDebugger(error.message)
-    return {success: false, result: error.message}
+    const cardToken = await stripe.tokens.create({ card: newCard });
+    return { success: true, result: cardToken };
+  } catch (error) {
+    stripeDebugger(error.message);
+    return { success: false, result: error.message };
   }
-  
 };
 
 // Creates a token using Bank Account Info and prints the token object
@@ -65,27 +65,29 @@ function createBankToken() {
 }
 
 // Links a token with a customer and returns the source object
-module.exports.createSource = async function (customerId, token) {
-  try{
-    const sourceToken = await stripe.customers.createSource(customerId, {source: token});
-    return {success: true, result: sourceToken}
+module.exports.createSource = async function(customerId, token) {
+  try {
+    const sourceToken = await stripe.customers.createSource(customerId, {
+      source: token
+    });
+    return { success: true, result: sourceToken };
+  } catch (error) {
+    stripeDebugger(error.message);
+    return { success: false, result: error.message };
   }
-  catch (error) {
-    stripeDebugger(error.message)
-    return {success: false, result: error.message}
-  }
-}
+};
 
 // Retreive all 3 cards (Maximum 3)
-module.exports.getCards = async function(clientId){
+module.exports.getCards = async function(clientId) {
   try {
-    const cardsQuery = await stripe.customers.listSources(clientId ,
-      {object: 'card', limit: 3})
-    return {success: true, result: cardsQuery}
-  } 
-  catch (error) {
-    stripeDebugger(error.message)
-    return {success: false, result: error.message}
+    const cardsQuery = await stripe.customers.listSources(clientId, {
+      object: "card",
+      limit: 3
+    });
+    return { success: true, result: cardsQuery };
+  } catch (error) {
+    stripeDebugger(error.message);
+    return { success: false, result: error.message };
   }
 };
 
@@ -129,17 +131,21 @@ async function invoice() {
   );
 }
 
-module.exports.chargeBalance = async function(sourceId, chargeAmount){
+module.exports.chargeBalance = async function(
+  customerId,
+  sourceId,
+  chargeAmount
+) {
   try {
     const charging = await stripe.charges.create({
+      customer: customerId,
       amount: chargeAmount,
-      currency: 'usd',
+      currency: "usd",
       source: sourceId
     });
-    return {success: true, result: charging}
-  } 
-  catch (error) {
-    stripeDebugger(error.message)
-    return {success: false, result: error.message}  
+    return { success: true, result: charging };
+  } catch (error) {
+    stripeDebugger(error.message);
+    return { success: false, result: error.message };
   }
-}
+};
