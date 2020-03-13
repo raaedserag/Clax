@@ -19,24 +19,9 @@ const driverSchema = new mongoose.Schema({
   status: {
       is_available: {type: Boolean},
       availableSeats: {type: Number},
-     // _activeCar: {type: mongoose.ObjectId, ref: 'Cars'},
-     car_no:{type:String},
-     car_color:{type:String}
-
-  },
-  line:{type:Number}
+      _activeCar: {type: mongoose.ObjectId, ref: 'Cars'}
+  }
 });
 const Drivers = mongoose.model("Drivers", driverSchema);
 
 module.exports.Drivers = Drivers;
-
-
-
-
-
-
-
-
-
-
-

@@ -6,7 +6,7 @@ const PasswordComplexity = require("joi-password-complexity");
 const jwt = require("jsonwebtoken");
 // Includes
 const jwtPassengerKey = require("../startup/config.js").jwtKeys().passengerJwt
-const RegExps = require("../db/regExps")
+const RegExps = require("./regExps")
 
 
 //****************** Passenger Model ******************

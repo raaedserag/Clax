@@ -6,7 +6,7 @@ Joi.objectId = require('joi-objectid')(Joi)
 
 //****************** Complain Model ******************
 // Schema
-const complainSchema = new mongoose.Schema({
+const complaintSchema = new mongoose.Schema({
     title:{
         type: String,
         required: true,
@@ -38,6 +38,7 @@ const complainSchema = new mongoose.Schema({
     _trip: {type: mongoose.ObjectId, ref: 'PastTrips'}
     // driver _id can be returned from _trip collection
 });
+const Complaint=mongoose.model("Complaint", complaintSchema);
 
 
 ////****************** Complain Validation  ******************
@@ -60,9 +61,9 @@ const validationSchema = Joi.object().keys({
     _trip: Joi.objectId(),
   });
 
-const validateComplain =function(complain){
-    return validationSchema.validate(complain);
+const validateComplaint =function(complaint){
+    return validationSchema.validate(complaint);
 };
-  
-module.exports.Complains = mongoose.model("Complains", complainSchema);
-module.exports.validateComplain = validateComplain;
+
+module.exports.Complaint = Complaint;
+module.exports.validateComplaint = validateComplaint;
