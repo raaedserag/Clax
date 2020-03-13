@@ -20,6 +20,7 @@ const offerSchema = new mongoose.Schema({
     minlength: 3,
     maxlength: 30
   },
+  description: { type: String, required: true, maxlength: 2000 },
   start: {
     type: Date,
     default: Date.now
@@ -113,6 +114,9 @@ const validationSchema = Joi.object().keys({
     .min(3)
     .max(30),
   start: Joi.date(),
+  description: Joi.string()
+    .required()
+    .max(2000),
   end: Joi.date(),
   offerType: Joi.string()
     .required()

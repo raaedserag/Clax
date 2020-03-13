@@ -1,13 +1,14 @@
+const express = require("express");
 const router = require("express").Router();
 
 const {
-  registerCard,
-  currentBalance,
-  transferMoney
+  payOgra,
+  ograSuccess,
+  ograCancel
 } = require("../controllers/transactions");
 
-router.post("/register", registerCard);
-router.get("/balance", currentBalance);
-router.post("/transfer", transferMoney);
+router.post("/pay", payOgra);
+router.get("/success/:id/:amount", ograSuccess);
+router.get("/cancel", ograCancel);
 
 module.exports = router;

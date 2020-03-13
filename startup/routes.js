@@ -1,17 +1,21 @@
-// Modules
+// Import Modules
 const express = require("express");
 const morgan = require("morgan");
+const startDebugger = require("debug")("app:start"); //create a 'start' debugger
+
+// Import Middlewares
+const error = require("../middlewares/error");
+
+// Import Routes
+const complaintRoute = require("../routes/complaints");
+const transRoute = require("../routes/transactions");
 const offers = require("../routes/offers");
 const passengers = require("../routes/passengers");
 const passengerLogin = require("../routes/passenger-login");
 const transaction = require("../routes/transactions");
 const pastTrips = require("../routes/past-trips");
 const family = require("../routes/family");
-// Middlewares
-const error = require("../middlewares/error");
 
-// Routes
-//----
 module.exports = function(app) {
   // Apply Essential Middlewares
   app.use(express.json()); // Reparse body of the request into json object

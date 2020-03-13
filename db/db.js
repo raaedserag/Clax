@@ -23,8 +23,8 @@ module.exports.connect = connect;
 
 //Closing connection, debugged with app:db
 //Use => call it with async-await after finishing read or write to database.
-module.exports.close = () => {
-  mongoose.connection
+module.exports.close = async () => {
+  await mongoose.connection
     .close()
     .then(() => console.log("DB closed..."))
     .catch(err => console.log("DB clossing failed!!:\n", err));
