@@ -114,12 +114,12 @@ const passengerSchema = new mongoose.Schema({
       message: "maxLoan should be a positive value"
     }
   },
-  _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips"},
-  _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips"}],
+  _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips" },
+  _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
   _complains: [{ type: mongoose.ObjectId, ref: "Complains" }],
-  _family: [{type: mongoose.ObjectId, ref: "Passengers"}],
-  _familyRequests: [{type: mongoose.ObjectId, ref: "Passengers"}]
+  _family: [{ type: mongoose.ObjectId, ref: "Passengers" }],
+  _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }]
 });
 
 // JWT generation method

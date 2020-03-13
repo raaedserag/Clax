@@ -9,17 +9,18 @@ const router = express.Router();
 router.post("/", authentication, async (req, res) => {
   //check if the offer code is valid.
   const { error } = validateOfferCode(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).send({ message: error.details[0].message });
 
   // check if code exists.
   let offer = await Offers.findOne({ code: req.body.code });
-  if (!offer) return res.status(404).send("هذا العرض غير متاح حالياً.");
+  if (!offer) return res.status(404).send({ message: "" });
 
   //check if passenger already used the code.
 
   const passengerId = offer._passengers.find(x => x == req.passenger._id);
 
-  if (passengerId) return res.status(400).send("لقد استخدمت هذا العرض مسبقاً.");
+  if (passengerId)
+    return res.status(400).send({ message: "لقد استخدمت العرض مسبقاً." });
 
   //push the passenger Id to the offer array.
   offer._passengers.push(req.passenger._id);
@@ -27,7 +28,9 @@ router.post("/", authentication, async (req, res) => {
   await offer.save();
 
   //send Ok Status to user.
-  res.status(200).send("تم تفعيل العرض.");
+  res
+    .status(200)
+    .send({ description: offer.description, message: "تم تفعيل العرض." });
 });
 
 module.exports = router;
