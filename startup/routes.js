@@ -18,6 +18,8 @@ const transaction = require("../routes/transactions");
 const payment = require("../routes/payment")
 const pastTrips = require("../routes/past-trips");
 const family = require("../routes/family");
+const pairing = require('../routes/pairing')
+
 
 
 module.exports = function(app) {
@@ -40,4 +42,5 @@ module.exports = function(app) {
     app.use("/api/payment", payment)
     app.use("/api/past-trips", pastTrips);
     app.use("/api/family", family);
+    app.use("/api/pairing",pairing);
 };
