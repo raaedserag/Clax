@@ -73,7 +73,7 @@ router.post("/add-card", async (req, res) => {
 
   // Retrieve stripe account id
   const userObject = await paymentController.getUserStripeId(req.body.id);
-  console.log(userObject);
+  
   // If retreiving stripe id failed
   if (!(userObject.success && userObject.result.stripeId))
     return res.status(500).send("Failed to implement 2");
