@@ -1,4 +1,4 @@
-const { PastTrips } = require("../models/past-trips-model");
+const { PastTrips } = require("../../models/past-trips-model");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 
