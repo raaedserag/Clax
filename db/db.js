@@ -1,8 +1,9 @@
 //*****Modules*****
 const mongoose = require("mongoose");
 const uri = require("../startup/config").connectionString();
+const winston = require("winston")
 
-//Opening connection, debugged with app:db
+//Opening connection
 //Use => call it with async-await before read or write to database, the connection stills open till closing it.
  const connect = async function(){
   await mongoose
@@ -20,7 +21,7 @@ const uri = require("../startup/config").connectionString();
 };
 module.exports.connect = connect;
 
-//Closing connection, debugged with app:db
+//Closing connection
 //Use => call it with async-await after finishing read or write to database.
 module.exports.close = async () => {
   await mongoose.connection

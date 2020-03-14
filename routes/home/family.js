@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const authentication = require("../middlewares/authentication");
+const authentication = require("../../middlewares/authentication");
 
 const {
   getFamilyMembers,
@@ -10,7 +10,7 @@ const {
   denyRequest,
   deleteFamilyMember,
   fetchSentRequests
-} = require("../controllers/family");
+} = require("../../controllers/home/family");
 
 router.get("/", authentication, getFamilyMembers);
 router.put("/add", authentication, sendFamilyRequest);

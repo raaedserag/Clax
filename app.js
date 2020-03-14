@@ -8,7 +8,7 @@ const app = express();
 require("dotenv").config();
 
 //Logging
-//require("./startup/logging")();
+require("./startup/logging")();
 
 //Data Base
 require("./db/db").connect(); //{connect, close}
