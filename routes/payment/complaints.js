@@ -5,7 +5,7 @@ const {
   complaintsPost,
   complaintsGet,
   tripGet
-} = require("../controllers/complaints");
+} = require("../../controllers/payment/complaints");
 
 router.post("/complaint", complaintsPost);
 router.post("/mycomplaint", complaintsGet);

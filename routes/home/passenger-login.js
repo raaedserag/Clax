@@ -1,7 +1,7 @@
 const {
   Passengers,
   validatePassengerLogin
-} = require("../models/passengers-model");
+} = require("../../models/passengers-model");
 const express = require("express");
 const bcrypt = require("bcrypt");
 

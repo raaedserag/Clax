@@ -1,4 +1,4 @@
-const { Passengers } = require("../models/passengers-model");
+const { Passengers } = require("../../models/passengers-model");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 const winston = require("winston");

@@ -1,5 +1,6 @@
-const { Passengers, validatePassenger } = require("../models/passengers-model");
-const authentication = require("../middlewares/authentication");
+const { Passengers, validatePassenger } = require("../../models/passengers-model");
+const authentication = require("../../middlewares/authentication");
+const createStripe = require('../../controllers/payment/stripe').createCustomer
 const express = require("express");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
@@ -11,6 +12,7 @@ router.get("/me", authentication, async (req, res) => {
   );
   res.send(passenger);
 });
+
 //register
 router.post("/register", async (req, res) => {
   //check if the passenger information is valid.
@@ -19,12 +21,17 @@ router.post("/register", async (req, res) => {
 
   // check if user with the same email already registered.
   let passenger = await Passengers.findOne({ mail: req.body.mail });
-  if (passenger) return res.status(400).send("email already exists.");
+  if (passenger) return res.status(409).send("email already exists.");
 
   // check if user with the same phone number already registered.
   passenger = await Passengers.findOne({ phone: req.body.phone });
-  if (passenger) return res.status(400).send("Phone number already exists.");
+  if (passenger) return res.status(409).send("Phone number already exists.");
 
+  // Creating Stripe account for the registered user
+  const customerToken = createStripe(_.pick(req.body, ["name", "mail", "phone"]))
+  if (!customerToken) return res.status(500).send(`Internal Server Erroe:\n ${customerToken.message}`)
+  res.status(200).send(customerToken)
+  /*
   //pick what you want to save in Database (using lodash).
   passenger = new Passengers(
     _.pick(req.body, ["name", "mail", "pass", "phone"])
@@ -42,6 +49,7 @@ router.post("/register", async (req, res) => {
 
   //pick what you want to send to the user (using lodash).
   res.header("x-login-token", webToken).send(_.pick(passenger, ["_id"]));
+  */
 });
 
 module.exports = router;

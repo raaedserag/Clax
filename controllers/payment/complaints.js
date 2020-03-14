@@ -1,8 +1,8 @@
-const { Complains, validateComplaint } = require("../models/complains-model");
-const { PastTrips } = require("../models/past-trips-model");
-const { Passengers } = require("../models/passengers-model");
-const { Lines } = require("../models/lines-model");
-const { Drivers } = require("../models/drivers-model");
+const { Complains, validateComplaint } = require("../../models/complains-model");
+const { PastTrips } = require("../../models/past-trips-model");
+const { Passengers } = require("../../models/passengers-model");
+const { Lines } = require("../../models/lines-model");
+const { Drivers } = require("../../models/drivers-model");
 
 let complaintsPost = async (req, res) => {
   let complaint = {

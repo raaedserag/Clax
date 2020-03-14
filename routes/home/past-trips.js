@@ -1,12 +1,12 @@
 const router = require("express").Router();
-const authentication = require("../middlewares/authentication");
+const authentication = require("../../middlewares/authentication");
 
 const {
   pastTrips,
   getFavourtieTrips,
   addToFavourite,
   removeFromFavourites
-} = require("../controllers/past-trips");
+} = require("../../controllers/home/past-trips");
 
 router.get("/", authentication, pastTrips);
 router.get("/favourite", authentication, getFavourtieTrips);
