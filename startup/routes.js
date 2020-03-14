@@ -27,9 +27,12 @@ module.exports = function(app) {
     app.use(express.urlencoded({ extended: true })); // Reparse url to encoded url payload
     //app.use(express.static("public")); // For static files if needed
     
-    // Apply MiddleWares
-    app.use(error);
-    app.use(morgan("tiny"));
+    // Apply Morgan middleware in development mode
+    if(process.env.NODE_ENV == "development")
+    {
+        app.use(morgan("tiny"));
+    }
+    
     
     // Apply Routes
     app.use("/api/user",complaintRoute);
@@ -41,4 +44,7 @@ module.exports = function(app) {
     app.use("/api/past-trips", pastTrips);
     app.use("/api/family", family);
     app.use("/api/pairing",pairing);
+
+    // Apply Error Middle ware
+    app.use(error);
 };

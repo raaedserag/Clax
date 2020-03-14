@@ -1,63 +1,64 @@
 // Modules
 const Joi = require("@hapi/joi");
-// Controllers
-const stripeController = require('./stripe')
 // Models
 const Passengers = require("../../models/passengers-model").Passengers;
 // Setup Error Debugger
-const paymentDebugger = require("debug")("app:paymentDebugger");
+const errorDebugger = require("debug")("app:error");
 
 // Functions
-// Retreive user balance
+// Retreive use balance
 module.exports.getUserBalance = async function(userId) {
   try {
     const user = await Passengers.findById(userId).select("-_id balance");
     return { success: true, result: user };
   } catch (error) {
-    paymentDebugger(error.message);
+    errorDebugger(error.message);
     return { success: false, result: error.message };
   }
 };
 
-// Retreive user stripe id 
 module.exports.getUserStripeId = async function(userId) {
   try {
     const user = await Passengers.findById(userId).select("-_id stripeId");
-    // Check if user id is null
-    if (!user.stripeId) {
-      paymentDebugger('This user have no stripe account');
-      return { success: false, result: 'This user have no stripe account' };
-    }
-
     return { success: true, result: user };
   } catch (error) {
-    paymentDebugger(error.message);
+    errorDebugger(error.message);
     return { success: false, result: error.message };
   }
 };
 
-// Transfer Money between users
-module.exports.transferMoney = async function(transfer){
-  try {
-    let transaction
+// Validators
+// Card Schema Validator
+const cardSchema = Joi.object().keys({
+  number: Joi.string().required(),
+  exp_month: Joi.number()
+    .integer()
+    .min(1)
+    .max(12)
+    .required(),
+  exp_year: Joi.number()
+    .integer()
+    .required(),
+  cvc: Joi.number()
+    .integer()
+    .required(),
+  //Adding id shit, Muuuuuuust be removed soon
+  id: Joi.string().required()
+});
+module.exports.validateCard = function(card) {
+  return cardSchema.validate(card);
+};
 
-    // Update sender stripe account
-    transaction.sender = await stripeController.updateCustomer(
-      transfer.senderStripeId,
-      {balance: - (parseFloat(transfer.amount))}
-    );
-    
-    // Update receiver stripe account
-    transaction.receiver = await stripeController.updateCustomer(
-      transfer.receiverStripeId,
-      {balance: parseFloat(transfer.amount)}
-    );
-
-    return {success: true, result: transaction}
-  } 
-  catch (error) {
-    paymentDebugger(error.message);
-    return { success: false, result: error.message };
-  }
-  
-}
+// Charge Balance Schema
+const chargeSchema = Joi.object().keys({
+  amount: Joi.number()
+    .integer()
+    .min(1)
+    .required(),
+  source: Joi.string().required(),
+  //Adding id shit, Muuuuuuust be removed soon
+  id: Joi.string().required()
+});
+module.exports.validateCharge = function(charge) {
+  return chargeSchema.validate(charge);
+};
