@@ -9,7 +9,7 @@ const {
   acceptRequest,
   denyRequest,
   deleteFamilyMember
-} = require("../controllers/family");
+} = require("../../controllers/home/family");
 
 router.get("/", authentication, getFamilyMembers);
 router.put("/add", authentication, sendFamilyRequest);
