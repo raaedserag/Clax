@@ -4,12 +4,37 @@ Joi.objectId = require("joi-objectid")(Joi);
 const winston = require("winston");
 
 let getFamilyMembers = async (req, res) => {
-  let familyMembers = await Passengers.find({
+  let familyMembers = await Passengers.findOne({
     _id: req.passenger._id
   })
     .populate("_family", "name phone")
     .select("_family");
-  res.send(familyMembers);
+
+  res.send(familyMembers._family);
+};
+
+let deleteFamilyMember = async (req, res) => {
+  // const { error } = validateSentRequest(req.body);
+  // if (error) return res.status(400).send(error.details[0].message);
+
+  const deletedMember = await Passengers.findOne({
+    _id: req.passenger._id,
+    _family: req.body._id
+  }).select("_id");
+
+  if (!deletedMember)
+    return res.status(404).send("user not found in your family");
+
+  result = await Passengers.updateOne(
+    {
+      _id: deletedMember._id
+    },
+    {
+      $pull: { _family: req.body._id }
+    }
+  );
+
+  res.status(200).send("member deleted");
 };
 
 let sendFamilyRequest = async (req, res) => {
@@ -51,7 +76,7 @@ let sendFamilyRequest = async (req, res) => {
     }
   );
 
-  res.status(200).send("member added");
+  res.status(200).send("request sent");
 };
 
 let cancelFamilyRequest = async (req, res) => {
@@ -82,7 +107,7 @@ const fetchRequests = async (req, res) => {
   const familyRequests = await Passengers.findById(req.passenger._id)
     .select("_familyRequests -_id")
     .populate({ path: "_familyRequests", select: "name phone" });
-  res.send(familyRequests);
+  res.send(familyRequests._familyRequests);
 };
 
 const acceptRequest = async (req, res) => {
@@ -141,3 +166,4 @@ module.exports.cancelFamilyRequest = cancelFamilyRequest;
 module.exports.fetchRequests = fetchRequests;
 module.exports.acceptRequest = acceptRequest;
 module.exports.denyRequest = denyRequest;
+module.exports.deleteFamilyMember = deleteFamilyMember;

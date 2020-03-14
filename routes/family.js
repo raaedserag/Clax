@@ -7,11 +7,13 @@ const {
   cancelFamilyRequest,
   fetchRequests,
   acceptRequest,
-  denyRequest
+  denyRequest,
+  deleteFamilyMember
 } = require("../controllers/family");
 
 router.get("/", authentication, getFamilyMembers);
 router.put("/add", authentication, sendFamilyRequest);
+router.put("/delete", authentication, deleteFamilyMember);
 router.put("/cancel", authentication, cancelFamilyRequest);
 router.get("/fetch-requests", authentication, fetchRequests);
 router.put("/accept-request", authentication, acceptRequest);

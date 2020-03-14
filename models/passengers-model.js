@@ -137,7 +137,7 @@ const complexityOptions = {
   numeric: 1,
   requirementCount: 2
 };
-const passwordComplexity = new PasswordComplexity(complexityOptions);
+const passwordComplexity = PasswordComplexity(complexityOptions);
 const authRequirements = {
   password: passwordComplexity
 };
@@ -156,7 +156,7 @@ const validationSchema = Joi.object().keys({
     .lowercase()
     .min(6)
     .max(64),
-  //pass: authRequirements.password.required(),
+  pass: authRequirements.password.required(),
   phone: Joi.string()
     .required()
     .trim()
