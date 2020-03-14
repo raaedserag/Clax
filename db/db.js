@@ -13,9 +13,9 @@ const uri = require("../startup/config").connectionString();
       useUnifiedTopology: true,
       useCreateIndex: true
     })
-    .then(() => console.log("DB connected..."))
+    .then(() => dbDebugger("DB connected..."))
     .catch(err => {
-      console.log(` DB connection failed: ${err} \n Reconnecting...`)
+      dbDebugger(` DB connection failed: ${err} \n Reconnecting...`)
       setTimeout(connect, 2000)
       });
 };
@@ -26,6 +26,6 @@ module.exports.connect = connect;
 module.exports.close = async () => {
   await mongoose.connection
     .close()
-    .then(() => console.log("DB closed..."))
-    .catch(err => console.log("DB clossing failed!!:\n", err));
+    .then(() => dbDebugger("DB closed..."))
+    .catch(err => dbDebugger("DB clossing failed!!:\n", err));
 };

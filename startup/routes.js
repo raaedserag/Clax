@@ -29,7 +29,12 @@ module.exports = function(app) {
     
     // Apply MiddleWares
     app.use(error);
-    app.use(morgan("tiny"));
+
+    // Apply Middlewares in Development Mode only
+    if (process.env.NODE_ENV == "development")
+    {
+        app.use(morgan("tiny"));
+    }
     
     // Apply Routes
     app.use("/api/user",complaintRoute);
