@@ -3,6 +3,7 @@ const authentication = require("../middlewares/authentication");
 const express = require("express");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
+const winston = require("winston");
 const router = express.Router();
 
 router.get("/me", authentication, async (req, res) => {

@@ -31,7 +31,7 @@ module.exports = function() {
   winston.add(
     new winston.transports.MongoDB({
       db: connString,
-      level: "error",
+      level: "info",
       options: { useUnifiedTopology: true }
     })
   );
