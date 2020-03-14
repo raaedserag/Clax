@@ -2,7 +2,7 @@
 const mongoose = require("mongoose");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
-const passwordComplexity = require("joi-password-complexity");
+const PasswordComplexity = require("joi-password-complexity");
 const jwt = require("jsonwebtoken");
 // Includes
 const jwtPassengerKey = require("../startup/config.js").jwtKeys().passengerJwt;
@@ -12,6 +12,13 @@ const RegExps = require("../db/regExps");
 // Schema
 const passengerSchema = new mongoose.Schema({
   name: {
+<<<<<<< HEAD
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 4,
+    maxlength: 64
+=======
     first: {
       type: String,
       required: true,
@@ -26,6 +33,7 @@ const passengerSchema = new mongoose.Schema({
       minlength: 3,
       maxlength: 64
     }
+>>>>>>> 769e6e7d99ba4745da97df609c1f009a01df67a7
   },
   mail: {
     type: String,
@@ -123,10 +131,13 @@ const passengerSchema = new mongoose.Schema({
       message: "maxLoan should be a positive value"
     }
   },
+<<<<<<< HEAD
+=======
   stripeId: {
     type: String,
     default: null
   },
+>>>>>>> 769e6e7d99ba4745da97df609c1f009a01df67a7
   _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips" },
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
@@ -137,6 +148,9 @@ const passengerSchema = new mongoose.Schema({
 
 // JWT generation method
 passengerSchema.methods.generateToken = function(expiry) {
+<<<<<<< HEAD
+  return jwt.sign({ _id: this._id }, jwtPassengerKey, { expiresIn: expiry });
+=======
   return jwt.sign(
     {
       _id: this._id,
@@ -145,6 +159,7 @@ passengerSchema.methods.generateToken = function(expiry) {
     jwtPassengerKey,
     { expiresIn: expiry }
   );
+>>>>>>> 769e6e7d99ba4745da97df609c1f009a01df67a7
 };
 
 ////****************** Passenger Validation  ******************
@@ -157,9 +172,20 @@ const complexityOptions = {
   numeric: 1,
   requirementCount: 2
 };
+const passwordComplexity = PasswordComplexity(complexityOptions);
+const authRequirements = {
+  password: passwordComplexity
+};
 
 // Set Validation Schema
 const validationSchema = Joi.object().keys({
+<<<<<<< HEAD
+  name: Joi.string()
+    .required()
+    .trim()
+    .min(4)
+    .max(64),
+=======
   name: Joi.object({
     first: Joi.string()
       .required()
@@ -172,6 +198,7 @@ const validationSchema = Joi.object().keys({
       .min(3)
       .max(64)
   }),
+>>>>>>> 769e6e7d99ba4745da97df609c1f009a01df67a7
   mail: Joi.string()
     .email()
     .required()
@@ -179,7 +206,11 @@ const validationSchema = Joi.object().keys({
     .lowercase()
     .min(6)
     .max(64),
+<<<<<<< HEAD
+  pass: authRequirements.password.required(),
+=======
   pass: passwordComplexity(complexityOptions),
+>>>>>>> 769e6e7d99ba4745da97df609c1f009a01df67a7
   phone: Joi.string()
     .required()
     .trim()
@@ -195,7 +226,6 @@ const validationSchema = Joi.object().keys({
   balance: Joi.number(),
   loanedAmount: Joi.number().min(0),
   maxLoan: Joi.number().min(0),
-  stripeId: Joi.string(),
   _currentTrip: Joi.objectId(),
   _pastTrips: Joi.array().items(Joi.objectId()),
   _offers: Joi.array().items(Joi.objectId()),

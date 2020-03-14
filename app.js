@@ -5,7 +5,10 @@ const express = require("express");
 const app = express();
 
 //load environment variables
-require("dotenv").config({override: true});
+require("dotenv").config({ override: true });
+
+//Logging
+require("./startup/logging")();
 
 //Data Base
 require("./db/db").connect(); //{connect, close}
