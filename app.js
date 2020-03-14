@@ -18,4 +18,4 @@ require("./startup/routes")(app);
 
 // Initiate the server on the selected PORT
 const port = configuration.port();
-app.listen(port, () => startDebugger(`Listening on port ${port}`));
+app.listen(port, () => console.log(`Listening on port ${port}`));

@@ -12,28 +12,11 @@ const RegExps = require("../db/regExps");
 // Schema
 const passengerSchema = new mongoose.Schema({
   name: {
-<<<<<<< HEAD
     type: String,
     required: true,
     trim: true,
     minlength: 4,
     maxlength: 64
-=======
-    first: {
-      type: String,
-      required: true,
-      trim: true,
-      minlength: 3,
-      maxlength: 64
-    },
-    last: {
-      type: String,
-      required: true,
-      trim: true,
-      minlength: 3,
-      maxlength: 64
-    }
->>>>>>> 769e6e7d99ba4745da97df609c1f009a01df67a7
   },
   mail: {
     type: String,
@@ -131,13 +114,6 @@ const passengerSchema = new mongoose.Schema({
       message: "maxLoan should be a positive value"
     }
   },
-<<<<<<< HEAD
-=======
-  stripeId: {
-    type: String,
-    default: null
-  },
->>>>>>> 769e6e7d99ba4745da97df609c1f009a01df67a7
   _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips" },
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
@@ -148,18 +124,7 @@ const passengerSchema = new mongoose.Schema({
 
 // JWT generation method
 passengerSchema.methods.generateToken = function(expiry) {
-<<<<<<< HEAD
   return jwt.sign({ _id: this._id }, jwtPassengerKey, { expiresIn: expiry });
-=======
-  return jwt.sign(
-    {
-      _id: this._id,
-      is_passenger: true
-    },
-    jwtPassengerKey,
-    { expiresIn: expiry }
-  );
->>>>>>> 769e6e7d99ba4745da97df609c1f009a01df67a7
 };
 
 ////****************** Passenger Validation  ******************
@@ -179,26 +144,11 @@ const authRequirements = {
 
 // Set Validation Schema
 const validationSchema = Joi.object().keys({
-<<<<<<< HEAD
   name: Joi.string()
     .required()
     .trim()
     .min(4)
     .max(64),
-=======
-  name: Joi.object({
-    first: Joi.string()
-      .required()
-      .trim()
-      .min(3)
-      .max(64),
-    last: Joi.string()
-      .required()
-      .trim()
-      .min(3)
-      .max(64)
-  }),
->>>>>>> 769e6e7d99ba4745da97df609c1f009a01df67a7
   mail: Joi.string()
     .email()
     .required()
@@ -206,11 +156,7 @@ const validationSchema = Joi.object().keys({
     .lowercase()
     .min(6)
     .max(64),
-<<<<<<< HEAD
   pass: authRequirements.password.required(),
-=======
-  pass: passwordComplexity(complexityOptions),
->>>>>>> 769e6e7d99ba4745da97df609c1f009a01df67a7
   phone: Joi.string()
     .required()
     .trim()

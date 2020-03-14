@@ -13,17 +13,11 @@ const connect = async function() {
       useUnifiedTopology: true,
       useCreateIndex: true
     })
-    .then(() => dbDebugger("DB connected..."))
+    .then(() => console.log("DB connected..."))
     .catch(err => {
-<<<<<<< HEAD
       console.log(` DB connection failed: ${err} \n Reconnecting...`);
       setTimeout(connect, 2000);
     });
-=======
-      dbDebugger(` DB connection failed: ${err} \n Reconnecting...`)
-      setTimeout(connect, 2000)
-      });
->>>>>>> 769e6e7d99ba4745da97df609c1f009a01df67a7
 };
 module.exports.connect = connect;
 
@@ -32,6 +26,6 @@ module.exports.connect = connect;
 module.exports.close = async () => {
   await mongoose.connection
     .close()
-    .then(() => dbDebugger("DB closed..."))
-    .catch(err => dbDebugger("DB clossing failed!!:\n", err));
+    .then(() => console.log("DB closed..."))
+    .catch(err => console.log("DB clossing failed!!:\n", err));
 };
