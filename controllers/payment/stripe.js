@@ -131,17 +131,13 @@ async function invoice() {
   );
 }
 
-module.exports.chargeBalance = async function(
-  customerId,
-  sourceId,
-  chargeAmount
-) {
+module.exports.chargeBalance = async function(charge) {
   try {
     const charging = await stripe.charges.create({
-      customer: customerId,
-      amount: chargeAmount,
+      customer: charge.customerStripeId,
+      amount: charge.amount,
       currency: "usd",
-      source: sourceId
+      source: charge.source
     });
     return { success: true, result: charging };
   } catch (error) {
@@ -149,3 +145,15 @@ module.exports.chargeBalance = async function(
     return { success: false, result: error.message };
   }
 };
+
+module.exports.updateCustomer = async function(customerId, updateParameters){
+  try {
+    const updatingResult = await stripe.customers.update(customerId, updateParameters)
+    return { success: true, result: updatingResult };
+  } 
+  catch (error) {
+    stripeDebugger(error.message);
+    return { success: false, result: error.message };
+  }
+  
+}

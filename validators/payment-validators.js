@@ -60,9 +60,8 @@ module.exports.validateCharge = function(charge) {
 
 // Transfer Money Schema
 const transferSchema = Joi.object().keys({
-  receiverId: Joi.string()
-  .required()
-  .objectId(),
+  receiverId: Joi.objectId()
+  .required(),
   amount: Joi.string()
     .required()
     .custom((amount, helpers) => {
