@@ -11,6 +11,7 @@ paypal.configure({
 });
 
 let payOgra = async (req, res) => {
+  console.log(req.body);
   var create_payment_json = {
     intent: "sale",
     payer: {
@@ -27,15 +28,15 @@ let payOgra = async (req, res) => {
             {
               name: "Balance Adjustment",
               sku: "001",
-              price: req.body.price,
-              currency: req.body.currency,
+              price: parseInt(req.body.price),
+              currency: "USD",
               quantity: 1
             }
           ]
         },
         amount: {
-          total: req.body.price,
-          currency: req.body.currency
+          total: parseInt(req.body.price),
+          currency: "USD"
         },
         description: "Balance Adjustment"
       }

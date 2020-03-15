@@ -2,6 +2,7 @@
 const router = require("express").Router();
 const _ = require("lodash");
 // Controllers
+const paymentValidators = require("../../validators/payment-validators");
 const paymentController = require("../../controllers/payment/payment");
 const stripeController = require("../../controllers/payment/stripe");
 //-------------------------------------------------------------------------
@@ -57,8 +58,8 @@ router.post("/get-cards", async (req, res) => {
 // Add a new card
 router.post("/add-card", async (req, res) => {
   // Validate req schema
-  //   const { error } = paymentController.validateCard(req.body);
-  //   if (error) return res.status(400).send(error.details[0].message);
+  const { error } = paymentValidators.validateCard(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
 
   // Generate stripe card token, muuuuuust edit this shit.....
   const createCardToken = await stripeController.createCardToken({
@@ -69,14 +70,13 @@ router.post("/add-card", async (req, res) => {
   });
   // If generating card token failed
   if (!(createCardToken.success && createCardToken.result))
-    return res.status(500).send("Failed to implement 1");
+    return res.status(500).send("Failed to implement");
 
   // Retrieve stripe account id
   const userObject = await paymentController.getUserStripeId(req.body.id);
-  
   // If retreiving stripe id failed
-  if (!(userObject.success && userObject.result.stripeId))
-    return res.status(500).send("Failed to implement 2");
+  if (!(userObject.success && userObject.result))
+    return res.status(500).send("Failed to implement");
 
   // Generating user card source
   const createSourceToken = await stripeController.createSource(
@@ -98,17 +98,19 @@ router.post("/add-card", async (req, res) => {
 router.post("/charge-balance", async (req, res) => {
   // Must be a transaction
   // Validate req schema
-  const { error } = paymentController.validateCharge(req.body);
+  const { error } = paymentValidators.validateCharge(req.body);
   if (error) return res.status(400).send(error.details[0].message);
+
   // Retrieve stripe account id
   const userObject = await paymentController.getUserStripeId(req.body.id);
-  // console.log(userObject.result.stripeId);
+  // If retreiving stripe id failed
+  if (!(userObject.success && userObject.result))
+    return res.status(500).send("Failed to implement");
+
+  req.body.customerStripeId = userObject.result.stripeId;
+
   // Creating charge
-  const creatingCharge = await stripeController.chargeBalance(
-    userObject.result.stripeId,
-    req.body.source,
-    req.body.amount
-  );
+  const creatingCharge = await stripeController.chargeBalance(req.body);
   // If creating charge failed
   if (!(creatingCharge.success && creatingCharge.result))
     return res.status(500).send("Failed to implement");
@@ -116,6 +118,41 @@ router.post("/charge-balance", async (req, res) => {
   // Adding balance to the user account
   //
   res.status(200).send({ balance: creatingCharge.result.amount });
+});
+
+// Transfer Money
+router.post("/transfer-money", async (req, res) => {
+  // Check request schema
+  const { error } = paymentValidators.validateTransfer(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  // Retrieve sender stripe account id
+  const senderStripe = await paymentController.getUserStripeId(req.body.id);
+  // If retreiving sender stripe id failed
+  if (!(senderStripe.success && senderStripe.result))
+    return res.status(500).send("Failed to implement");
+  // Assign senderStripeId
+  req.body.senderStripeId = senderStripe;
+
+  // Retrieve receiver stripe account id
+  const receiverStripe = await paymentController.getUserStripeId(req.body.id);
+  // If retreiving sender stripe id failed
+  if (!(receiverStripe.success && receiverStripe.result))
+    return res.status(500).send("Failed to implement");
+  // Assign receiverStripeId
+  req.body.receiverStripeId = receiverStripe;
+
+  // Transfer Money from sender to receiver
+  const transferTransaction = await paymentController.transferMoney(req.body);
+  // If transaction hasn't completed
+  if (!(transferTransaction.success && transferTransaction.result))
+    return res.status(500).send("Failed to implement");
+
+  // IF ALL IS WELL
+  res.status(200).send({
+    senderBalance: transferTransaction.result.sender.balance,
+    receiverBalance: transferTransaction.result.receiver.balance
+  });
 });
 
 module.exports = router;

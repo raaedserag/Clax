@@ -1,5 +1,5 @@
 // Setup Error Debugger
-const stripeDebugger = require("debug")("app:stripeController");
+const stripeDebugger = require("debug")("Clax:stripeController");
 // Stripe Secret Key
 const stripeSecretKey = require("../../startup/config").stripeKey();
 // Stripe package installation
@@ -146,14 +146,15 @@ module.exports.chargeBalance = async function(charge) {
   }
 };
 
-module.exports.updateCustomer = async function(customerId, updateParameters){
+module.exports.updateCustomer = async function(customerId, updateParameters) {
   try {
-    const updatingResult = await stripe.customers.update(customerId, updateParameters)
+    const updatingResult = await stripe.customers.update(
+      customerId,
+      updateParameters
+    );
     return { success: true, result: updatingResult };
-  } 
-  catch (error) {
+  } catch (error) {
     stripeDebugger(error.message);
     return { success: false, result: error.message };
   }
-  
-}
+};
