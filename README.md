@@ -1,1 +1,1 @@
-# Clax
+# Clax Server
