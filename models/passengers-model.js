@@ -44,6 +44,12 @@ const passengerSchema = new mongoose.Schema({
     minlength: 8,
     maxlength: 1024
   },
+  passLength: {
+    type: Number,
+    required: true,
+    min: 8,
+    max: 30
+  },
   phone: {
     type: String,
     required: true,
@@ -54,6 +60,12 @@ const passengerSchema = new mongoose.Schema({
     match: RegExps.phoneRegExp
   },
   phone_verified: { type: Boolean, default: false },
+  avatarIndex:{
+    type: Number,
+    default: null,
+    min: 0,
+    max: 50
+  },
   tripsCount: {
     type: Number,
     default: 0,
@@ -175,13 +187,28 @@ const validationSchema = Joi.object().keys({
     .lowercase()
     .min(6)
     .max(64),
-  pass: passwordComplexity(complexityOptions),  
+  pass: passwordComplexity(complexityOptions),
+  passLength: Joi.string()
+    .required()
+    .custom((value, helpers) => {
+      value = parseFloat(value);
+      if(isNaN(value) || !Number.isInteger(value) || value < 8 || value > 30) return helpers.error('any.invalid');
+      // else
+      return value
+  }, 'passLength Validation'),
   phone: Joi.string()
     .required()
     .trim()
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
+  avatarIndex: Joi.string()
+  .custom((value, helpers) => {
+    value = parseFloat(value);
+    if(isNaN(value) || !Number.isInteger(value) || value < 0 || value > 50) return helpers.error('any.invalid');
+    // else
+    return value
+  }, 'avatarIndex Validation'),
   tripsCount: Joi.number()
     .integer()
     .min(0),
