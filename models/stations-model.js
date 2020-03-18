@@ -24,16 +24,13 @@ const stationSchema = new mongoose.Schema({
     coordinates: {
         type: Array,
         required: true,
-        set: function(c){
-            if (this.type == 'Point') return c[0][0]
-            else return c
-        }
     }
 });
+module.exports.Stations = mongoose.model("Stations", stationSchema);
 
 ////****************** Station Validation  ******************
-// Set Validation Schema
-const validationSchema = Joi.object().keys({
+// Set one station Validation Schema
+const validateStationSchema = Joi.object().keys({
     name: Joi.string()
     .required()
     .trim()
@@ -44,11 +41,28 @@ const validationSchema = Joi.object().keys({
     type: Joi.string()
     .required()
     .valid('Point', 'Polygon'),
-    coordinates: Joi.array().items(Joi.array().items(Joi.array().items(Joi.number())))
+    coordinates: Joi.array().items(Joi.number())
 });
-const validateStation = function(station){
-    return validationSchema.validate(station);
+module.exports.validateStation = function(station){
+    return validateStationSchema.validate(station);
 }
 
-module.exports.Stations = mongoose.model("Stations", stationSchema);
-module.exports.validateStation = validateStation;
+// Set Array of Stations Validation Schema
+const validateStationsSchema = Joi.array().items({
+    name: Joi.string()
+    .required()
+    .trim()
+    .min(3)
+    .max(30),
+    description: Joi.string()
+    .max(120),
+    type: Joi.string()
+    .required()
+    .valid('Point', 'Polygon'),
+    coordinates: Joi.array().items(Joi.number())
+});
+module.exports.validateStations = function(stations){
+    return validateStationsSchema.validate(stations);
+}
+
+
