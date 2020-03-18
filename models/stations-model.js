@@ -9,7 +9,7 @@ const stationSchema = new mongoose.Schema({
         required: true,
         trim: true,
         minlength: 3,
-        maxlength: 30
+        maxlength: 50
     },
     description: {
         type: String,
@@ -53,7 +53,7 @@ const validateStationsSchema = Joi.array().items({
     .required()
     .trim()
     .min(3)
-    .max(30),
+    .max(50),
     description: Joi.string()
     .max(120),
     type: Joi.string()
