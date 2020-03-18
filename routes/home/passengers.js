@@ -1,17 +1,28 @@
-const { Passengers, validatePassenger } = require("../../models/passengers-model");
+// Modules
+const express = require("express");
+const router = express.Router();
+const bcrypt = require("bcrypt");
+const _ = require("lodash");
+// Models
+const { Passengers, 
+  validatePassenger, 
+  validatePassengerLogin } = require("../../models/passengers-model");
+// Controllers and middlewares
 const authentication = require("../../middlewares/authentication");
 const createStripe = require('../../controllers/payment/stripe').createCustomer
-const express = require("express");
-const _ = require("lodash");
-const bcrypt = require("bcrypt");
-const router = express.Router();
+// Routes
+const settingsRoute = require("./settings");
+const pastTripsRoute = require("./past-trips");
+const familyRoute = require("./family");
+const offersRoute = require("./offers");
 
-router.get("/me", authentication, async (req, res) => {
-  const passenger = await Passengers.findById(req.passenger._id).select(
-    "name mail phone"
-  );
-  res.send(passenger);
-});
+//---------------------
+
+// Redirections
+router.use("/settings", authentication, settingsRoute)
+router.use("/offers",authentication, offersRoute);
+router.use("/past-trips",authentication, pastTripsRoute);
+router.use("/family",authentication, familyRoute);
 
 //register
 router.post("/register", async (req, res) => {
@@ -51,5 +62,26 @@ router.post("/register", async (req, res) => {
   res.header("x-login-token", webToken).send(_.pick(passenger, ["_id"]));
   */
 });
+
+// Login
+router.post("/login", async (req, res) => {
+  //Validate the data of user
+  const { error } = validatePassengerLogin(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  //Checkin if the email exists
+  let passenger = await Passengers.findOne({ mail: req.body.mail });
+  if (!passenger) return res.status(400).send("Email does not exist.");
+
+  //Checkin if Password is correct
+  const validPassword = await bcrypt.compare(req.body.pass, passenger.pass);
+  if (!validPassword) return res.status(400).send("Invaild password.");
+
+  //Create token, expires within 5 hours.
+  const webToken = passenger.generateToken("5h");
+  res.send(webToken);
+});
+
+
 
 module.exports = router;
