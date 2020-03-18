@@ -1,9 +1,9 @@
 //*****Modules*****
 const mongoose = require("mongoose");
-const dbDebugger = require("debug")("app:db");
 const uri = require("../startup/config").connectionString();
+const winston = require("winston")
 
-//Opening connection, debugged with app:db
+//Opening connection
 //Use => call it with async-await before read or write to database, the connection stills open till closing it.
  const connect = async function(){
   await mongoose
@@ -13,19 +13,19 @@ const uri = require("../startup/config").connectionString();
       useUnifiedTopology: true,
       useCreateIndex: true
     })
-    .then(() => console.log("DB connected..."))
+    .then(() => winston.info("DB connected..."))
     .catch(err => {
-      console.log(` DB connection failed: ${err} \n Reconnecting...`)
-      setTimeout(connect, 2000)
+      winston.info(` DB connection failed: ${err} \n Reconnecting...`)
+      setTimeout(connect, 4000)
       });
 };
 module.exports.connect = connect;
 
-//Closing connection, debugged with app:db
+//Closing connection
 //Use => call it with async-await after finishing read or write to database.
 module.exports.close = async () => {
   await mongoose.connection
     .close()
-    .then(() => console.log("DB closed..."))
-    .catch(err => console.log("DB clossing failed!!:\n", err));
+    .then(() => winston.info("DB closed..."))
+    .catch(err => winston.info("DB clossing failed!!:\n", err));
 };
