@@ -19,7 +19,7 @@ router.post("/get-balance", async (req, res) => {
     return res.status(400).send("user not found");
 
   // IF ALL IS WELLs
-  res.status(200).send(userQuery.result);
+  res.status(200).send(Number.parseFloat(userQuery.result.balance).toFixed(2));
 });
 
 // Get card info
@@ -94,6 +94,34 @@ router.post("/add-card", async (req, res) => {
   return res.status(200).send(createSourceToken.result.id);
 });
 
+// Removed a new card
+router.post("/remove-card", async (req, res) => {
+  // Retrieve stripe account id
+  const userObject = await paymentController.getUserStripeId(req.body.id);
+  // If retreiving stripe id failed
+  if (!(userObject.success && userObject.result))
+    return res
+      .status(500)
+      .send(`Failed to get getUserStripeId of ${req.body.id}`);
+  // Generating user card source
+  const removedSource = await stripeController.removeSource(
+    userObject.result.stripeId,
+    req.body.source
+    // "card_1GOHn9FRbrLkbntUE68tSytY"
+  );
+
+  // If generating source failed
+  if (!(removedSource.success && removedSource.result))
+    return res
+      .status(500)
+      .send(
+        `Failed to remove srouce ${req.body.source}` + removedSource.result
+      );
+
+  // IF ALL IS WELL
+  return res.status(200).send("Source removed successfully!");
+});
+
 // Charge balance
 router.post("/charge-balance", async (req, res) => {
   // Must be a transaction
@@ -116,13 +144,18 @@ router.post("/charge-balance", async (req, res) => {
     throw new Error(userObject.result);
 
   // Adding balance to the user account
-  const updatingBalance = await paymentController.updateUserBalance(req.body.id, req.body.amount)
+  const updatingBalance = await paymentController.updateUserBalance(
+    req.body.id,
+    req.body.amount
+  );
   // If updating failed
-  if (!(updatingBalance.success && updatingBalance.result)) 
-    throw new Error(userObject.result)
-  
+  if (!(updatingBalance.success && updatingBalance.result))
+    throw new Error(userObject.result);
+
   // IF ALL IS WELL
-  return res.status(200).send({ balance: creatingCharge.result.amount/100});
+  return res
+    .status(200)
+    .send({ balance: Number.parseFloat(creatingCharge.result).toFixed(2) });
 });
 
 // Transfer Money
@@ -131,33 +164,36 @@ router.post("/transfer-money", async (req, res) => {
   const { error } = paymentValidators.validateTransfer(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
+  // Check if sender balance is sufficient
+  const senderBalance = await paymentController.getUserBalance(req.body.id);
+  if (!(senderBalance.success && senderBalance.result))
+    throw new Error(senderBalance.result);
+  if (senderBalance.result.balance < Number.parseFloat(req.body.amount))
+    return res.sendStatus(400);
+
   // Retrieve sender stripe account id
   const senderStripe = await paymentController.getUserStripeId(req.body.id);
   // If retreiving sender stripe id failed
   if (!(senderStripe.success && senderStripe.result))
-    return res.status(500).send("Failed to implement");
+    throw new Error(senderStripe.result);
   // Assign senderStripeId
-  req.body.senderStripeId = senderStripe;
+  req.body.senderStripeId = senderStripe.result.stripeId;
 
   // Retrieve receiver stripe account id
   const receiverStripe = await paymentController.getUserStripeId(req.body.id);
   // If retreiving sender stripe id failed
   if (!(receiverStripe.success && receiverStripe.result))
-    return res.status(500).send("Failed to implement");
+    throw new Error(receiverStripe.result);
   // Assign receiverStripeId
-  req.body.receiverStripeId = receiverStripe;
+  req.body.receiverStripeId = receiverStripe.result.stripeId;
 
   // Transfer Money from sender to receiver
   const transferTransaction = await paymentController.transferMoney(req.body);
   // If transaction hasn't completed
   if (!(transferTransaction.success && transferTransaction.result))
-    return res.status(500).send("Failed to implement");
+    throw new Error(transferTransaction.result);
 
   // IF ALL IS WELL
-  res.status(200).send({
-    senderBalance: transferTransaction.result.sender.balance,
-    receiverBalance: transferTransaction.result.receiver.balance
-  });
+  return res.send(transferTransaction.result.toString());
 });
-
 module.exports = router;

@@ -25,7 +25,7 @@ const passengerSchema = new mongoose.Schema({
       trim: true,
       minlength: 3,
       maxlength: 64
-    } 
+    }
   },
   mail: {
     type: String,
@@ -88,6 +88,12 @@ const passengerSchema = new mongoose.Schema({
   balance: {
     type: Number,
     default: 0,
+    get: function(b) {
+      return Number.parseFloat(b).toFixed(2);
+    },
+    set: function(b) {
+      return Number.parseFloat(b).toFixed(2);
+    },
     validate: {
       validator: function(b) {
         return b >= this.balance - this.maxLoan;
@@ -124,23 +130,27 @@ const passengerSchema = new mongoose.Schema({
     }
   },
   stripeId: {
-    type: String, 
+    type: String,
     default: null
   },
-  _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips"},
-  _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips"}],
+  _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips" },
+  _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
   _complains: [{ type: mongoose.ObjectId, ref: "Complains" }],
-  _family: [{type: mongoose.ObjectId, ref: "Passengers"}],
-  _familyRequests: [{type: mongoose.ObjectId, ref: "Passengers"}]
+  _family: [{ type: mongoose.ObjectId, ref: "Passengers" }],
+  _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }]
 });
 
 // JWT generation method
 passengerSchema.methods.generateToken = function(expiry) {
-  return jwt.sign({
-     _id: this._id,
-     is_passenger: true 
-    }, jwtPassengerKey, { expiresIn: expiry });
+  return jwt.sign(
+    {
+      _id: this._id,
+      is_passenger: true
+    },
+    jwtPassengerKey,
+    { expiresIn: expiry }
+  );
 };
 
 ////****************** Passenger Validation  ******************
@@ -158,15 +168,15 @@ const complexityOptions = {
 const validationSchema = Joi.object().keys({
   name: Joi.object({
     first: Joi.string()
-    .required()
-    .trim()
-    .min(3)
-    .max(64),
+      .required()
+      .trim()
+      .min(3)
+      .max(64),
     last: Joi.string()
-    .required()
-    .trim()
-    .min(3)
-    .max(64)
+      .required()
+      .trim()
+      .min(3)
+      .max(64)
   }),
   mail: Joi.string()
     .email()
@@ -175,7 +185,7 @@ const validationSchema = Joi.object().keys({
     .lowercase()
     .min(6)
     .max(64),
-  pass: passwordComplexity(complexityOptions),  
+  pass: passwordComplexity(complexityOptions),
   phone: Joi.string()
     .required()
     .trim()

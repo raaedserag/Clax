@@ -76,6 +76,18 @@ module.exports.createSource = async function(customerId, token) {
     return { success: false, result: error.message };
   }
 };
+module.exports.removeSource = async function(customerId, source) {
+  try {
+    const sourceRemoved = await stripe.customers.deleteSource(
+      customerId,
+      source
+    );
+    return { success: true, result: sourceRemoved.deleted };
+  } catch (error) {
+    stripeDebugger(error.message);
+    return { success: false, result: error.message };
+  }
+};
 
 // Retreive all 3 cards (Maximum 3)
 module.exports.getCards = async function(clientId) {
@@ -139,7 +151,19 @@ module.exports.chargeBalance = async function(charge) {
       currency: "usd",
       source: charge.source
     });
-    return { success: true, result: charging };
+
+    // Retrieving Customer's current Balance
+    const retreivedBalance = await stripe.customers.retrieve(
+      charge.customerStripeId
+    );
+
+    const updateBalance = await stripe.customers.update(
+      charge.customerStripeId,
+      {
+        balance: retreivedBalance.balance + charge.amount * 100
+      }
+    );
+    return { success: true, result: updateBalance.balance / 100 };
   } catch (error) {
     stripeDebugger(error.message);
     return { success: false, result: error.message };

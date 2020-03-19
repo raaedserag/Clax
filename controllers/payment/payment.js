@@ -13,20 +13,20 @@ module.exports.getUserBalance = async function(userId) {
   try {
     const user = await Passengers.findById(userId).select("-_id balance");
     return { success: true, result: user };
-  } 
-  catch (error) {
+  } catch (error) {
     paymentDebugger(error.message);
     return { success: false, result: error.message };
   }
 };
 
 // Update user balance
-module.exports.updateUserBalance = async function(userId, amount){
+module.exports.updateUserBalance = async function(userId, amount) {
   try {
-    const userUpdate = await Passengers.findByIdAndUpdate(userId, {$inc: {balance: amount}})
+    const userUpdate = await Passengers.findByIdAndUpdate(userId, {
+      $inc: { balance: amount }
+    });
     return { success: true, result: userUpdate.balance };
-  } 
-  catch (error) {
+  } catch (error) {
     paymentDebugger(error.message);
     return { success: false, result: error.message };
   }
@@ -52,32 +52,30 @@ module.exports.getUserStripeId = async function(userId) {
 // Transfer Money between users
 module.exports.transferMoney = async function(transfer) {
   try {
-    let transaction;
+    // Update sender database balance
+    const sender = await Passengers.findByIdAndUpdate(transfer.id, {
+      $inc: { balance: -transfer.amount }
+    }).select("-_id balance");
+
+    // Update receiver database balance
+    const receiver = await Passengers.findByIdAndUpdate(transfer.receiverId, {
+      $inc: { balance: transfer.amount }
+    }).select("-_id balance");
 
     // Update sender stripe account
-    transaction.sender = await stripeController.updateCustomer(
-      transfer.senderStripeId,
-      { balance: -parseFloat(transfer.amount) }
-    );
+    await stripeController.updateCustomer(transfer.senderStripeId, {
+      balance: sender.balance - parseFloat(transfer.amount)
+    });
 
     // Update receiver stripe account
-    transaction.receiver = await stripeController.updateCustomer(
-      transfer.receiverStripeId,
-      { balance: parseFloat(transfer.amount) }
-    );
-    
-    // Update sender database balance
-    await Passengers.findByIdAndUpdate(transfer.id, {$$dec: {balance: amount}})
-    
-    // Update receiver database balance
-    await Passengers.findByIdAndUpdate(transfer.receiverId, {$inc: {balance: amount}})
-    
+    await stripeController.updateCustomer(transfer.receiverStripeId, {
+      balance: receiver.balance + parseFloat(transfer.amount)
+    });
+
     // return esult
-    return { success: true, result: transaction };
-  } 
-  catch (error) {
+    return { success: true, result: sender.balance };
+  } catch (error) {
     paymentDebugger(error.message);
     return { success: false, result: error.message };
   }
 };
-
