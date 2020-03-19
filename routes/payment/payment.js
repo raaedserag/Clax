@@ -116,8 +116,12 @@ router.post("/charge-balance", async (req, res) => {
     return res.status(500).send("Failed to implement");
 
   // Adding balance to the user account
-  //
-  res.status(200).send({ balance: creatingCharge.result.amount });
+  const updatingBalance = await paymentController.updateUserBalance(req.body.id, req.body.amount)
+  // If updating failed
+  if (!(updatingBalance.success && updatingBalance.result)) return res.status(500).send("Failed to implement");
+  
+  // IF ALL IS WELL
+  return res.status(200).send({ balance: creatingCharge.result.amount });
 });
 
 // Transfer Money

@@ -13,7 +13,20 @@ module.exports.getUserBalance = async function(userId) {
   try {
     const user = await Passengers.findById(userId).select("-_id balance");
     return { success: true, result: user };
-  } catch (error) {
+  } 
+  catch (error) {
+    paymentDebugger(error.message);
+    return { success: false, result: error.message };
+  }
+};
+
+// Update user balance
+module.exports.updateUserBalance = async function(userId, amount){
+  try {
+    const userUpdate = await Passengers.findByIdAndUpdate(userId, {$inc: {balance: amount}})
+    return { success: true, result: userUpdate.balance };
+  } 
+  catch (error) {
     paymentDebugger(error.message);
     return { success: false, result: error.message };
   }
@@ -52,10 +65,19 @@ module.exports.transferMoney = async function(transfer) {
       transfer.receiverStripeId,
       { balance: parseFloat(transfer.amount) }
     );
-
+    
+    // Update sender database balance
+    await Passengers.findByIdAndUpdate(transfer.id, {$$dec: {balance: amount}})
+    
+    // Update receiver database balance
+    await Passengers.findByIdAndUpdate(transfer.receiverId, {$inc: {balance: amount}})
+    
+    // return esult
     return { success: true, result: transaction };
-  } catch (error) {
+  } 
+  catch (error) {
     paymentDebugger(error.message);
     return { success: false, result: error.message };
   }
 };
+
