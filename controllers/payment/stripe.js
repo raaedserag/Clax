@@ -135,7 +135,7 @@ module.exports.chargeBalance = async function(charge) {
   try {
     const charging = await stripe.charges.create({
       customer: charge.customerStripeId,
-      amount: charge.amount,
+      amount: charge.amount * 100,
       currency: "usd",
       source: charge.source
     });

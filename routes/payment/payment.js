@@ -105,7 +105,7 @@ router.post("/charge-balance", async (req, res) => {
   const userObject = await paymentController.getUserStripeId(req.body.id);
   // If retreiving stripe id failed
   if (!(userObject.success && userObject.result))
-    return res.status(500).send("Failed to implement");
+    throw new Error(userObject.result);
 
   req.body.customerStripeId = userObject.result.stripeId;
 
@@ -113,15 +113,16 @@ router.post("/charge-balance", async (req, res) => {
   const creatingCharge = await stripeController.chargeBalance(req.body);
   // If creating charge failed
   if (!(creatingCharge.success && creatingCharge.result))
-    return res.status(500).send("Failed to implement");
+    throw new Error(userObject.result);
 
   // Adding balance to the user account
   const updatingBalance = await paymentController.updateUserBalance(req.body.id, req.body.amount)
   // If updating failed
-  if (!(updatingBalance.success && updatingBalance.result)) return res.status(500).send("Failed to implement");
+  if (!(updatingBalance.success && updatingBalance.result)) 
+    throw new Error(userObject.result)
   
   // IF ALL IS WELL
-  return res.status(200).send({ balance: creatingCharge.result.amount });
+  return res.status(200).send({ balance: creatingCharge.result.amount/100});
 });
 
 // Transfer Money
