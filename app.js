@@ -1,11 +1,11 @@
 //Modules
+const winston = require("winston");
 const configuration = require("./startup/config");
-const startDebugger = require("debug")("app:start"); //create a 'start' debugger
 const express = require("express");
 const app = express();
 
 //load environment variables
-require("dotenv").config({ override: true });
+require("dotenv").config();
 
 //Logging
 require("./startup/logging")();
@@ -18,4 +18,4 @@ require("./startup/routes")(app);
 
 // Initiate the server on the selected PORT
 const port = configuration.port();
-app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(port, () => winston.info(`Listening on port ${port}`));

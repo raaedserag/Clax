@@ -13,18 +13,27 @@ module.exports.jwtKeys = function() {
 
 //get port from the configuration file
 module.exports.port = function() {
-const port = config.get("port");
-if (!port) {
-  throw new Error("FATAL ERROR: port is not defined.");
-}
-return port;
+  const port = config.get("port");
+  if (!port) {
+    throw new Error("FATAL ERROR: port is not defined.");
+  }
+  return port;
 };
 
 //get connection string from the environment file
 module.exports.connectionString = function() {
-const connectionString = process.env.URI
-if (!(connectionString)) {
-  throw new Error("FATAL ERROR: connectionString is not defined.");
+  const connectionString = process.env.URI
+  if (!(connectionString)) {
+    throw new Error("FATAL ERROR: connectionString is not defined.");
+  }
+  return connectionString;
 }
-return connectionString;
+
+// get stripe key from the environment file
+module.exports.stripeKey = function(){
+  const key = process.env.STRIPEKEY
+  if (!(key)) {
+    throw new Error("FATAL ERROR: stripeKey is not defined.");
+  }
+  return key;
 }
