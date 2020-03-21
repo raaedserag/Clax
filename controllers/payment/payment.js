@@ -2,7 +2,6 @@
 const Joi = require("@hapi/joi");
 
 // Models
-const { Transactions } = require("../../models/transactions-model");
 const { Passengers } = require("../../models/passengers-model");
 const { Payment } = require("../../models/payment-model");
 // Setup Error Debugger
