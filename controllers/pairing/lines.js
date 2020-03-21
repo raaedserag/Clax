@@ -4,20 +4,15 @@ const {Lines} = require('../../models/lines-model');
 
  let lines = async(req, res) => {
   console.log("line:")
-  
-  let oneLine= new Lines({
-    id: req.body.id,
-    from: req.body.from,
-    to: req.body.to,
-    direction: req.body.direction,
-    cost: req.body.cost,
-    _stations: req.body.stations
+  const viewlines = await Lines.find({ }).select("from to _stations cost ").populate({
+    path:"_stations",
+     select:"coordinates name id"});
+    if (!viewlines) return res.status(404).send("error");
+    console.log('lines here');
    
-      });
-    line= await oneLine.save();  
-    console.log(req.body)
-    res.send('yes');
+    res.send(viewlines);
 };
+
 
 
 module.exports.lines=lines;
