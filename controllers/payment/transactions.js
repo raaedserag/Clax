@@ -1,4 +1,7 @@
 const { Passengers } = require("../../models/passengers-model");
+const transactionDebugger = require("debug")("Clax:transactionDebugger");
+// Controllers
+const stripeController = require("./stripe");
 var paypal = require("paypal-rest-sdk");
 const port = require("../../startup/config").port();
 
@@ -55,6 +58,7 @@ let payOgra = async (req, res) => {
     }
   });
 };
+module.exports.payOgra = payOgra;
 
 let ograSuccess = async (req, res) => {
   execute_payment_json = {
@@ -95,11 +99,55 @@ let ograSuccess = async (req, res) => {
     }
   });
 };
+module.exports.ograSuccess = ograSuccess;
 
 let ograCancel = async (req, res) => {
   res.send("Cancelled");
 };
-
-module.exports.payOgra = payOgra;
-module.exports.ograSuccess = ograSuccess;
 module.exports.ograCancel = ograCancel;
+
+// Retreive User by number
+module.exports.getUserbyNumber = async function(number) {
+  try {
+    const user = await Passengers.findOne({ phone: number }).select("_id");
+    return { success: true, result: user._id };
+  } catch (error) {
+    transactionDebugger(error.message);
+    return { success: false, result: error.message };
+  }
+};
+// Add request to Database
+module.exports.registerReqeust = async function(transfer) {
+  try {
+    await new Transactions(transfer).save();
+    return { success: true, result: true };
+  } catch (error) {
+    return { success: true, result: error.message };
+  }
+};
+// Transfer Money between users
+module.exports.transferMoney = async function(transfer) {
+  try {
+    // Update sender database balance
+    const sender = await Passengers.findByIdAndUpdate(transfer.id, {
+      $inc: { balance: -parseInt(transfer.amount) }
+    }).select("-_id balance");
+    // Update receiver database balance
+    const receiver = await Passengers.findByIdAndUpdate(transfer.receiverId, {
+      $inc: { balance: +parseInt(transfer.amount) }
+    }).select("-_id balance");
+    // Update sender stripe account
+    await stripeController.updateCustomer(transfer.senderStripeId, {
+      balance: (-parseInt(sender.balance) + parseInt(transfer.amount)) * 100
+    });
+    // Update receiver stripe account
+    await stripeController.updateCustomer(transfer.receiverStripeId, {
+      balance: -(parseInt(receiver.balance) + parseInt(transfer.amount)) * 100
+    });
+    // return esult
+    return { success: true, result: sender.balance };
+  } catch (error) {
+    transactionDebugger(error.message);
+    return { success: false, result: error.message };
+  }
+};

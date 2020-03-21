@@ -1,9 +1,10 @@
 // Modules
 const Joi = require("@hapi/joi");
-// Controllers
-const stripeController = require("./stripe");
+
 // Models
-const Passengers = require("../../models/passengers-model").Passengers;
+const { Transactions } = require("../../models/transactions-model");
+const { Passengers } = require("../../models/passengers-model");
+const { Payment } = require("../../models/payment-model");
 // Setup Error Debugger
 const paymentDebugger = require("debug")("Clax:paymentDebugger");
 
@@ -19,12 +20,22 @@ module.exports.getUserBalance = async function(userId) {
   }
 };
 
+module.exports.registerPayment = async function(payment) {
+  try {
+    await new Payment(payment).save();
+    return { success: true, result: true };
+  } catch (error) {
+    return { success: true, result: error.message };
+  }
+};
+
 // Update user balance
-module.exports.updateUserBalance = async function(userId, amount) {
+module.exports.updateUserBalance = async function(userId, amount, source) {
   try {
     const userUpdate = await Passengers.findByIdAndUpdate(userId, {
       $inc: { balance: amount }
     });
+
     return { success: true, result: userUpdate.balance };
   } catch (error) {
     paymentDebugger(error.message);
@@ -43,37 +54,6 @@ module.exports.getUserStripeId = async function(userId) {
     }
 
     return { success: true, result: user };
-  } catch (error) {
-    paymentDebugger(error.message);
-    return { success: false, result: error.message };
-  }
-};
-
-// Transfer Money between users
-module.exports.transferMoney = async function(transfer) {
-  try {
-    // Update sender database balance
-    const sender = await Passengers.findByIdAndUpdate(transfer.id, {
-      $inc: { balance: -transfer.amount }
-    }).select("-_id balance");
-
-    // Update receiver database balance
-    const receiver = await Passengers.findByIdAndUpdate(transfer.receiverId, {
-      $inc: { balance: transfer.amount }
-    }).select("-_id balance");
-
-    // Update sender stripe account
-    await stripeController.updateCustomer(transfer.senderStripeId, {
-      balance: sender.balance - parseFloat(transfer.amount)
-    });
-
-    // Update receiver stripe account
-    await stripeController.updateCustomer(transfer.receiverStripeId, {
-      balance: receiver.balance + parseFloat(transfer.amount)
-    });
-
-    // return esult
-    return { success: true, result: sender.balance };
   } catch (error) {
     paymentDebugger(error.message);
     return { success: false, result: error.message };

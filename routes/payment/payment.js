@@ -3,8 +3,11 @@ const router = require("express").Router();
 const _ = require("lodash");
 // Controllers
 const paymentValidators = require("../../validators/payment-validators");
+const transactionValidators = require("../../validators/transaction-validators");
+const transactionsController = require("../../controllers/payment/transactions");
 const paymentController = require("../../controllers/payment/payment");
 const stripeController = require("../../controllers/payment/stripe");
+
 //-------------------------------------------------------------------------
 
 // Get balance
@@ -146,11 +149,25 @@ router.post("/charge-balance", async (req, res) => {
   // Adding balance to the user account
   const updatingBalance = await paymentController.updateUserBalance(
     req.body.id,
-    req.body.amount
+    req.body.amount,
+    req.body.source
   );
   // If updating failed
   if (!(updatingBalance.success && updatingBalance.result))
     throw new Error(userObject.result);
+
+  const payment = {
+    amount: parseFloat(req.body.amount),
+    _passenger: req.body.id,
+    description: req.body.source,
+    type: "Charge"
+  };
+  let { error2 } = paymentValidators.validatePayment(payment);
+  if (error2) return res.status(400).send(error2.details[0].message);
+
+  const addPayment = await paymentController.registerPayment(payment);
+  if (!(addPayment.result && addPayment.success))
+    throw new Error(addPayment.result);
 
   // IF ALL IS WELL
   return res
@@ -158,18 +175,41 @@ router.post("/charge-balance", async (req, res) => {
     .send({ balance: Number.parseFloat(creatingCharge.result).toFixed(2) });
 });
 
-// Transfer Money
-router.post("/transfer-money", async (req, res) => {
-  // Check request schema
-  const { error } = paymentValidators.validateTransfer(req.body);
+//// Transfer Money Request
+router.post("/add-transfer", async (req, res) => {
+  // Check Transfer Reqeust Schema
+  const { error } = transactionValidators.validateTransferRequest(req.body);
   if (error) return res.status(400).send(error.details[0].message);
+
+  // Retrieve receiver by Number
+  const receiverId = await transactionsController.getUserbyNumber(
+    req.body.phone
+  );
+  if (!(receiver.success && receiver.result))
+    return res.sendStatus(404).send({ message: "User doesn't Exist" });
 
   // Check if sender balance is sufficient
   const senderBalance = await paymentController.getUserBalance(req.body.id);
   if (!(senderBalance.success && senderBalance.result))
     throw new Error(senderBalance.result);
+
   if (senderBalance.result.balance < Number.parseFloat(req.body.amount))
-    return res.sendStatus(400);
+    return res
+      .sendStatus(300)
+      .send({ message: "User doesn't have enough money" });
+  req.body.status = "pending";
+  req.body.date = Date.now();
+  const addPayment = await transactionsController.registerReqeust(req);
+  if (!(addPayment.result && addPayment.success))
+    throw new Error(addPayment.result);
+  res.sendStatus(200).send("Request was made successfully");
+});
+
+// Transfer Money
+router.post("/transfer-money", async (req, res) => {
+  // Check request schema
+  const { error } = transactionValidators.validateTransfer(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
 
   // Retrieve sender stripe account id
   const senderStripe = await paymentController.getUserStripeId(req.body.id);
@@ -180,7 +220,9 @@ router.post("/transfer-money", async (req, res) => {
   req.body.senderStripeId = senderStripe.result.stripeId;
 
   // Retrieve receiver stripe account id
-  const receiverStripe = await paymentController.getUserStripeId(req.body.id);
+  const receiverStripe = await paymentController.getUserStripeId(
+    req.body.receiverId
+  );
   // If retreiving sender stripe id failed
   if (!(receiverStripe.success && receiverStripe.result))
     throw new Error(receiverStripe.result);
@@ -188,7 +230,9 @@ router.post("/transfer-money", async (req, res) => {
   req.body.receiverStripeId = receiverStripe.result.stripeId;
 
   // Transfer Money from sender to receiver
-  const transferTransaction = await paymentController.transferMoney(req.body);
+  const transferTransaction = await transactionsController.transferMoney(
+    req.body
+  );
   // If transaction hasn't completed
   if (!(transferTransaction.success && transferTransaction.result))
     throw new Error(transferTransaction.result);
@@ -197,3 +241,8 @@ router.post("/transfer-money", async (req, res) => {
   return res.send(transferTransaction.result.toString());
 });
 module.exports = router;
+
+// router.put("/cancel-transfer", cancelFamilyRequest);
+// router.get("/fetch-transfers", fetchRequests);
+// router.put("/accept-transfer", acceptRequest);
+// router.put("/deny-transfer", denyRequest);

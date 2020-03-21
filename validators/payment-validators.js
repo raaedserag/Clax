@@ -63,20 +63,19 @@ module.exports.validateCharge = function(charge) {
   return chargeSchema.validate(charge);
 };
 
-// Transfer Money Schema
-const transferSchema = Joi.object().keys({
-  receiverId: Joi.objectId().required(),
-  amount: Joi.string()
+// Payment History Schema
+const paymentSchema = Joi.object().keys({
+  amount: Joi.number()
+    .integer()
+    .min(1)
+    .required(),
+  date: Joi.date().required(),
+  _passenger: Joi.objectId(),
+  description: Joi.string(),
+  type: Joi.string()
+    .valid("Charge", "Pay", "Punishment", "Borrow", "Lend")
     .required()
-    .custom((amount, helpers) => {
-      amount = parseFloat(amount);
-      if (isNaN(amount) || amount <= 0) return helpers.error("any.invalid");
-      // else
-      return amount;
-    }, "Amount Validation"),
-  //Adding id shit, Muuuuuuust be removed soon
-  id: Joi.objectId().required()
 });
-module.exports.validateTransfer = function(transfer) {
-  return transferSchema.validate(transfer);
+module.exports.validatePayment = function(charge) {
+  return paymentSchema.validate(charge);
 };

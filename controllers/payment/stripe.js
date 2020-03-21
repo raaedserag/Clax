@@ -160,7 +160,7 @@ module.exports.chargeBalance = async function(charge) {
     const updateBalance = await stripe.customers.update(
       charge.customerStripeId,
       {
-        balance: retreivedBalance.balance + charge.amount * 100
+        balance: retreivedBalance.balance - charge.amount * 100
       }
     );
     return { success: true, result: updateBalance.balance / 100 };

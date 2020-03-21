@@ -1,4 +1,7 @@
-const { Complains, validateComplaint } = require("../../models/complains-model");
+const {
+  Complains,
+  validateComplaint
+} = require("../../models/complains-model");
 const { PastTrips } = require("../../models/past-trips-model");
 const { Passengers } = require("../../models/passengers-model");
 const { Lines } = require("../../models/lines-model");
@@ -16,11 +19,8 @@ let complaintsPost = async (req, res) => {
 
   const { error } = validateComplaint(complaint);
   if (error) return res.status(400).send(error.details[0].message);
-
   complaint = new Complains(complaint);
   complaint = await complaint.save();
-  console.log(req.body);
-
   const updatingResult = await Passengers.findByIdAndUpdate(
     req.body._passenger,
     {
