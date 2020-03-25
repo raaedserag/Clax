@@ -40,7 +40,7 @@ module.exports = function(app) {
     app.use("/api/passengers", passengers);
     app.use("/api/login", passengerLogin);
     app.use("/api/transactions", transaction);
-    app.use("/api/payment", payment)
+    app.use("/api/payment",authentication, payment)
     app.use("/api/past-trips", pastTrips);
     app.use("/api/family", family);
     app.use("/api/pairing",pairing);

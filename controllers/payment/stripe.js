@@ -34,13 +34,8 @@ module.exports.createCustomer = function(user) {
 
 // Creates a token using Card Info and returns the token object
 module.exports.createCardToken = async function(newCard) {
-  try {
-    const cardToken = await stripe.tokens.create({ card: newCard });
-    return { success: true, result: cardToken };
-  } catch (error) {
-    stripeDebugger(error.message);
-    return { success: false, result: error.message };
-  }
+
+  return await stripe.tokens.create({ card: newCard });
 };
 
 // Creates a token using Bank Account Info and prints the token object
@@ -66,41 +61,27 @@ function createBankToken() {
 
 // Links a token with a customer and returns the source object
 module.exports.createSource = async function(customerId, token) {
-  try {
-    const sourceToken = await stripe.customers.createSource(customerId, {
-      source: token
-    });
-    return { success: true, result: sourceToken };
-  } catch (error) {
-    stripeDebugger(error.message);
-    return { success: false, result: error.message };
-  }
+  return await stripe.customers.createSource(customerId, {source: token});
 };
+
 module.exports.removeSource = async function(customerId, source) {
-  try {
-    const sourceRemoved = await stripe.customers.deleteSource(
-      customerId,
-      source
-    );
-    return { success: true, result: sourceRemoved.deleted };
-  } catch (error) {
-    stripeDebugger(error.message);
-    return { success: false, result: error.message };
-  }
+
+  const sourceRemoved = await stripe.customers.deleteSource(
+    customerId,
+    source
+  );
+  return sourceRemoved.deleted
+
 };
 
 // Retreive all 3 cards (Maximum 3)
 module.exports.getCards = async function(clientId) {
-  try {
-    const cardsQuery = await stripe.customers.listSources(clientId, {
-      object: "card",
-      limit: 3
-    });
-    return { success: true, result: cardsQuery };
-  } catch (error) {
-    stripeDebugger(error.message);
-    return { success: false, result: error.message };
-  }
+
+  return await stripe.customers.listSources(clientId, {
+    object: "card",
+    limit: 3
+  });
+
 };
 
 // Updates user's balance manually
@@ -144,41 +125,34 @@ async function invoice() {
 }
 
 module.exports.chargeBalance = async function(charge) {
-  try {
-    const charging = await stripe.charges.create({
-      customer: charge.customerStripeId,
-      amount: charge.amount * 100,
-      currency: "usd",
-      source: charge.source
-    });
 
-    // Retrieving Customer's current Balance
-    const retreivedBalance = await stripe.customers.retrieve(
-      charge.customerStripeId
-    );
+  await stripe.charges.create({
+    customer: charge.customerStripeId,
+    amount: charge.amount * 100,
+    currency: "usd",
+    source: charge.source
+  });
 
-    const updateBalance = await stripe.customers.update(
-      charge.customerStripeId,
-      {
-        balance: retreivedBalance.balance - charge.amount * 100
-      }
-    );
-    return { success: true, result: updateBalance.balance / 100 };
-  } catch (error) {
-    stripeDebugger(error.message);
-    return { success: false, result: error.message };
-  }
+  // Retrieving Customer's current Balance
+  const retreivedBalance = await stripe.customers.retrieve(
+    charge.customerStripeId
+  );
+
+  const updateBalance = await stripe.customers.update(
+    charge.customerStripeId,
+    {
+      balance: retreivedBalance.balance - charge.amount * 100
+    }
+  );
+  return updateBalance.balance / 100 ;
+
 };
 
 module.exports.updateCustomer = async function(customerId, updateParameters) {
-  try {
-    const updatingResult = await stripe.customers.update(
-      customerId,
-      updateParameters
-    );
-    return { success: true, result: updatingResult };
-  } catch (error) {
-    stripeDebugger(error.message);
-    return { success: false, result: error.message };
-  }
+
+  return await stripe.customers.update(
+    customerId,
+    updateParameters
+  );
+  
 };
