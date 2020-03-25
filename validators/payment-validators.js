@@ -13,7 +13,7 @@ const cardSchema = Joi.object().keys({
       if (isNaN(value) || !Number.isInteger(value) || value < 1 || value > 12)
         return helpers.error("any.invalid");
       // else
-      return parseInt(value);
+      return value;
     }, "month Validation"),
   exp_year: Joi.string()
     .required()
@@ -22,7 +22,7 @@ const cardSchema = Joi.object().keys({
       if (isNaN(value) || !Number.isInteger(value) || value < 2000)
         return helpers.error("any.invalid");
       // else
-      return parseInt(value);
+      return value;
     }, "year Validation"),
   cvc: Joi.number()
     .required()
@@ -36,8 +36,10 @@ const cardSchema = Joi.object().keys({
       )
         return helpers.error("any.invalid");
       // else
-      return parseInt(value);
-    }, "cvc Validation")
+      return value;
+    }, "cvc Validation"),
+  //Adding id shit, Muuuuuuust be removed soon
+  id: Joi.string().required()
 });
 module.exports.validateCard = function(card) {
   return cardSchema.validate(card);
@@ -51,9 +53,11 @@ const chargeSchema = Joi.object().keys({
       amount = parseFloat(amount);
       if (isNaN(amount) || amount <= 0) return helpers.error("any.invalid");
       // else
-      return parseFloat(value);
+      return amount;
     }, "Amount Validation"),
-  source: Joi.string().required()
+  source: Joi.string().required(),
+  //Adding id shit, Muuuuuuust be removed soon
+  id: Joi.string().required()
 });
 module.exports.validateCharge = function(charge) {
   return chargeSchema.validate(charge);
@@ -61,14 +65,10 @@ module.exports.validateCharge = function(charge) {
 
 // Payment History Schema
 const paymentSchema = Joi.object().keys({
-  amount: Joi.string()
-    .required()
-    .custom((amount, helpers) => {
-      amount = parseFloat(amount);
-      if (isNaN(amount) || amount <= 0) return helpers.error("any.invalid");
-      // else
-      return parseFloat(value);
-    }, "Amount Validation"),
+  amount: Joi.number()
+    .integer()
+    .min(1)
+    .required(),
   date: Joi.date().required(),
   _passenger: Joi.objectId(),
   description: Joi.string(),

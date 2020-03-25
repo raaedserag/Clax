@@ -14,6 +14,7 @@ const offers = require("../routes/home/offers");
 const passengers = require("../routes/home/passengers");
 const passengerLogin = require("../routes/home/passenger-login");
 const transaction = require("../routes/payment/transactions");
+const paypal = require("../routes/payment/paypal");
 const payment = require("../routes/payment/payment")
 const pastTrips = require("../routes/home/past-trips");
 const family = require("../routes/home/family")
@@ -39,8 +40,8 @@ module.exports = function(app) {
     app.use("/api/offers", offers);
     app.use("/api/passengers", passengers);
     app.use("/api/login", passengerLogin);
-    app.use("/api/transactions", transaction);
-    app.use("/api/payment",authentication, payment)
+    app.use("/api/paypal", paypal);
+    app.use("/api/payment", payment)
     app.use("/api/past-trips", pastTrips);
     app.use("/api/family", family);
     app.use("/api/pairing",pairing);

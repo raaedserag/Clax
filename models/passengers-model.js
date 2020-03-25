@@ -137,6 +137,7 @@ const passengerSchema = new mongoose.Schema({
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
   _complains: [{ type: mongoose.ObjectId, ref: "Complains" }],
+  _payments: [{ type: mongoose.ObjectId, ref: "Payments" }],
   _family: [{ type: mongoose.ObjectId, ref: "Passengers" }],
   _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }]
 });
@@ -146,7 +147,6 @@ passengerSchema.methods.generateToken = function(expiry) {
   return jwt.sign(
     {
       _id: this._id,
-      stripeId: this.stripeId,
       is_passenger: true
     },
     jwtPassengerKey,

@@ -10,20 +10,69 @@ const paymentDebugger = require("debug")("Clax:paymentDebugger");
 // Functions
 // Retreive user balance
 module.exports.getUserBalance = async function(userId) {
-
-  const user = await Passengers.findById(userId).select("-_id balance");
-  return user.balance
-
+  try {
+    const user = await Passengers.findById(userId).select("-_id balance");
+    return { success: true, result: user };
+  } catch (error) {
+    paymentDebugger(error.message);
+    return { success: false, result: error.message };
+  }
 };
 
 module.exports.registerPayment = async function(payment) {
-  return await Payment.create(payment)
+  try {
+    await new Payment(payment).save();
+    return { success: true, result: true };
+  } catch (error) {
+    return { success: true, result: error.message };
+  }
 };
 
 // Update user balance
-module.exports.updateUserBalance = async function(userId, amount) {
-  const userUpdate = await Passengers.findByIdAndUpdate(userId, {
-    $inc: { balance: amount }
-  });
-  return userUpdate.balance
+module.exports.updateUserBalance = async function(userId, amount, source) {
+  try {
+    const userUpdate = await Passengers.findByIdAndUpdate(userId, {
+      $inc: { balance: amount }
+    });
+
+    return { success: true, result: userUpdate.balance };
+  } catch (error) {
+    paymentDebugger(error.message);
+    return { success: false, result: error.message };
+  }
+};
+
+// Retreive user stripe id
+module.exports.getUserStripeId = async function(userId) {
+  try {
+    const user = await Passengers.findById(userId).select("-_id stripeId");
+    // Check if user id is null
+    if (!user.stripeId) {
+      paymentDebugger("This user have no stripe account");
+      return { success: false, result: "This user have no stripe account" };
+    }
+
+    return { success: true, result: user };
+  } catch (error) {
+    paymentDebugger(error.message);
+    return { success: false, result: error.message };
+  }
+};
+
+//Get user payments
+module.exports.getUserPayments =  async (req, res) => {
+  try{
+  const payment = await Passengers.findById(req.body.passenger)
+  .select("-_id name")
+  .populate({
+    path: "_payments",
+    select: " amount description type date",
+   
+  })
+    
+  res.send(payment);
+}catch (error) {
+  paymentDebugger(error.message);
+  return { success: false, result: error.message };
+}
 };

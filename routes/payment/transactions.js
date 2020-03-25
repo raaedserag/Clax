@@ -8,16 +8,6 @@ const transactionsController = require("../../controllers/payment/transactions")
 const paymentController = require("../../controllers/payment/payment");
 const paymentValidators = require("../../validators/payment-validators");
 
-const {
-  payOgra,
-  ograSuccess,
-  ograCancel
-} = require("../../controllers/payment/transactions");
-
-router.post("/pay", payOgra);
-router.get("/success/:id/:amount", ograSuccess);
-router.get("/cancel", ograCancel);
-
 //// Add a Transfer Money Request
 router.post("/add", async (req, res) => {
   // Check Transfer Reqeust Schema
