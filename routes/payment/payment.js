@@ -11,11 +11,11 @@ const paymentController = require("../../controllers/payment/payment");
 const stripeController = require("../../controllers/payment/stripe");
 //-------------------------------------------------------------------------
 //Get user payments
-router.post("/",authrization, paymentController.getUserPayments);
+router.get("/",authrization, paymentController.getUserPayments);
 
 // Get balance
-router.post("/get-balance",authrization, async (req, res) => {
-  const userQuery = await paymentController.getUserBalance(req.body.id);
+router.get("/get-balance",authrization, async (req, res) => {
+  const userQuery = await paymentController.getUserBalance(req.passenger._id);
 
   // If failed due to server error
   if (!userQuery.success) return res.status(500).send("Failed to implement");
@@ -29,9 +29,9 @@ router.post("/get-balance",authrization, async (req, res) => {
 });
 
 // Get card info
-router.post("/get-cards", authrization,async (req, res) => {
+router.get("/get-cards", authrization,async (req, res) => {
   // Retrieve stripe account id
-  const userObject = await paymentController.getUserStripeId(req.body.id);
+  const userObject = await paymentController.getUserStripeId(req.passenger._id);
   // If retreiving stripe id failed
   if (!(userObject.success && userObject.result))
     return res.status(500).send("Failed to implement");

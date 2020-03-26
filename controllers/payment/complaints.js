@@ -35,7 +35,7 @@ let complaintsPost = async (req, res) => {
 };
 
 let complaintsGet = async (req, res) => {
-  var complaints = await Passengers.findById(req.body.passenger)
+  var complaints = await Passengers.findById(req.passenger._id)
     .select("name")
     .populate({
       path: "_complains",
@@ -62,7 +62,7 @@ let complaintsGet = async (req, res) => {
 };
 
 let tripGet = async (req, res) => {
-  const result = await Passengers.findById(req.body.id)
+  const result = await Passengers.findById(req.passenger._id)
     .select("-_id _pastTrips")
     .populate({
       path: "_pastTrips",

@@ -28,7 +28,7 @@ let ChargeOgra = async (req, res) => {
       payment_method: "paypal"
     },
     redirect_urls: {
-      return_url: `http://localhost:${port}/api/paypal/success/${req.body._passenger}/${req.body.amount}/${req.body.type}`,
+      return_url: `http://localhost:${port}/api/paypal/success/${req.passenger._id}/${req.body.amount}/${req.body.type}`,
       cancel_url: `http://localhost:${port}/api/paypal/cancel`
     },
     transactions: [

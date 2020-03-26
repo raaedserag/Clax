@@ -63,8 +63,8 @@ router.post("/cancel",authrization, async (req, res) => {
   return res.status(200).send("Request was canceled successfully");
 });
 //// Fetch Transfer Money Request
-router.post("/",authrization, async (req, res) => {
-  const requests = await transactionsController.fetchRequests(req.body.id);
+router.get("/",authrization, async (req, res) => {
+  const requests = await transactionsController.fetchRequests(req.passenger._id);
   if (!(requests.success && requests.result)) {
     return res.status(404).send("Unknown User Id");
   }

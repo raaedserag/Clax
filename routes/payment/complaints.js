@@ -14,9 +14,9 @@ const {
 router.post("/complaint",authrization, complaintsPost);
 
 //Get user complaint
-router.post("/mycomplaint",authrization, complaintsGet);
+router.get("/mycomplaint",authrization, complaintsGet);
 
 //Get user trips
-router.post("/",authrization, tripGet);
+router.get("/",authrization, tripGet);
 
 module.exports = router;

@@ -63,7 +63,7 @@ module.exports.getUserStripeId = async function(userId) {
 //Get user payments
 module.exports.getUserPayments = async (req, res) => {
   try {
-      var payment = await Passengers.findById(req.body.passenger)
+      var payment = await Passengers.findById(req.passenger._id)
       .select("-_id name")
       .populate({
         path: "_payments",
