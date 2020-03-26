@@ -177,8 +177,3 @@ router.post("/charge-balance", async (req, res) => {
 });
 
 module.exports = router;
-
-// router.put("/cancel-transfer", cancelFamilyRequest);
-// router.get("/fetch-transfers", fetchRequests);
-// router.put("/accept-transfer", acceptRequest);
-// router.put("/deny-transfer", denyRequest);

@@ -21,7 +21,7 @@ module.exports.getUserBalance = async function(userId) {
 
 module.exports.registerPayment = async function(payment) {
   try {
-    await new Payment(payment).save();
+    await Payment(payment).save();
     return { success: true, result: true };
   } catch (error) {
     return { success: true, result: error.message };
@@ -60,19 +60,18 @@ module.exports.getUserStripeId = async function(userId) {
 };
 
 //Get user payments
-module.exports.getUserPayments =  async (req, res) => {
-  try{
-  const payment = await Passengers.findById(req.body.passenger)
-  .select("-_id name")
-  .populate({
-    path: "_payments",
-    select: " amount description type date",
-   
-  })
-    
-  res.send(payment);
-}catch (error) {
-  paymentDebugger(error.message);
-  return { success: false, result: error.message };
-}
+module.exports.getUserPayments = async (req, res) => {
+  try {
+    const payment = await Passengers.findById(req.body.passenger)
+      .select("-_id name")
+      .populate({
+        path: "_payments",
+        select: " amount description type date"
+      });
+
+    res.send(payment);
+  } catch (error) {
+    paymentDebugger(error.message);
+    return { success: false, result: error.message };
+  }
 };

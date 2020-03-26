@@ -41,7 +41,7 @@ const acceptRequestSchema = Joi.object().keys({
     .min(10)
     .required(),
   id: Joi.string().required(),
-  balance: Joi.number().required()
+  toNamed: Joi.string().required()
 });
 module.exports.acceptRequest = function(transfer) {
   return acceptRequestSchema.validate(transfer);

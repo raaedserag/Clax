@@ -49,22 +49,17 @@ router.post("/add", async (req, res) => {
   return res.status(200).send("Request was made successfully");
 });
 
-//// Cancel Transfer Money Request
+//// Cancel a Request
 router.post("/cancel", async (req, res) => {
-  // Check Transfer Reqeust Schema
-  const { error } = transactionValidators.validateAddRequest(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  const canceledRequest = await transactionsController.cencelReqeust(req.body);
 
-  const canceledRequest = await transactionsController.fetchRequests(
-    req.body.id
-  );
   if (!(canceledRequest.success && canceledRequest.result)) {
     return res.status(404).send("UnAuthorized.");
   }
 
   return res.status(200).send("Request was canceled successfully");
 });
-//// Cancel Transfer Money Request
+//// Fetch Transfer Money Request
 router.post("/", async (req, res) => {
   const requests = await transactionsController.fetchRequests(req.body.id);
   if (!(requests.success && requests.result)) {
@@ -73,9 +68,8 @@ router.post("/", async (req, res) => {
   return res.status(200).send(requests.result);
 });
 
-//// Transfer Money
+//// Accept a Request
 router.post("/accept", async (req, res) => {
-  req.body.balance = parseFloat(req.body.balance);
   // Check request Schema
   const { error } = transactionValidators.acceptRequest(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -120,11 +114,6 @@ router.post("/accept", async (req, res) => {
   if (!(transferTransaction.success && transferTransaction.result))
     throw new Error(transferTransaction.result);
 
-  req.body.type = "loaner";
-  const canceledRequest = await transactionsController.cencelReqeust(req.body);
-  if (!(canceledRequest.success && canceledRequest.result))
-    return res.status(404).send("Removing Request went wrong!");
-
   const sender = {
     amount: parseFloat(req.body.amount),
     _passenger: req.body.id,
@@ -136,10 +125,11 @@ router.post("/accept", async (req, res) => {
   const addPayment = await paymentController.registerPayment(sender);
   if (!(addPayment.result && addPayment.success))
     throw new Error(addPayment.result);
+
   const receiver = {
     amount: parseFloat(req.body.amount),
     _passenger: req.body.receiverId,
-    description: req.body.id,
+    description: req.body.toNamed,
     type: "Borrow",
     date: Date.now()
   };

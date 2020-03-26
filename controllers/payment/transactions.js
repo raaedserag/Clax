@@ -42,7 +42,8 @@ module.exports.fetchRequests = async function(id) {
   try {
     let result = await Transactions.find({
       to: id
-    });
+    }).select("_id fromNamed date status amount");
+
     return { success: true, result: result };
   } catch (error) {
     transactionDebugger(error.message);
@@ -90,6 +91,9 @@ module.exports.transferMoney = async function(transfer) {
     // Update receiver stripe account
     await stripeController.updateCustomer(transfer.receiverStripeId, {
       balance: -(parseInt(receiver.balance) + parseInt(transfer.amount)) * 100
+    });
+    await Transactions.findOneAndRemove({
+      _id: transfer.transactionId
     });
     // return esult
     return { success: true, result: sender.balance };
