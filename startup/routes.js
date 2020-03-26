@@ -5,7 +5,9 @@ const morgan = require("morgan");
 
 // Import Middlewares
 const error = require("../middlewares/error");
-const authentication = require("../middlewares/authentication")
+const authentication = require("../middlewares/authentication");
+
+
 
 
 // Import Routes
