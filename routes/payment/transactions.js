@@ -2,6 +2,9 @@
 const router = require("express").Router();
 const _ = require("lodash");
 
+//Middlewares
+const authrization=require("../../middlewares/authentication");
+
 // Controllers
 const transactionValidators = require("../../validators/transaction-validators");
 const transactionsController = require("../../controllers/payment/transactions");
@@ -9,7 +12,7 @@ const paymentController = require("../../controllers/payment/payment");
 const paymentValidators = require("../../validators/payment-validators");
 
 //// Add a Transfer Money Request
-router.post("/add", async (req, res) => {
+router.post("/add",authrization,async (req, res) => {
   // Check Transfer Reqeust Schema
   const { error } = transactionValidators.validateAddRequest(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -50,7 +53,7 @@ router.post("/add", async (req, res) => {
 });
 
 //// Cancel a Request
-router.post("/cancel", async (req, res) => {
+router.post("/cancel",authrization, async (req, res) => {
   const canceledRequest = await transactionsController.cencelReqeust(req.body);
 
   if (!(canceledRequest.success && canceledRequest.result)) {
@@ -60,7 +63,7 @@ router.post("/cancel", async (req, res) => {
   return res.status(200).send("Request was canceled successfully");
 });
 //// Fetch Transfer Money Request
-router.post("/", async (req, res) => {
+router.post("/",authrization, async (req, res) => {
   const requests = await transactionsController.fetchRequests(req.body.id);
   if (!(requests.success && requests.result)) {
     return res.status(404).send("Unknown User Id");
@@ -69,7 +72,7 @@ router.post("/", async (req, res) => {
 });
 
 //// Accept a Request
-router.post("/accept", async (req, res) => {
+router.post("/accept",authrization, async (req, res) => {
   // Check request Schema
   const { error } = transactionValidators.acceptRequest(req.body);
   if (error) return res.status(400).send(error.details[0].message);

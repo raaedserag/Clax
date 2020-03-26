@@ -1,6 +1,8 @@
 // Modules
 const router = require("express").Router();
 const _ = require("lodash");
+//Middlewares
+const authrization=require("../../middlewares/authentication");
 // Controllers
 const paymentValidators = require("../../validators/payment-validators");
 const transactionValidators = require("../../validators/transaction-validators");
@@ -9,10 +11,10 @@ const paymentController = require("../../controllers/payment/payment");
 const stripeController = require("../../controllers/payment/stripe");
 //-------------------------------------------------------------------------
 //Get user payments
-router.post("/", paymentController.getUserPayments);
+router.post("/",authrization, paymentController.getUserPayments);
 
 // Get balance
-router.post("/get-balance", async (req, res) => {
+router.post("/get-balance",authrization, async (req, res) => {
   const userQuery = await paymentController.getUserBalance(req.body.id);
 
   // If failed due to server error
@@ -27,7 +29,7 @@ router.post("/get-balance", async (req, res) => {
 });
 
 // Get card info
-router.post("/get-cards", async (req, res) => {
+router.post("/get-cards", authrization,async (req, res) => {
   // Retrieve stripe account id
   const userObject = await paymentController.getUserStripeId(req.body.id);
   // If retreiving stripe id failed
@@ -60,7 +62,7 @@ router.post("/get-cards", async (req, res) => {
 });
 
 // Add a new card
-router.post("/add-card", async (req, res) => {
+router.post("/add-card",authrization, async (req, res) => {
   // Validate req schema
   const { error } = paymentValidators.validateCard(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -99,7 +101,7 @@ router.post("/add-card", async (req, res) => {
 });
 
 // Removed a new card
-router.post("/remove-card", async (req, res) => {
+router.post("/remove-card",authrization, async (req, res) => {
   // Retrieve stripe account id
   const userObject = await paymentController.getUserStripeId(req.body.id);
   // If retreiving stripe id failed
@@ -127,7 +129,7 @@ router.post("/remove-card", async (req, res) => {
 });
 
 // Charge balance
-router.post("/charge-balance", async (req, res) => {
+router.post("/charge-balance",authrization, async (req, res) => {
   // Must be a transaction
   // Validate req schema
   const { error } = paymentValidators.validateCharge(req.body);
