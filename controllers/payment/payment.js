@@ -1,5 +1,6 @@
 // Modules
 const Joi = require("@hapi/joi");
+const JsonFind = require('json-find');
 
 // Models
 const { Passengers } = require("../../models/passengers-model");
@@ -62,14 +63,18 @@ module.exports.getUserStripeId = async function(userId) {
 //Get user payments
 module.exports.getUserPayments = async (req, res) => {
   try {
-    const payment = await Passengers.findById(req.body.passenger)
+      var payment = await Passengers.findById(req.body.passenger)
       .select("-_id name")
       .populate({
         path: "_payments",
         select: " amount description type date"
       });
 
-    res.send(payment);
+
+    //take only payment from passenger opject
+     payment = JsonFind(payment);
+     payment= payment.checkKey('_payments');
+     res.send(payment);
   } catch (error) {
     paymentDebugger(error.message);
     return { success: false, result: error.message };

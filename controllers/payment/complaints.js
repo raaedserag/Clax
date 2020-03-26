@@ -1,3 +1,5 @@
+const JsonFind = require('json-find');
+
 const {
   Complains,
   validateComplaint
@@ -33,7 +35,7 @@ let complaintsPost = async (req, res) => {
 };
 
 let complaintsGet = async (req, res) => {
-  const complaints = await Passengers.findById(req.body.passenger)
+  var complaints = await Passengers.findById(req.body.passenger)
     .select("name")
     .populate({
       path: "_complains",
@@ -53,7 +55,10 @@ let complaintsGet = async (req, res) => {
         ]
       }
     });
-  res.send(complaints);
+    complaints = JsonFind(complaints);
+    complaints= complaints.checkKey('_complains');
+    res.send(complaints);
+  
 };
 
 let tripGet = async (req, res) => {
