@@ -14,7 +14,7 @@ const passengers = require("../routes/home/passengers");
 const transaction = require("../routes/payment/transactions");
 const payment = require("../routes/payment/payment")
 const pairing = require('../routes/pairing/pairing')
-
+const passengerExternal = require('../routes/clients/passengerExternal-route')
 
 
 module.exports = function(app) {
@@ -31,11 +31,12 @@ module.exports = function(app) {
     
     
     // Apply Routes
-    app.use("/api/user",complaintRoute);
+    app.use("/api/user", complaintRoute);
     app.use("/api/passengers", passengers);
     app.use("/api/transactions", transaction);
     app.use("/api/payment", payment)
     app.use("/api/pairing",pairing);
+    app.use("/clients/passenger", passengerExternal)
 
     // Apply Error Middle ware
     app.use(error);
