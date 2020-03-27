@@ -37,3 +37,43 @@ module.exports.stripeKey = function(){
   }
   return key;
 }
+
+//Determine Twilio Credetinals from the environment file
+module.exports.twilioCredentials = function() {
+  const sid = process.env.TWILIOSID
+  const token = process.env.TWILIOTOKEN
+  const number = process.env.TWILIONUMBER
+  if (!(sid && token && number)) {
+    throw new Error("FATAL ERROR: twilioCredentials is not defined.");
+  } 
+  return {sid, token, number};
+};
+
+// Determine Nexmo credentials
+module.exports.nexmoCredentials = function() {
+  const nexmoKey = process.env.NEXMOKEY
+  const nexmoSecret = process.env.NEXMOSECRET
+  if (!(nexmoKey && nexmoSecret)) {
+    throw new Error("FATAL ERROR: nexmoCredentials is not defined.");
+  } 
+  return {nexmoKey, nexmoSecret};
+};
+
+// get SendGrid key from the environment file
+module.exports.sendGridKey = function(){
+  const key = process.env.SENDGRIDKEY
+  if (!(key)) {
+    throw new Error("FATAL ERROR: sendGridKey is not defined.");
+  }
+  return key;
+}
+
+// get cryptos
+module.exports.cryptos = function()
+{
+  const passengerCrypto = process.env.CRYPTOPASSENGER
+  if (!(passengerCrypto)) {
+    throw new Error("FATAL ERROR: cryptos is not defined.");
+  }
+  return {passengerCrypto};
+}
