@@ -60,12 +60,6 @@ const passengerSchema = new mongoose.Schema({
     match: RegExps.phoneRegExp
   },
   phone_verified: { type: Boolean, default: false },
-  avatarIndex:{
-    type: Number,
-    default: null,
-    min: 0,
-    max: 50
-  },
   tripsCount: {
     type: Number,
     default: 0,
@@ -151,6 +145,7 @@ const passengerSchema = new mongoose.Schema({
 passengerSchema.methods.generateToken = function(expiry) {
   return jwt.sign({
      _id: this._id,
+     stripeId: this.stripeId,
      is_passenger: true 
     }, jwtPassengerKey, { expiresIn: expiry });
 };
@@ -202,13 +197,6 @@ const validationSchema = Joi.object().keys({
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
-  avatarIndex: Joi.string()
-  .custom((value, helpers) => {
-    value = parseFloat(value);
-    if(isNaN(value) || !Number.isInteger(value) || value < 0 || value > 50) return helpers.error('any.invalid');
-    // else
-    return value
-  }, 'avatarIndex Validation'),
   tripsCount: Joi.number()
     .integer()
     .min(0),

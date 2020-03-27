@@ -14,20 +14,16 @@ const stripe = require("stripe")(stripeSecretKey);
 // ---------------------------------------------------
 
 // Creates a Customer and return the customer object.
-module.exports.createCustomer = function(user) {
+module.exports.createCustomer = async function(user) {
   if (!(user.name.first && user.name.last && user.mail && user.phone)) {
-    return { message: "invalid user object" };
+    throw new Error("invalid user object")
   }
 
-  stripe.customers.create(
+  return await stripe.customers.create(
     {
       name: user.name.first.concat(" ", user.name.last),
       email: user.mail,
       phone: user.phone
-    },
-    function(err, customer) {
-      if (err) return err;
-      return customer;
     }
   );
 };
