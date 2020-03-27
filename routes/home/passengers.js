@@ -11,7 +11,7 @@ const { Passengers,
 const authentication = require("../../middlewares/authentication");
 const createStripe = require('../../controllers/payment/stripe').createCustomer
 // Routes
-const settingsRoute = require("./settings");
+const settingsRoute = require("./settings-route");
 const pastTripsRoute = require("./past-trips");
 const familyRoute = require("./family");
 const offersRoute = require("./offers");
@@ -39,13 +39,12 @@ router.post("/register", async (req, res) => {
   if (passenger) return res.status(409).send("Phone number already exists.");
 
   // Creating Stripe account for the registered user
-  const customerToken = createStripe(_.pick(req.body, ["name", "mail", "phone"]))
+  const customerToken = await createStripe(_.pick(req.body, ["name", "mail", "phone"]))
   if (!customerToken) return res.status(500).send(`Internal Server Erroe:\n ${customerToken.message}`)
-  res.status(200).send(customerToken)
-  /*
+  
   //pick what you want to save in Database (using lodash).
   passenger = new Passengers(
-    _.pick(req.body, ["name", "mail", "pass", "phone"])
+    _.pick(req.body, ["name", "mail", "pass", "passLength", "phone"])
   );
 
   //add salt before the hashed password, then hash it.
@@ -59,8 +58,8 @@ router.post("/register", async (req, res) => {
   const webToken = passenger.generateToken("5h");
 
   //pick what you want to send to the user (using lodash).
-  res.header("x-login-token", webToken).send(_.pick(passenger, ["_id"]));
-  */
+  res.header("x-login-token", webToken).sendStatus(200);
+  
 });
 
 // Login
