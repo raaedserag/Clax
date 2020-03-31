@@ -28,39 +28,21 @@ module.exports.updateMe = async (req, res) => {
   if (request.mail) request.mail_verified = false;
   if (request.phone) request.phone_verified = false;
   if (request.pass) request.pass = await hashingPassword(request.pass);
-  let name = {};
+
   if (request.firstName) {
+    let name = {};
     name.first = request.firstName;
-    delete request.firstName;
-  }
-  if (request.lastName) {
     name.last = request.lastName;
     delete request.lastName;
+    delete request.firstName;
+    request.name = name;
   }
-  request.name = name;
+
   await Passengers.findByIdAndUpdate(req.passenger._id, request);
 
   return res.sendStatus(200);
 };
 
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
-// Request mail verification
 // Request mail verification
 module.exports.requestMailVerification = async (req, res) => {
   // Update mail and set to unverified
@@ -106,7 +88,7 @@ module.exports.requestPhoneVerification = async (req, res) => {
     Math.random() * (999999 - 100000) + 100000
   ).toString();
   await sms.sendVerificationCode(req.body.phone, code);
-  return res.send(code.toString());
+  return res.send(code);
 };
 
 // Confirm phone
