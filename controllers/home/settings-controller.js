@@ -1,71 +1,118 @@
 // Models
-const {Passengers} = require("../../models/passengers-model");
+const { Passengers } = require("../../models/passengers-model");
 // Helpers
-const {encodePassengerId}= require("../../helpers/encryption-helper")
-const mail= require('../../services/sendgrid-mail')
-const sms= require('../../services/nexmo-sms')
-const {validateUpdateMe} = require("../../validators/settings-validator")
+const {
+  encodePassengerId,
+  hashingPassword
+} = require("../../helpers/encryption-helper");
+const mail = require("../../services/sendgrid-mail");
+const sms = require("../../services/nexmo-sms");
+const { validateUpdateMe } = require("../../validators/settings-validator");
+//----------------------
 
 // Get passenger info
 module.exports.getMe = async (req, res) => {
-    const passenger = await Passengers.findById(req.passenger._id).select(
-      "-_id name mail phone pass passLength phone_verified mail_verified"
-    );
-    return res.send(passenger);
-}
+  const passenger = await Passengers.findById(req.passenger._id).select(
+    "-_id name mail phone pass passLength phone_verified mail_verified"
+  );
+  return res.send(passenger);
+};
 
 // Update passenger info
 module.exports.updateMe = async (req, res) => {
-    // Validate update reuest
-    const {error, value} = validateUpdateMe(req.body)
-    if(error) return res.status(404).send(updateValidation.error.details[0].message)
-    let request = value;
-    
-    // Format update request
-    if(request.mail) request.mail_verified = false
-    if(request.phone) request.phone_verified = false
-    
-    await Passengers.findByIdAndUpdate(req.passenger._id, request)
-  
-    return res.sendStatus(200);
-}
+  // Validate update reuest
+  const { error, value } = validateUpdateMe(req.body);
+  if (error) return res.status(404).send(error.details[0].message);
+  let request = value;
+  // Format update request
+  if (request.mail) request.mail_verified = false;
+  if (request.phone) request.phone_verified = false;
+  if (request.pass) request.pass = await hashingPassword(request.pass);
+  let name = {};
+  if (request.firstName) {
+    name.first = request.firstName;
+    delete request.firstName;
+  }
+  if (request.lastName) {
+    name.last = request.lastName;
+    delete request.lastName;
+  }
+  request.name = name;
+  await Passengers.findByIdAndUpdate(req.passenger._id, request);
+
+  return res.sendStatus(200);
+};
 
 // Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
+// Request mail verification
 module.exports.requestMailVerification = async (req, res) => {
-    // Update mail and set to unverified
-    const userUpdate = await Passengers.findByIdAndUpdate(req.passenger._id, {
-      mail: req.body.mail, 
-      mail_verified: false})
-    // Send mail with confirmation code & link
-    const code = (Number.parseInt(Math.random() * (999999 - 100000) + 100000)).toString()
-    const link = "localhost:3000/clients/passenger/verify-mail/" + encodePassengerId(req.passenger._id)
-    await mail.sendVerificationCode(req.body.mail, {code, link, firstName: userUpdate.name.first})
-    
-    // Respond with verification code
-    res.send(code.toString())
-}
+  // Update mail and set to unverified
+  const userUpdate = await Passengers.findByIdAndUpdate(req.passenger._id, {
+    mail: req.body.mail,
+    mail_verified: false
+  });
+  // Send mail with confirmation code & link
+  const code = Number.parseInt(
+    Math.random() * (999999 - 100000) + 100000
+  ).toString();
+  const link =
+    "localhost:3000/clients/passenger/verify-mail/" +
+    encodePassengerId(req.passenger._id);
+  await mail.sendVerificationCode(req.body.mail, {
+    code,
+    link,
+    firstName: userUpdate.name.first
+  });
+
+  // Respond with verification code
+  res.send(code.toString());
+};
 
 // Confirm mail
-module.exports.confirmMail = async(req, res) => {
-    await Passengers.findByIdAndUpdate(req.passenger._id, {mail_verified: true})
-    return res.sendStatus(200)
-}
+module.exports.confirmMail = async (req, res) => {
+  await Passengers.findByIdAndUpdate(req.passenger._id, {
+    mail_verified: true
+  });
+  return res.sendStatus(200);
+};
 
 // Request phone verification
 module.exports.requestPhoneVerification = async (req, res) => {
-    // Update phone and set to unverified
-    const userUpdate = await Passengers.findByIdAndUpdate(req.passenger._id, {
-        phone: req.body.phone, 
-        phone_verified: false})
+  // Update phone and set to unverified
+  const userUpdate = await Passengers.findByIdAndUpdate(req.passenger._id, {
+    phone: req.body.phone,
+    phone_verified: false
+  });
 
-    // Send an sms with the generated code
-    const code = (Number.parseInt(Math.random() * (999999 - 100000) + 100000)).toString()
-    await sms.sendVerificationCode(req.body.phone,code)
-    return res.send(code.toString())
-}
+  // Send an sms with the generated code
+  const code = Number.parseInt(
+    Math.random() * (999999 - 100000) + 100000
+  ).toString();
+  await sms.sendVerificationCode(req.body.phone, code);
+  return res.send(code.toString());
+};
 
 // Confirm phone
-module.exports.confirmPhone =  async(req, res) => {
-    await Passengers.findByIdAndUpdate(req.passenger._id, {phone_verified: true})
-    return res.sendStatus(200)
-}
+module.exports.confirmPhone = async (req, res) => {
+  await Passengers.findByIdAndUpdate(req.passenger._id, {
+    phone_verified: true
+  });
+  return res.sendStatus(200);
+};
