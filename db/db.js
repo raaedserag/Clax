@@ -5,7 +5,7 @@ const winston = require("winston")
 
 //Opening connection
 //Use => call it with async-await before read or write to database, the connection stills open till closing it.
- const connect = async function(){
+const connect = async function () {
   await mongoose
     .connect(uri, {
       useNewUrlParser: true,
@@ -17,7 +17,7 @@ const winston = require("winston")
     .catch(err => {
       winston.info(` DB connection failed: ${err} \n Reconnecting...`)
       setTimeout(connect, 4000)
-      });
+    });
 };
 module.exports.connect = connect;
 

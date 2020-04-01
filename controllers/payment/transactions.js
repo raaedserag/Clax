@@ -1,12 +1,11 @@
-const transactionDebugger = require("debug")("Clax:transactionDebugger");
 // Models
 const { Passengers } = require("../../models/passengers-model");
 const { Transactions } = require("../../models/transactions-model");
 // Controllers
-const stripeController = require("./stripe");
+const stripeController = require("../../services/stripe");
 
 // Retreive User by number
-module.exports.getUserbyNumber = async function(number) {
+module.exports.getUserbyNumber = async function (number) {
   try {
     let user = await Passengers.findOne({ phone: number }).select("_id name");
     if (user == null) user = { _id: false };
@@ -18,7 +17,7 @@ module.exports.getUserbyNumber = async function(number) {
 };
 
 // Cancel request to Database
-module.exports.cencelReqeust = async function(body) {
+module.exports.cencelReqeust = async function (body) {
   try {
     if (body.type == "loanee") {
       let cancel = await Transactions.findOneAndRemove({
@@ -38,7 +37,7 @@ module.exports.cencelReqeust = async function(body) {
     return { success: false, result: error.message };
   }
 };
-module.exports.fetchRequests = async function(id) {
+module.exports.fetchRequests = async function (id) {
   try {
     let result = await Transactions.find({
       to: id
@@ -51,7 +50,7 @@ module.exports.fetchRequests = async function(id) {
   }
 };
 // Accept request to Database
-module.exports.acceptReqeust = async function(data) {
+module.exports.acceptReqeust = async function (data) {
   try {
     let request = await Transactions.findOne({
       to: data.id,
@@ -65,7 +64,7 @@ module.exports.acceptReqeust = async function(data) {
 };
 
 // Add request to Database
-module.exports.registerReqeust = async function(transfer) {
+module.exports.registerReqeust = async function (transfer) {
   try {
     await new Transactions(transfer).save();
     return { success: true, result: true };
@@ -74,7 +73,7 @@ module.exports.registerReqeust = async function(transfer) {
   }
 };
 // Transfer Money between users
-module.exports.transferMoney = async function(transfer) {
+module.exports.transferMoney = async function (transfer) {
   try {
     // Update sender database balance
     const sender = await Passengers.findByIdAndUpdate(transfer.id, {

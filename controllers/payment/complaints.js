@@ -55,10 +55,10 @@ let complaintsGet = async (req, res) => {
         ]
       }
     });
-    complaints = JsonFind(complaints);
-    complaints= complaints.checkKey('_complains');
-    res.send(complaints);
-  
+  complaints = JsonFind(complaints);
+  complaints = complaints.checkKey('_complains');
+  res.send(complaints);
+
 };
 
 let tripGet = async (req, res) => {

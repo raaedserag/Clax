@@ -3,16 +3,16 @@ const router = require("express").Router();
 const _ = require("lodash");
 
 //Middlewares
-const authrization=require("../../middlewares/authentication");
+const authrization = require("../../middlewares/authentication");
 
 // Controllers
 const transactionValidators = require("../../validators/transaction-validators");
 const transactionsController = require("../../controllers/payment/transactions");
-const paymentController = require("../../controllers/payment/payment");
+const paymentHelper = require("../../helpers/payment");
 const paymentValidators = require("../../validators/payment-validators");
 
 //// Add a Transfer Money Request
-router.post("/add",authrization,async (req, res) => {
+router.post("/add", authrization, async (req, res) => {
   // Check Transfer Reqeust Schema
   const { error } = transactionValidators.validateAddRequest(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -26,7 +26,7 @@ router.post("/add",authrization,async (req, res) => {
   }
 
   // Check if sender balance is sufficient
-  const senderBalance = await paymentController.getUserBalance(req.body.id);
+  const senderBalance = await paymentHelper.getUserBalance(req.body.id);
   if (!(senderBalance.success && senderBalance.result))
     throw new Error(senderBalance.result);
 
@@ -53,7 +53,7 @@ router.post("/add",authrization,async (req, res) => {
 });
 
 //// Cancel a Request
-router.post("/cancel",authrization, async (req, res) => {
+router.post("/cancel", authrization, async (req, res) => {
   const canceledRequest = await transactionsController.cencelReqeust(req.body);
 
   if (!(canceledRequest.success && canceledRequest.result)) {
@@ -63,7 +63,7 @@ router.post("/cancel",authrization, async (req, res) => {
   return res.status(200).send("Request was canceled successfully");
 });
 //// Fetch Transfer Money Request
-router.get("/",authrization, async (req, res) => {
+router.get("/", authrization, async (req, res) => {
   const requests = await transactionsController.fetchRequests(req.passenger._id);
   if (!(requests.success && requests.result)) {
     return res.status(404).send("Unknown User Id");
@@ -72,7 +72,7 @@ router.get("/",authrization, async (req, res) => {
 });
 
 //// Accept a Request
-router.post("/accept",authrization, async (req, res) => {
+router.post("/accept", authrization, async (req, res) => {
   // Check request Schema
   const { error } = transactionValidators.acceptRequest(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -89,7 +89,7 @@ router.post("/accept",authrization, async (req, res) => {
   delete transferRequest;
 
   // Retrieve sender stripe account id
-  const senderStripe = await paymentController.getUserStripeId(req.body.id);
+  const senderStripe = await paymentHelper.getUserStripeId(req.body.id);
 
   // If retreiving sender stripeId failed
   if (!(senderStripe.success && senderStripe.result))
@@ -99,7 +99,7 @@ router.post("/accept",authrization, async (req, res) => {
   req.body.senderStripeId = senderStripe.result.stripeId;
 
   // Retrieve receiver stripe account id
-  const receiverStripe = await paymentController.getUserStripeId(
+  const receiverStripe = await paymentHelper.getUserStripeId(
     req.body.receiverId
   );
   // If retreiving receiver stripeId failed
@@ -125,7 +125,7 @@ router.post("/accept",authrization, async (req, res) => {
     date: Date.now()
   };
 
-  const addPayment = await paymentController.registerPayment(sender);
+  const addPayment = await paymentHelper.registerPayment(sender);
   if (!(addPayment.result && addPayment.success))
     throw new Error(addPayment.result);
 
@@ -139,7 +139,7 @@ router.post("/accept",authrization, async (req, res) => {
   let { error3 } = paymentValidators.validatePayment(receiver);
   if (error3) return res.status(400).send(error3.details[0].message);
 
-  const addPayment2 = await paymentController.registerPayment(receiver);
+  const addPayment2 = await paymentHelper.registerPayment(receiver);
   if (!(addPayment2.result && addPayment2.success))
     throw new Error(addPayment2.result);
 

@@ -37,11 +37,9 @@ const cardSchema = Joi.object().keys({
         return helpers.error("any.invalid");
       // else
       return value;
-    }, "cvc Validation"),
-  //Adding id shit, Muuuuuuust be removed soon
-  id: Joi.string().required()
+    }, "cvc Validation")
 });
-module.exports.validateCard = function(card) {
+module.exports.validateCard = function (card) {
   return cardSchema.validate(card);
 };
 
@@ -55,27 +53,8 @@ const chargeSchema = Joi.object().keys({
       // else
       return amount;
     }, "Amount Validation"),
-  source: Joi.string().required(),
-  //Adding id shit, Muuuuuuust be removed soon
-  id: Joi.string().required()
+  source: Joi.string().required()
 });
-module.exports.validateCharge = function(charge) {
+module.exports.validateCharge = function (charge) {
   return chargeSchema.validate(charge);
-};
-
-// Payment History Schema
-const paymentSchema = Joi.object().keys({
-  amount: Joi.number()
-    .integer()
-    .min(1)
-    .required(),
-  date: Joi.date().required(),
-  _passenger: Joi.objectId(),
-  description: Joi.string(),
-  type: Joi.string()
-    .valid("Charge", "Pay", "Punishment", "Borrow", "Lend")
-    .required()
-});
-module.exports.validatePayment = function(charge) {
-  return paymentSchema.validate(charge);
 };
