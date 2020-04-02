@@ -1,29 +1,30 @@
 // Modules
 const router = require("express").Router();
-const _ = require("lodash");
-//Middlewares
-const authrization=require("../../middlewares/authentication");
 // Controllers
-
-const paymentController = require("../../controllers/payment/payment");
-
+const { getUserPayments,
+    getBalance,
+    getCardInfo,
+    addNewCard,
+    removeCard,
+    chargeBlance } = require("../../controllers/payment/payment");
 //-------------------------------------------------------------------------
+
 //Get user payments
-router.get("/",authrization, paymentController.getUserPayments);
+router.get("/", getUserPayments);
 
 // Get balance
-router.get("/get-balance",authrization,paymentController.getBalance);
+router.get("/get-balance", getBalance);
 
 // Get card info
-router.get("/get-cards", authrization,paymentController.getCardInfo);
+router.get("/get-cards", getCardInfo);
 
 // Add a new card
-router.post("/add-card",authrization,paymentController.addNewCard);
+router.post("/add-card", addNewCard);
 
 // Removed a new card
-router.post("/remove-card",authrization,paymentController.removeCard);
+router.post("/remove-card", removeCard);
 
 // Charge balance
-router.post("/charge-balance",authrization,paymentController.chargeBlance );
+router.post("/charge-balance", chargeBlance);
 
 module.exports = router;

@@ -30,13 +30,13 @@ module.exports = function(app) {
   }
 
   // Apply Routes
-  app.use("/api/user", complaintRoute);
+  app.use("/api/user", authentication, complaintRoute);
   app.use("/api/offers", offers);
   app.use("/api/passengers", passengers);
   app.use("/api/login", passengerLogin);
-  app.use("/api/paypal", paypal);
-  app.use("/api/payment", payment);
-  app.use("/api/transactions", transaction);
+  app.use("/api/paypal", authentication, paypal);
+  app.use("/api/payment", authentication, payment);
+  app.use("/api/transactions", authentication, transaction);
   app.use("/api/past-trips", pastTrips);
   app.use("/api/family", family);
   app.use("/api/pairing", pairing);

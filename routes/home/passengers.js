@@ -1,6 +1,6 @@
 const { Passengers, validatePassenger } = require("../../models/passengers-model");
 const authentication = require("../../middlewares/authentication");
-const createStripe = require('../../controllers/payment/stripe').createCustomer
+const createStripe = require('../../services/stripe').createCustomer
 const express = require("express");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");

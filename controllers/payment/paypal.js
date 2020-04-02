@@ -53,7 +53,7 @@ let ChargeOgra = async (req, res) => {
     ]
   };
 
-  paypal.payment.create(create_payment_json, function(error, payment) {
+  paypal.payment.create(create_payment_json, function (error, payment) {
     if (error) {
       throw error;
     } else {
@@ -82,7 +82,7 @@ let ChargeSuccess = async (req, res) => {
   const paymentId = req.query.paymentId;
   execute_payment_json.payer_id = payerId;
 
-  paypal.payment.execute(paymentId, execute_payment_json, async function(
+  paypal.payment.execute(paymentId, execute_payment_json, async function (
     error,
     payment
   ) {

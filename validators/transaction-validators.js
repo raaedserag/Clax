@@ -15,9 +15,7 @@ const addRequestSchema = Joi.object().keys({
       if (isNaN(amount) || amount <= 0) return helpers.error("any.invalid");
       // else
       return amount;
-    }, "Amount Validation"),
-  //Adding id shit, Muuuuuuust be removed soon
-  id: Joi.objectId().required()
+    }, "Amount Validation")
 });
 module.exports.validateAddRequest = function(transfer) {
   return addRequestSchema.validate(transfer);
@@ -25,10 +23,7 @@ module.exports.validateAddRequest = function(transfer) {
 
 // Cancel a Transfer Money Reqeust Schema
 const cancelRequestSchema = Joi.object().keys({
-  transactionId: Joi.string()
-    .min(10)
-    .required(),
-  id: Joi.string().required(),
+  transactionId: Joi.objectId().required(),
   type: Joi.string().required()
 });
 module.exports.validateCancelRequest = function(transfer) {
@@ -37,29 +32,9 @@ module.exports.validateCancelRequest = function(transfer) {
 
 // Accept a Transfer Money Reqeust Schema
 const acceptRequestSchema = Joi.object().keys({
-  transactionId: Joi.string()
-    .min(10)
-    .required(),
-  id: Joi.string().required(),
-  toNamed: Joi.string().required()
+  transactionId: Joi.objectId().required(),
+  loanerNamed: Joi.string().required()
 });
-module.exports.acceptRequest = function(transfer) {
+module.exports.validateAcceptRequest = function(transfer) {
   return acceptRequestSchema.validate(transfer);
-};
-
-// Transfer Money Schema
-const transferSchema = Joi.object().keys({
-  receiverId: Joi.objectId().required(),
-  amount: Joi.string()
-    .required()
-    .custom((amount, helpers) => {
-      amount = parseFloat(amount);
-      if (isNaN(amount) || amount <= 0) return helpers.error("any.invalid");
-      // else
-      return amount;
-    }, "Amount Validation"),
-  id: Joi.objectId().required()
-});
-module.exports.validateTransfer = function(transfer) {
-  return transferSchema.validate(transfer);
 };
