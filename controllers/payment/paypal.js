@@ -28,7 +28,7 @@ let ChargeOgra = async (req, res) => {
       payment_method: "paypal"
     },
     redirect_urls: {
-      return_url: `http://localhost:${port}/api/paypal/success/${req.passenger._id}/${req.body.amount}/${req.body.type}`,
+      return_url: `http://localhost:${port}/api/paypal/success/${req.body._passenger}/${req.body.amount}`,
       cancel_url: `http://localhost:${port}/api/paypal/cancel`
     },
     transactions: [
@@ -105,7 +105,7 @@ let ChargeSuccess = async (req, res) => {
       };
       //Save payment in DB on success
       confirmedPayment = new Payment(confirmedPayment);
-      confirmedPayment = await result.save();
+      confirmedPayment = await confirmedPayment.save();
       res.send(confirmedPayment);
     }
   });
