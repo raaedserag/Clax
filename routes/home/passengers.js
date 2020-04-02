@@ -1,6 +1,9 @@
-const { Passengers, validatePassenger } = require("../../models/passengers-model");
+const {
+  Passengers,
+  validatePassenger
+} = require("../../models/passengers-model");
 const authentication = require("../../middlewares/authentication");
-const createStripe = require('../../controllers/payment/stripe').createCustomer
+const createStripe = require("../../controllers/payment/stripe").createCustomer;
 const express = require("express");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
@@ -28,10 +31,15 @@ router.post("/register", async (req, res) => {
   if (passenger) return res.status(409).send("Phone number already exists.");
 
   // Creating Stripe account for the registered user
-  const customerToken = createStripe(_.pick(req.body, ["name", "mail", "phone"]))
-  if (!customerToken) return res.status(500).send(`Internal Server Erroe:\n ${customerToken.message}`)
-  res.status(200).send(customerToken)
-  /*
+  const customerToken = createStripe(
+    _.pick(req.body, ["name", "mail", "phone"])
+  );
+  if (!customerToken)
+    return res
+      .status(500)
+      .send(`Internal Server Erroe:\n ${customerToken.message}`);
+  res.status(200).send(customerToken);
+
   //pick what you want to save in Database (using lodash).
   passenger = new Passengers(
     _.pick(req.body, ["name", "mail", "pass", "phone"])
@@ -49,7 +57,24 @@ router.post("/register", async (req, res) => {
 
   //pick what you want to send to the user (using lodash).
   res.header("x-login-token", webToken).send(_.pick(passenger, ["_id"]));
-  */
+});
+
+router.post("/login", async (req, res) => {
+  //Validate the data of user
+  const { error } = validatePassengerLogin(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  //Checkin if the email exists
+  let passenger = await Passengers.findOne({ mail: req.body.mail });
+  if (!passenger) return res.status(400).send("Email does not exist.");
+
+  //Checkin if Password is correct
+  const validPassword = await bcrypt.compare(req.body.pass, passenger.pass);
+  if (!validPassword) return res.status(400).send("Invalid password.");
+
+  //Create token, expires within some hours.
+  const webToken = passenger.generateToken("96h");
+  res.send(webToken);
 });
 
 module.exports = router;

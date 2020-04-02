@@ -1,7 +1,6 @@
 const { Passengers } = require("../../models/passengers-model");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
-const winston = require("winston");
 
 let getFamilyMembers = async (req, res) => {
   let familyMembers = await Passengers.findOne({

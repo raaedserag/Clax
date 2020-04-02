@@ -1,13 +1,13 @@
 const jwt = require("jsonwebtoken");
-const jwtPassengerKey = require("../startup/config.js").jwtKeys().passengerJwt;
-function authorize(req, res, next) {
+const { passengerJwt } = require("../startup/config.js").jwtKeys();
+function authenticate(req, res, next) {
   const token = req.header("x-login-token");
   //if token isn't included in the header
   if (!token) return res.status(401).send("Access Denied. No token Provided");
 
   try {
     //if token is valid include decoded info in the request.
-    const decoded = jwt.verify(token, jwtPassengerKey);
+    const decoded = jwt.verify(token, passengerJwt);
     req.passenger = decoded;
     next();
   } catch (ex) {
@@ -15,4 +15,4 @@ function authorize(req, res, next) {
     res.status(400).send("Invalid Token.");
   }
 }
-module.exports = authorize;
+module.exports = authenticate;

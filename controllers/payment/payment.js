@@ -1,7 +1,7 @@
 // Modules
 const Joi = require("@hapi/joi");
 // Models
-const Passengers = require("../../models/passengers-model").Passengers;
+const { Passengers } = require("../../models/passengers-model");
 // Setup Error Debugger
 const errorDebugger = require("debug")("app:error");
 
@@ -61,4 +61,20 @@ const chargeSchema = Joi.object().keys({
 });
 module.exports.validateCharge = function(charge) {
   return chargeSchema.validate(charge);
+};
+
+const paymentSchema = Joi.object().keys({
+  amount: Joi.number()
+    .integer()
+    .min(1)
+    .required(),
+  date: Joi.date().required(),
+  _passenger: Joi.objectId(),
+  description: Joi.string(),
+  type: Joi.string()
+    .valid("Charge", "Pay", "Punishment", "Borrow", "Lend")
+    .required()
+});
+module.exports.validatePayment = function(charge) {
+  return paymentSchema.validate(charge);
 };
