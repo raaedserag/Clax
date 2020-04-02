@@ -39,7 +39,7 @@ const cardSchema = Joi.object().keys({
       return value;
     }, "cvc Validation")
 });
-module.exports.validateCard = function (card) {
+module.exports.validateCard = function(card) {
   return cardSchema.validate(card);
 };
 
@@ -55,6 +55,6 @@ const chargeSchema = Joi.object().keys({
     }, "Amount Validation"),
   source: Joi.string().required()
 });
-module.exports.validateCharge = function (charge) {
+module.exports.validateChargeRequest = function(charge) {
   return chargeSchema.validate(charge);
 };

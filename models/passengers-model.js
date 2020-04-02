@@ -143,11 +143,12 @@ const passengerSchema = new mongoose.Schema({
 });
 
 // JWT generation method
-passengerSchema.methods.generateToken = function(expiry) {
+passengerSchema.methods.generateToken = function(expiry, stripe) {
   return jwt.sign(
     {
       _id: this._id,
-      is_passenger: true
+      is_passenger: true,
+      stripeId: stripe
     },
     jwtPassengerKey,
     { expiresIn: expiry }

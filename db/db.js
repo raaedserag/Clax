@@ -1,11 +1,11 @@
 //*****Modules*****
 const mongoose = require("mongoose");
 const uri = require("../startup/config").connectionString();
-const winston = require("winston")
+const winston = require("winston");
 
 //Opening connection
 //Use => call it with async-await before read or write to database, the connection stills open till closing it.
-const connect = async function () {
+const connect = async function() {
   await mongoose
     .connect(uri, {
       useNewUrlParser: true,
@@ -15,8 +15,8 @@ const connect = async function () {
     })
     .then(() => winston.info("DB connected..."))
     .catch(err => {
-      winston.info(` DB connection failed: ${err} \n Reconnecting...`)
-      setTimeout(connect, 4000)
+      winston.info(` DB connection failed: ${err} \n Reconnecting...`);
+      setTimeout(connect, 4000);
     });
 };
 module.exports.connect = connect;
@@ -28,4 +28,10 @@ module.exports.close = async () => {
     .close()
     .then(() => winston.info("DB closed..."))
     .catch(err => winston.info("DB clossing failed!!:\n", err));
+};
+
+module.exports.startTransaction = async function() {
+  let session = await mongoose.startSession();
+  await session.startTransaction();
+  return session;
 };

@@ -1,15 +1,26 @@
 // Modules
 const _ = require("lodash");
+// Models
+const { Passengers } = require("../../models/passengers-model");
 // Helpers and Services
-const { getPassengerBalance,
+const {
+  getPassengerBalance,
   chargePassengerBalance,
-  registerPayment } = require("../../helpers/payment");
-const stripeHelper = require("../../services/stripe");
+  registerPayment
+} = require("../../helpers/payment");
+const {
+  getCards,
+  createCardToken,
+  createSource,
+  removeSource,
+  chargeStripeBalance
+} = require("../../services/stripe");
 // Validators
-const { validateCard,
-  validateCharge } = require("../../validators/payment-validators");
+const {
+  validateCard,
+  validateChargeRequest
+} = require("../../validators/payment-validators");
 //-------------------------------------------------------------------------
-
 
 // Get balance
 module.exports.getBalance = async (req, res) => {
@@ -20,13 +31,21 @@ module.exports.getBalance = async (req, res) => {
 // Get card info
 module.exports.getCardInfo = async (req, res) => {
   // Retreive cards info
-  const cardsQuery = await stripeHelper.getCards(req.passenger.stripeId);
-  res.status(200).send(_.map(cardsQuery.data, _.partialRight(_.pick, [
-    "id",
-    "exp_year",
-    "exp_month",
-    "last4",
-    "brand"])));
+  const cardsQuery = await getCards(req.passenger.stripeId);
+  res
+    .status(200)
+    .send(
+      _.map(
+        cardsQuery.data,
+        _.partialRight(_.pick, [
+          "id",
+          "exp_year",
+          "exp_month",
+          "last4",
+          "brand"
+        ])
+      )
+    );
 };
 
 // Add a new card
@@ -36,7 +55,7 @@ module.exports.addNewCard = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // Generate stripe card token, muuuuuust edit this shit.....
-  const cardTokenId = await stripeHelper.createCardToken({
+  const cardTokenId = await createCardToken({
     number: req.body.number,
     exp_month: parseInt(req.body.exp_month),
     exp_year: parseInt(req.body.exp_year),
@@ -44,41 +63,46 @@ module.exports.addNewCard = async (req, res) => {
   });
 
   // Generating user card source
-  const sourceTokenId = await stripeHelper.createSource(
-    req.passenger.stripeId,
-    cardTokenId
-  );
+  const sourceTokenId = await createSource(req.passenger.stripeId, cardTokenId);
 
   return res.status(200).send(sourceTokenId);
 };
 
 // Removed a new card
 module.exports.removeCard = async (req, res) => {
-  await stripeHelper.removeSource(req.passenger.stripeId, req.body.source);
+  await removeSource(req.passenger.stripeId, req.body.source);
   return res.status(200).send("Source removed successfully!");
 };
 
 // Charge balance
 module.exports.chargeBlance = async (req, res) => {
   // Validate req schema
-  const { error } = validateCharge(req.body);
+  const { error } = validateChargeRequest(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  // Charge passenger stripe account 
-  const chargedBalance = await stripeHelper.chargeStripeBalance(req.passenger.stripeId, req.body);
+  // Charge passenger stripe account
+  const chargedBalance = await chargeStripeBalance(
+    req.passenger.stripeId,
+    req.body
+  );
   // Adding balance to the passenger account
   await chargePassengerBalance(req.passenger._id, req.body.amount);
 
   // Registering charge operation
-  await registerPayment({
+  let payment = await registerPayment({
     amount: parseFloat(req.body.amount),
     _passenger: req.passenger._id,
     description: req.body.source,
     type: "Charge"
   });
 
+  await Passengers.updateOne(
+    { _id: req.passenger._id },
+    { $push: { _payments: payment._id } }
+  );
+
   // IF ALL IS WELL
-  return res.send({ balance: parseFloat(chargedBalance).toFixed(2) });
+  return res.send(_.pick(payment, ["amount", "description", "type", "date"]));
 };
 
 //Get user payments
@@ -87,7 +111,7 @@ module.exports.getUserPayments = async (req, res) => {
     .select("-_id name")
     .populate({
       path: "_payments",
-      select: "amount description type date"
+      select: "-_id amount description type date loaneeName"
     });
-  res.send(_.map(payments, _.pick, ["_payments"]));
-}
+  res.send(payments._payments);
+};

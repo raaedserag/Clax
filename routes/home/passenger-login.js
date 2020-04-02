@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
   if (!validPassword) return res.status(400).send("Invaild password.");
 
   //Create token, expires within 5 hours.
-  const webToken = passenger.generateToken("5h");
+  const webToken = passenger.generateToken("144h", passenger.stripeId);
   res.send(webToken);
 });
 
