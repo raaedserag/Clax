@@ -16,7 +16,7 @@ const {
 router.post("/charge", authrization, ChargeOgra);
 
 // confirm charge process
-router.get("/success/:id/:amount", authrization, ChargeSuccess);
+router.get("/success/:id/:amount", ChargeSuccess);
 //cancel  charge process
 router.get("/cancel", authrization, ChargeCancel);
 
