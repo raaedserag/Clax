@@ -12,12 +12,13 @@ module.exports.jwtKeys = function () {
 };
 
 //get port from the configuration file
-module.exports.port = function () {
+module.exports.serverConfig = function () {
   const port = config.get("port");
-  if (!port) {
-    throw new Error("FATAL ERROR: port is not defined.");
+  const host = config.get("host");
+  if (!(host && port)) {
+    throw new Error("FATAL ERROR: port or host is not defined.");
   }
-  return port;
+  return { host, port };
 };
 
 //get connection string from the environment file

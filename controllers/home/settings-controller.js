@@ -8,6 +8,8 @@ const {
 const mail = require("../../services/sendgrid-mail");
 const sms = require("../../services/nexmo-sms");
 const { validateUpdateMe } = require("../../validators/settings-validator");
+// Configurations
+const { host, port } = require('../../startup/config').serverConfig()
 //----------------------
 
 // Get passenger info
@@ -56,7 +58,7 @@ module.exports.requestMailVerification = async (req, res) => {
   ).toString();
 
   const link =
-    "localhost:3000/clients/passenger/verify-mail/" + encodeId(req.passenger._id);
+    `${host}:${port}/clients/passenger/verify-mail/${encodeId(req.passenger._id)}`;
 
   await mail.sendVerificationCode(req.body.mail, {
     code,
