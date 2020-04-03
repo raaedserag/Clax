@@ -7,7 +7,7 @@ const {
   getPassengerBalance,
   chargePassengerBalance,
   registerPayment
-} = require("../../helpers/payment");
+} = require("../../helpers/payment-helper");
 const {
   getCards,
   createCardToken,

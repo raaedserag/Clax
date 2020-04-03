@@ -2,7 +2,7 @@
 const { Passengers } = require("../../models/passengers-model");
 const { Transactions } = require("../../models/transactions-model");
 // Helpers
-const { transferMoney } = require("../../helpers/transasctions");
+const { transferMoney } = require("../../helpers/transasctions-helper");
 // Validators
 const {
   validateAcceptRequest,
