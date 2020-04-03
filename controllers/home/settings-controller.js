@@ -2,7 +2,7 @@
 const { Passengers } = require("../../models/passengers-model");
 // Helpers
 const {
-  encodePassengerId,
+  encodeId,
   hashingPassword
 } = require("../../helpers/encryption-helper");
 const mail = require("../../services/sendgrid-mail");
@@ -54,9 +54,10 @@ module.exports.requestMailVerification = async (req, res) => {
   const code = Number.parseInt(
     Math.random() * (999999 - 100000) + 100000
   ).toString();
+
   const link =
-    "localhost:3000/clients/passenger/verify-mail/" +
-    encodePassengerId(req.passenger._id);
+    "localhost:3000/clients/passenger/verify-mail/" + encodeId(req.passenger._id);
+
   await mail.sendVerificationCode(req.body.mail, {
     code,
     link,
