@@ -3,7 +3,7 @@ const { Passengers } = require("../../models/passengers-model");
 const { Payment } = require("../../models/payment-model");
 // Controllers
 const paypal = require("paypal-rest-sdk");
-const port = require("../../startup/config").port();
+const { host, port } = require("../../startup/config").serverConfig()
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -14,22 +14,14 @@ paypal.configure({
 });
 
 let ChargeOgra = async (req, res) => {
-  // var payment={
-  //   amount: req.body.amount,
-  //   _passenger: req.body._passenger,
-
-  // };
-  // payment = new Payment(payment);
-  // payment = await payment.save();
-
   var create_payment_json = {
     intent: "sale",
     payer: {
       payment_method: "paypal"
     },
     redirect_urls: {
-      return_url: `http://localhost:${port}/api/paypal/success/${req.body._passenger}/${req.body.amount}`,
-      cancel_url: `http://localhost:${port}/api/paypal/cancel`
+      return_url: `http://${host}:${port}/api/paypal/success/${req.body._passenger}/${req.body.amount}`,
+      cancel_url: `http://${host}:${port}/api/paypal/cancel`
     },
     transactions: [
       {
@@ -91,7 +83,7 @@ let ChargeSuccess = async (req, res) => {
     } else {
       const oldBalance = (
         await Passengers.findById(req.params.id).select("balance -_id ")
-      ).balance;
+      ).lean().balance;
       total = parseInt(req.params.amount) + oldBalance;
       await Passengers.updateOne(
         { _id: req.params.id },
@@ -112,7 +104,4 @@ let ChargeSuccess = async (req, res) => {
 };
 module.exports.ChargeSuccess = ChargeSuccess;
 
-let ChargeCancel = async (req, res) => {
-  res.send("Cancelled");
-};
-module.exports.ChargeCancel = ChargeCancel;
+module.exports.ChargeCancel = async (req, res) => { res.send("Cancelled"); };

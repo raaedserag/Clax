@@ -6,7 +6,7 @@ const { getUserPayments,
     getCardInfo,
     addNewCard,
     removeCard,
-    chargeBlance } = require("../../controllers/payment/payment");
+    chargeBlance } = require("../../controllers/payment/manage-financials-controller");
 //-------------------------------------------------------------------------
 
 //Get user payments
@@ -15,7 +15,7 @@ router.get("/", getUserPayments);
 // Get balance
 router.get("/get-balance", getBalance);
 
-// Get card info
+// Get card infoذ
 router.get("/get-cards", getCardInfo);
 
 // Add a new card
@@ -25,6 +25,6 @@ router.post("/add-card", addNewCard);
 router.post("/remove-card", removeCard);
 
 // Charge balance
-router.post("/charge-balance", chargeBlance);
+router.post("/charge-credit", chargeBlance);
 
 module.exports = router;

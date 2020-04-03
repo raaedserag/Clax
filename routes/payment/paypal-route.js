@@ -10,7 +10,7 @@ const {
   ChargeOgra,
   ChargeSuccess,
   ChargeCancel
-} = require("../../controllers/payment/paypal");
+} = require("../../controllers/payment/paypal-controller");
 
 //charge user balance
 router.post("/charge", authrization, ChargeOgra);

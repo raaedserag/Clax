@@ -8,15 +8,15 @@ const {
   complaintsPost,
   complaintsGet,
   tripGet
-} = require("../../controllers/payment/complaints");
+} = require("../../controllers/payment/complains-controller");
 
-//making a complaint
-router.post("/complaint", complaintsPost);
+// Create a complaint
+router.post("/add", complaintsPost);
 
-//Get user complaint
-router.get("/mycomplaint", complaintsGet);
+// Get all passenger complains
+router.get("/all", complaintsGet);
 
-//Get user trips
-router.get("/", tripGet);
+// Get user trips
+router.get("/get-trips", tripGet);
 
 module.exports = router;

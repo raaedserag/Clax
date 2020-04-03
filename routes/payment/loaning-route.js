@@ -6,12 +6,12 @@ const {
   addRequest,
   fetchRequests,
   cancelRequest
-} = require("../../controllers/payment/transactions");
+} = require("../../controllers/payment/loaning-controller");
 //-------------------------------------------------------------------------
 
-router.get("/", fetchRequests);
-router.post("/add", addRequest);
-router.post("/accept", acceptRequest);
-router.post("/cancel", cancelRequest);
+router.get("/fetch-requests", fetchRequests);
+router.post("/request-loan", addRequest);
+router.put("/accept-request", acceptRequest);
+router.delete("/reject-request", cancelRequest);
 
 module.exports = router;

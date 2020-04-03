@@ -2,15 +2,26 @@
 const { Passengers } = require("../../models/passengers-model");
 const { Transactions } = require("../../models/transactions-model");
 // Helpers
-const { transferMoney } = require("../../helpers/transasctions-helper");
+const { transferMoney } = require("../../helpers/payments-helper");
 // Validators
 const {
   validateAcceptRequest,
   validateAddRequest,
   validateCancelRequest
-} = require("../../validators/transaction-validators");
+} = require("../../validators/loaning-validators");
+//-------------
 
-//// Add a Transfer Money Request
+
+// Fetch Transfer Money Request
+module.exports.fetchRequests = async (req, res) => {
+  const requests = await Transactions.find({
+    loaner: req.passenger._id
+  }).select("_id loaneeNamed date amount").lean();
+
+  return res.send(requests);
+};
+
+// Add a Transfer Money Request
 module.exports.addRequest = async (req, res) => {
   // Check Transfer Reqeust Schema
   const { error } = validateAddRequest(req.body);
@@ -19,7 +30,7 @@ module.exports.addRequest = async (req, res) => {
   // Retrieve receiver by Number
   const loaner = await Passengers.findOne({ phone: req.body.phone }).select(
     "_id name balance"
-  );
+  ).lean();
 
   // Check if sender balance is sufficient
   if (loaner.balance < Number.parseFloat(req.body.amount)) {
@@ -40,7 +51,7 @@ module.exports.addRequest = async (req, res) => {
   return res.status(200).send("تم إضافة طلبك بنجاح.");
 };
 
-//// Cancel a Request
+// Cancel a Request
 module.exports.cancelRequest = async (req, res) => {
   const { error } = validateCancelRequest(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -59,16 +70,7 @@ module.exports.cancelRequest = async (req, res) => {
   return res.send("Request was canceled successfully");
 };
 
-//// Fetch Transfer Money Request
-module.exports.fetchRequests = async (req, res) => {
-  const requests = await Transactions.find({
-    loaner: req.passenger._id
-  }).select("_id loaneeNamed date amount");
-
-  return res.send(requests);
-};
-
-//// Accept a Request
+// Accept a Request
 module.exports.acceptRequest = async (req, res) => {
   // Check request Schema
   const { error } = validateAcceptRequest(req.body);
@@ -78,7 +80,7 @@ module.exports.acceptRequest = async (req, res) => {
   const transferRequest = await Transactions.findOne({
     loaner: req.passenger._id,
     _id: req.body.transactionId
-  });
+  }).lean();
   if (transferRequest == null)
     return res
       .status(204)
@@ -87,7 +89,7 @@ module.exports.acceptRequest = async (req, res) => {
   // Retrieve receiver by Number
   const loanerBalance = await Passengers.findById(
     transferRequest.loaner
-  ).select("-_id balance");
+  ).select("-_id balance").lean();
 
   // Check if sender balance is sufficient
   if (
@@ -101,3 +103,4 @@ module.exports.acceptRequest = async (req, res) => {
   // // IF ALL IS WELL
   return res.send(transferTransaction);
 };
+

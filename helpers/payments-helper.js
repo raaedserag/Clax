@@ -4,8 +4,47 @@ const _ = require("lodash");
 const { startTransaction } = require("../db/db");
 // Models
 const { Passengers } = require("../models/passengers-model");
-const { Transactions } = require("../models/transactions-model");
 const { Payments } = require("../models/payment-model");
+const { Transactions } = require("../models/transactions-model");
+
+// Functions
+// Retreive user balance
+module.exports.getPassengerBalance = async function (userId) {
+  const user = await Passengers.findById(userId).select("-_id balance").lean();
+  if (!user) throw new Error("User not found");
+  return user.balance;
+};
+
+// Update user balance
+module.exports.chargePassengerBalance = async function (userId, request) {
+  let session = null;
+  try {
+    // Start Transaction
+    await session.startTransaction();
+    const payment = await Payments.create([{
+      amount: parseFloat(request.amount),
+      _passenger: userId,
+      description: request.source,
+      type: "Charge"
+    }], { session }).lean();
+
+    await Passengers.findByIdAndUpdate(userId, {
+      $inc: { balance: request.amount },
+      $push: { _payments: payment._id }
+    }).lean();
+
+    // All Is well
+    await session.commitTransaction();
+    return _.map(
+      loanerPayment,
+      _.partialRight(_.pick, ["amount", "description", "type", "date"])
+    )[0];
+
+  } catch (error) {
+    await session.abortTransaction();
+    throw new Error("Transaction Failed !\n" + error.message);
+  }
+};
 
 // Transfer Money between users
 module.exports.transferMoney = async function (transferRequest, req) {
@@ -21,7 +60,7 @@ module.exports.transferMoney = async function (transferRequest, req) {
         $inc: { balance: -parseFloat(transferRequest.amount) }
       },
       { session }
-    ).select("-_id balance");
+    ).select("-_id balance").lean();
     if (!loaner) throw new Error("Loaner Not Found !");
 
     // Register loaner payment
@@ -51,7 +90,7 @@ module.exports.transferMoney = async function (transferRequest, req) {
         $inc: { balance: +parseFloat(transferRequest.amount) }
       },
       { session }
-    ).select("-_id balance");
+    ).select("-_id balance").lean();
     if (!loanee) throw new Error("Receiver Not Found !");
 
     // Register receiver payment
@@ -85,6 +124,7 @@ module.exports.transferMoney = async function (transferRequest, req) {
     )[0];
   } catch (error) {
     await session.abortTransaction();
-    throw new Error("Transaction Failed !\n" + error);
+    throw new Error("Transaction Failed !\n" + error.message);
   }
 };
+
