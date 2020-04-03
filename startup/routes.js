@@ -8,9 +8,9 @@ const authentication = require("../middlewares/authentication");
 
 // Import Routes
 // Login & Registration
-const passengers = require("../routes/home/passengers");
 const passengerLogin = require("../routes/home/passenger-login");
 // Home Screen Section
+const passengers = require("../routes/home/passengers");
 const pastTrips = require("../routes/home/past-trips");
 const family = require("../routes/home/family");
 const offers = require("../routes/home/offers");
@@ -22,6 +22,7 @@ const paypal = require("../routes/payment/paypal-route");
 // Pairing & Tracking Section
 const pairing = require("../routes/pairing/pairing");
 // Externals Section
+const passengerExternal = require('../routes/clients/passengerExternal-route')
 
 
 module.exports = function (app) {
@@ -47,10 +48,11 @@ module.exports = function (app) {
   app.use("/api/passengers/complains", authentication, complaintRoute);
   app.use("/api/passengers/payments/manage-financials", authentication, manageFinancialsRoute);
   app.use("/api/passengers/payments/loaning", authentication, loaningRoute);
-  app.use("/api/paypal", authentication, paypal);
+  app.use("/api/passengers/paypal", paypal);
   // Pairing & Tracking Section
   app.use("/api/pairing", pairing);
   // Externals Section
+  app.use("/clients/passenger", passengerExternal)
 
 
   // Apply Error Middle ware

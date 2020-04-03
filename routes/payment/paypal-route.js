@@ -13,11 +13,11 @@ const {
 } = require("../../controllers/payment/paypal-controller");
 
 //charge user balance
-router.post("/charge", authrization, ChargeOgra);
+router.post("/charge-paypal", authrization, ChargeOgra);
 
 // confirm charge process
 router.get("/success/:id/:amount", ChargeSuccess);
 //cancel  charge process
-router.get("/cancel", authrization, ChargeCancel);
+router.get("/cancel", ChargeCancel);
 
 module.exports = router;

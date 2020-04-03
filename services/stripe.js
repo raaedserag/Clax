@@ -5,32 +5,24 @@ const stripe = require("stripe")(stripeSecretKey);
 //------------------------------------------------
 
 // Creates a Customer and return the customer object.
-module.exports.createCustomer = function(user) {
-  if (!(user.name.first && user.name.last && user.mail && user.phone)) {
-    return { message: "invalid user object" };
-  }
-
-  stripe.customers.create(
+module.exports.createCustomer = function (user) {
+  await stripe.customers.create(
     {
       name: user.name.first.concat(" ", user.name.last),
       email: user.mail,
       phone: user.phone
-    },
-    function(err, customer) {
-      if (err) return err;
-      return customer;
     }
   );
 };
 
 // Creates a token using Card Info and returns the token object
-module.exports.createCardToken = async function(newCard) {
+module.exports.createCardToken = async function (newCard) {
   const cardToken = await stripe.tokens.create({ card: newCard });
   return cardToken.id;
 };
 
 // Links a token with a customer and returns the source object
-module.exports.createSource = async function(customerId, token) {
+module.exports.createSource = async function (customerId, token) {
   const sourceToken = await stripe.customers.createSource(customerId, {
     source: token
   });
@@ -38,7 +30,7 @@ module.exports.createSource = async function(customerId, token) {
 };
 
 // remove source
-module.exports.removeSource = async function(customerId, source) {
+module.exports.removeSource = async function (customerId, source) {
   const sourceRemoved = await stripe.customers.deleteSource(customerId, source);
   if (sourceRemoved.deleted == null)
     throw new Error(`Failed to remove srouce: ${sourceRemoved}`);
@@ -46,14 +38,14 @@ module.exports.removeSource = async function(customerId, source) {
 };
 
 // Retreive all 3 cards (Maximum 3)
-module.exports.getCards = async function(clientId) {
+module.exports.getCards = async function (clientId) {
   return await stripe.customers.listSources(clientId, {
     object: "card",
     limit: 3
   });
 };
 
-module.exports.chargeStripeBalance = async function(customerStripeId, charge) {
+module.exports.chargeStripeBalance = async function (customerStripeId, charge) {
   await stripe.charges.create({
     customer: customerStripeId,
     // Amount should be passed to stripe in cents
@@ -72,7 +64,7 @@ module.exports.chargeStripeBalance = async function(customerStripeId, charge) {
   return updateBalance.balance / 100;
 };
 
-module.exports.updateCustomer = async function(customerId, updateParameters) {
+module.exports.updateCustomer = async function (customerId, updateParameters) {
   return await stripe.customers.update(customerId, updateParameters);
 };
 
