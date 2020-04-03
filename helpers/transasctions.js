@@ -8,8 +8,8 @@ const { Transactions } = require("../models/transactions-model");
 const { Payments } = require("../models/payment-model");
 
 // Transfer Money between users
-module.exports.transferMoney = async function(transferRequest, req) {
-  // let session = null;
+module.exports.transferMoney = async function (transferRequest, req) {
+  let session = null;
   try {
     // Start Transaction Session
     session = await startTransaction();
