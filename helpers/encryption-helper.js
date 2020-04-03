@@ -4,16 +4,16 @@ const bcrypt = require("bcrypt");
 //----------------
 
 // Secrets
-const { passengerCrypto } = require("../startup/config").cryptos();
+const cryptoKey = require("../startup/config").cryptoKey()
 
 // Encode passenger id using crypto and url encoding
 module.exports.encodeId = function (id) {
-  return encodeURIComponent(CryptoJS.AES.encrypt(id, passengerCrypto));
+  return encodeURIComponent(CryptoJS.AES.encrypt(id, cryptoKey));
 };
 
 // Decode passenger id from crypto
 module.exports.decodeId = function (encodedId) {
-  return CryptoJS.AES.decrypt(encodedId, passengerCrypto).toString(
+  return CryptoJS.AES.decrypt(encodedId, cryptoKey).toString(
     CryptoJS.enc.Utf8
   );
 };
