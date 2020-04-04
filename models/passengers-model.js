@@ -6,7 +6,7 @@ const passwordComplexity = require("joi-password-complexity");
 const jwt = require("jsonwebtoken");
 // Includes
 const jwtPassengerKey = require("../startup/config.js").jwtKeys().passengerJwt;
-const RegExps = require("../db/regExps");
+const RegExps = require("../validators/regExps");
 
 //****************** Passenger Model ******************
 // Schema
@@ -147,7 +147,6 @@ const passengerSchema = new mongoose.Schema({
   _family: [{ type: mongoose.ObjectId, ref: "Passengers" }],
   _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }]
 });
-
 // JWT generation method
 passengerSchema.methods.generateToken = function (expiry) {
   return jwt.sign({
@@ -156,6 +155,7 @@ passengerSchema.methods.generateToken = function (expiry) {
     is_passenger: true
   }, jwtPassengerKey, { expiresIn: expiry });
 };
+module.exports.Passengers = mongoose.model("Passengers", passengerSchema);
 
 ////****************** Passenger Validation  ******************
 // Set Password Complexity
@@ -170,18 +170,17 @@ const complexityOptions = {
 
 // Set Validation Schema
 const validationSchema = Joi.object().keys({
-  name: Joi.object({
-    first: Joi.string()
-      .required()
-      .trim()
-      .min(3)
-      .max(64),
-    last: Joi.string()
-      .required()
-      .trim()
-      .min(3)
-      .max(64)
-  }),
+
+  firstName: Joi.string()
+    .required()
+    .trim()
+    .min(3)
+    .max(64),
+  lastName: Joi.string()
+    .required()
+    .trim()
+    .min(3)
+    .max(64),
   mail: Joi.string()
     .email()
     .required()
@@ -196,7 +195,7 @@ const validationSchema = Joi.object().keys({
       value = parseFloat(value);
       if (isNaN(value) || !Number.isInteger(value) || value < 8 || value > 30) return helpers.error('any.invalid');
       // else
-      return value
+      return parseInt(value)
     }, 'passLength Validation'),
   phone: Joi.string()
     .required()
@@ -204,46 +203,7 @@ const validationSchema = Joi.object().keys({
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
-  tripsCount: Joi.number()
-    .integer()
-    .min(0),
-  rate: Joi.number()
-    .min(0)
-    .max(5),
-  balance: Joi.number(),
-  loanedAmount: Joi.number().min(0),
-  maxLoan: Joi.number().min(0),
-  stripeId: Joi.string(),
-  _currentTrip: Joi.objectId(),
-  _pastTrips: Joi.array().items(Joi.objectId()),
-  _offers: Joi.array().items(Joi.objectId()),
-  _complains: Joi.array().items(Joi.objectId()),
-  _family: Joi.array().items(Joi.objectId()),
-  _familyRequests: Joi.array().items(Joi.objectId())
 });
-const validatePassenger = function (passenger) {
+module.exports.validatePassenger = function (passenger) {
   return validationSchema.validate(passenger);
 };
-
-////****************** Passenger Login Validation  ******************
-// Set Login Schema
-const loginSchema = Joi.object().keys({
-  mail: Joi.string()
-    .email()
-    .required()
-    .trim()
-    .lowercase()
-    .min(6)
-    .max(64),
-  pass: Joi.string()
-    .required()
-    .min(8)
-    .max(30)
-});
-const validatePassengerLogin = function (passengerRequest) {
-  return loginSchema.validate(passengerRequest);
-};
-
-module.exports.Passengers = mongoose.model("Passengers", passengerSchema);
-module.exports.validatePassenger = validatePassenger;
-module.exports.validatePassengerLogin = validatePassengerLogin;
