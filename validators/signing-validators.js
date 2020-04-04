@@ -1,18 +1,21 @@
+const Joi = require("@hapi/joi");
 const RegExps = require("./regExps")
 ////****************** Login Validation  ******************
 // Set Login Schema
 const loginSchema = Joi.object().keys({
-    phone: Joi.string()
-        .trim()
-        .min(11)
-        .max(11)
-        .pattern(RegExps.phoneRegExp, "Phone Number"),
-    mail: Joi.string()
-        .email()
-        .trim()
-        .lowercase()
-        .min(6)
-        .max(64),
+    user: Joi.string().required()
+        .custom((value, helpers) => {
+            // If the user is a valid phone number returns true
+            let validation = value.match(RegExps.phoneRegExp)
+            if (validation && validation[0] == value) return true;
+            // If the user is a valid mail returns false
+            else {
+                validation = value.match(RegExps.mailRegExp);
+                if (validation && validation[0] == value) return false;
+                // Else, throw an error
+                else return helpers.error("any.invalid");
+            }
+        }, "User Validation"),
     pass: Joi.string()
         .required()
         .min(8)

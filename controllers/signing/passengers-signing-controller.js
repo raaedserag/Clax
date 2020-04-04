@@ -26,20 +26,21 @@ module.exports.passengerSignUp = async (req, res) => {
     if (error) return res.status(409).send("Phone number already exists.");
 
     // Creating Stripe account for the registered user
-    const customerToken = await createStripeAccount(_.pick(req.body, ["name", "mail", "phone"]))
+    const customerToken = await createStripeAccount(_.pick(req.body,
+        ["firstName", "lastNAme", "mail", "phone"]))
 
     // Organizig passenger object
     passenger.name = { first: passenger.firstName, last: passenger.lastName };
     passenger.stripeId = customerToken.id;
-    passenger.pass = hashingPassword(passenger.pass)
-    passenger = _.pick(req.body, ["name", "mail", "pass", "passLength", "phone", "stripeId"])
-
+    passenger.pass = await hashingPassword(passenger.pass)
+    passenger = _.pick(passenger, ["name", "mail", "pass", "passLength", "phone", "stripeId"])
+    console.log(passenger)
     //save user to the database.
     passenger = new Passengers(passenger)
     await passenger.save();
 
     //create web token and sends it to the user as an http header.
-    const webToken = passenger.generateToken("96h");
+    const webToken = passenger.generateToken();
 
     //pick what you want to send to the user (using lodash).
     res.header("x-login-token", webToken).sendStatus(200);
@@ -48,22 +49,35 @@ module.exports.passengerSignUp = async (req, res) => {
 // Sign-in
 module.exports.passengerSignIn = async (req, res) => {
     //Validate the data of user
-    const { error } = validateLogin(req.body);
+    const { error, value } = validateLogin(req.body);
     if (error) return res.status(400).send(error.details[0].message);
+    let passenger;
+    // If the value is true => user is a phone number
+    if (value == true) {
+        passenger = await Passengers.findOne({ phone: req.body.user });
+        if (!passenger) return res.sendStatus(406);
+        if (!passenger.phone_verified) return res.sendStatus(403);
+    }
+    // Else, => user is a mail
+    else {
+        passenger = await Passengers.findOne({ mail: req.body.user });
+        if (!passenger) return res.sendStatus(406);
+        if (!passenger.mail_verified) return res.sendStatus(403);
+    }
 
-    //Checkin if the email exists
-    let passenger = await Passengers.findOne({ mail: req.body.mail });
-    if (!passenger) return res.status(400).send("Email does not exist.");
-    if (!passenger.mail_verified) return res.status(402).send("This mail hasn't been activated yet")
     //Checkin if Password is correct
     const validPassword = await bcrypt.compare(req.body.pass, passenger.pass);
-    if (!validPassword) return res.status(400).send("Invaild password.");
+    if (!validPassword) return res.sendStatus(401)
 
     //Create token, expires within 5 hours.
-    const webToken = passenger.generateToken("96h");
-    res.send(webToken);
+    const webToken = passenger.generateToken();
+    res.header("x-login-token", webToken).sendStatus(200);
 };
 
 module.exports.passengerForgottenPass = async (req, res) => {
+
+}
+
+module.exports.setNewPassword = async (req, res) => {
 
 }

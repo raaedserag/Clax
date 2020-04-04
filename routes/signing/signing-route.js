@@ -11,5 +11,6 @@ const { passengerSignIn,
 router.post("/passengers/sign-in", passengerSignIn);
 router.post("/passengers/sign-up", passengerSignUp);
 router.post("/passengers/forgotten-password", passengerForgottenPass);
+router.post("/passengers/set-new-password")
 
 module.exports = router;

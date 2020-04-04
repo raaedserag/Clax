@@ -12,6 +12,6 @@ const {
 router.get("/fetch-requests", fetchRequests);
 router.post("/request-loan", addRequest);
 router.put("/accept-request", acceptRequest);
-router.delete("/reject-request", cancelRequest);
+router.put("/reject-request", cancelRequest);
 
 module.exports = router;

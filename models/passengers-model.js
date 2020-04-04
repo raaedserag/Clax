@@ -148,7 +148,7 @@ const passengerSchema = new mongoose.Schema({
   _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }]
 });
 // JWT generation method
-passengerSchema.methods.generateToken = function (expiry) {
+passengerSchema.methods.generateToken = function (expiry = "96h") {
   return jwt.sign({
     _id: this._id,
     stripeId: this.stripeId,
