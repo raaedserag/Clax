@@ -44,6 +44,12 @@ const passengerSchema = new mongoose.Schema({
     minlength: 8,
     maxlength: 1024
   },
+  passLength: {
+    type: Number,
+    required: true,
+    min: 8,
+    max: 30
+  },
   phone: {
     type: String,
     required: true,
@@ -88,14 +94,14 @@ const passengerSchema = new mongoose.Schema({
   balance: {
     type: Number,
     default: 0,
-    get: function(b) {
+    get: function (b) {
       return Number.parseFloat(b).toFixed(2);
     },
-    set: function(b) {
+    set: function (b) {
       return Number.parseFloat(b).toFixed(2);
     },
     validate: {
-      validator: function(b) {
+      validator: function (b) {
         return b >= this.balance - this.maxLoan;
       },
       message: "balance can't be less than maxLoan value"
@@ -106,13 +112,13 @@ const passengerSchema = new mongoose.Schema({
     default: 0,
     validate: [
       {
-        validator: function(l) {
+        validator: function (l) {
           return l >= 0;
         },
         message: "loanedAmount should be a positive value"
       },
       {
-        validator: function(l) {
+        validator: function (l) {
           return l <= this.maxLoan;
         },
         message: "loanedAmount must be less than or equal maxLoan"
@@ -123,7 +129,7 @@ const passengerSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     validate: {
-      validator: function(m) {
+      validator: function (m) {
         return m >= 0;
       },
       message: "maxLoan should be a positive value"
@@ -143,16 +149,12 @@ const passengerSchema = new mongoose.Schema({
 });
 
 // JWT generation method
-passengerSchema.methods.generateToken = function(expiry, stripe) {
-  return jwt.sign(
-    {
-      _id: this._id,
-      is_passenger: true,
-      stripeId: stripe
-    },
-    jwtPassengerKey,
-    { expiresIn: expiry }
-  );
+passengerSchema.methods.generateToken = function (expiry) {
+  return jwt.sign({
+    _id: this._id,
+    stripeId: this.stripeId,
+    is_passenger: true
+  }, jwtPassengerKey, { expiresIn: expiry });
 };
 
 ////****************** Passenger Validation  ******************
@@ -188,6 +190,14 @@ const validationSchema = Joi.object().keys({
     .min(6)
     .max(64),
   pass: passwordComplexity(complexityOptions),
+  passLength: Joi.string()
+    .required()
+    .custom((value, helpers) => {
+      value = parseFloat(value);
+      if (isNaN(value) || !Number.isInteger(value) || value < 8 || value > 30) return helpers.error('any.invalid');
+      // else
+      return value
+    }, 'passLength Validation'),
   phone: Joi.string()
     .required()
     .trim()
@@ -211,7 +221,7 @@ const validationSchema = Joi.object().keys({
   _family: Joi.array().items(Joi.objectId()),
   _familyRequests: Joi.array().items(Joi.objectId())
 });
-const validatePassenger = function(passenger) {
+const validatePassenger = function (passenger) {
   return validationSchema.validate(passenger);
 };
 
@@ -230,7 +240,7 @@ const loginSchema = Joi.object().keys({
     .min(8)
     .max(30)
 });
-const validatePassengerLogin = function(passengerRequest) {
+const validatePassengerLogin = function (passengerRequest) {
   return loginSchema.validate(passengerRequest);
 };
 
