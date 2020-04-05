@@ -36,7 +36,7 @@ module.exports.chargePassengerBalance = async function (userId, request) {
     // All Is well
     await session.commitTransaction();
     return _.map(
-      loanerPayment,
+      payment,
       _.partialRight(_.pick, ["amount", "description", "type", "date"])
     )[0];
 

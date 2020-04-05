@@ -8,7 +8,7 @@ const cryptoKey = require("../startup/config").cryptoKey()
 
 // Encode passenger id using crypto and url encoding
 module.exports.encodeId = function (id) {
-  return encodeURIComponent(CryptoJS.AES.encrypt(id, cryptoKey));
+  return encodeURIComponent(CryptoJS.AES.encrypt(id.toString(), cryptoKey))
 };
 
 // Decode passenger id from crypto

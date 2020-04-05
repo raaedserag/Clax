@@ -2,13 +2,14 @@ const config = require("config");
 
 //Determine Jwt Keys from the environment file
 module.exports.jwtKeys = function () {
-  const passengerJwt = process.env.JWTPASSENGER
-  const driverJwt = process.env.JWTDRIVER
-  const adminJwt = process.env.JWTADMIN
-  if (!(passengerJwt && driverJwt && adminJwt)) {
+  const passengerJwt = process.env.JWT_PASSENGER
+  const driverJwt = process.env.JWT_DRIVER
+  const adminJwt = process.env.JWT_ADMIN
+  const tempJwt = process.env.JWT_TEMP
+  if (!(passengerJwt && driverJwt && adminJwt && tempJwt)) {
     throw new Error("FATAL ERROR: jwtPrivateKey is not defined.");
   }
-  return { passengerJwt, driverJwt, adminJwt };
+  return { passengerJwt, driverJwt, adminJwt, tempJwt };
 };
 
 //get port from the configuration file
@@ -32,7 +33,7 @@ module.exports.connectionString = function () {
 
 // get stripe key from the environment file
 module.exports.stripeKey = function () {
-  const key = process.env.STRIPEKEY
+  const key = process.env.STRIPE_KEY
   if (!(key)) {
     throw new Error("FATAL ERROR: stripeKey is not defined.");
   }
@@ -41,9 +42,9 @@ module.exports.stripeKey = function () {
 
 //Determine Twilio Credetinals from the environment file
 module.exports.twilioCredentials = function () {
-  const sid = process.env.TWILIOSID
-  const token = process.env.TWILIOTOKEN
-  const number = process.env.TWILIONUMBER
+  const sid = process.env.TWILIO_SID
+  const token = process.env.TWILIO_TOKEN
+  const number = process.env.TWILIO_NUMBER
   if (!(sid && token && number)) {
     throw new Error("FATAL ERROR: twilioCredentials is not defined.");
   }
@@ -52,8 +53,8 @@ module.exports.twilioCredentials = function () {
 
 // Determine Nexmo credentials
 module.exports.nexmoCredentials = function () {
-  const nexmoKey = process.env.NEXMOKEY
-  const nexmoSecret = process.env.NEXMOSECRET
+  const nexmoKey = process.env.NEXMO_KEY
+  const nexmoSecret = process.env.NEXMO_SECRET
   if (!(nexmoKey && nexmoSecret)) {
     throw new Error("FATAL ERROR: nexmoCredentials is not defined.");
   }
@@ -62,7 +63,7 @@ module.exports.nexmoCredentials = function () {
 
 // get SendGrid key from the environment file
 module.exports.sendGridKey = function () {
-  const key = process.env.SENDGRIDKEY
+  const key = process.env.SENDGRID_KEY
   if (!(key)) {
     throw new Error("FATAL ERROR: sendGridKey is not defined.");
   }
@@ -71,7 +72,7 @@ module.exports.sendGridKey = function () {
 
 // get cryptos
 module.exports.cryptoKey = function () {
-  const cryptoKey = process.env.EXTERNALCRYPTO
+  const cryptoKey = process.env.EXTERNAL_CRYPTO
   if (!(cryptoKey)) {
     throw new Error("FATAL ERROR: cryptoKey is not defined.");
   }

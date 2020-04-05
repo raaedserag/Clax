@@ -1,19 +1,20 @@
+// Modules
 const Joi = require("@hapi/joi");
-const RegExps = require("./regExps")
+const passwordComplexity = require("joi-password-complexity");
+// Schemas
+const RegExps = require("./regExps");
+const { complexityOptions } = require("../models/passengers-model")
 ////****************** Login Validation  ******************
 // Set Login Schema
 const loginSchema = Joi.object().keys({
-    phone: Joi.string()
-        .trim()
-        .min(11)
-        .max(11)
-        .pattern(RegExps.phoneRegExp, "Phone Number"),
-    mail: Joi.string()
-        .email()
-        .trim()
-        .lowercase()
-        .min(6)
-        .max(64),
+    user: Joi.string().required()
+        .custom((value, helpers) => {
+            let result = value.match(RegExps.phoneRegExp)
+            if (result && result[0] == value) return true;
+            result = value.match(RegExps.mailRegExp);
+            if (result && result[0] == value) return false;
+            return helpers.error("any.invalid");
+        }, "user Validation"),
     pass: Joi.string()
         .required()
         .min(8)
@@ -21,4 +22,27 @@ const loginSchema = Joi.object().keys({
 });
 module.exports.validateLogin = function (loginRequest) {
     return loginSchema.validate(loginRequest);
+};
+
+// Forget password schema
+const forgetSchema = Joi.object().keys({
+    user: Joi.string().required()
+        .custom((value, helpers) => {
+            let result = value.match(RegExps.phoneRegExp)
+            if (result && result[0] == value) return true;
+            result = value.match(RegExps.mailRegExp);
+            if (result && result[0] == value) return false;
+            return helpers.error("any.invalid");
+        }, "user Validation")
+});
+module.exports.validateForgetPassword = function (forgetrequest) {
+    return forgetSchema.validate(forgetrequest);
+};
+
+// New password schema
+const passSchema = Joi.object().keys({
+    pass: passwordComplexity(complexityOptions)
+});
+module.exports.validateNewPass = function (newPass) {
+    return passSchema.validate(newPass);
 };

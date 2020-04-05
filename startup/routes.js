@@ -38,7 +38,7 @@ module.exports = function (app) {
 
   // Apply Routes
   // Login & Registration
-  app.use("/api/passengers/signing", passengerSigningRoute);
+  app.use("/api/signing", passengerSigningRoute);
   // Home Screen Section
   app.use("/api/passengers/settings", authentication, settingsRoute);
   app.use("/api/passengers/family", authentication, familyRoute);
