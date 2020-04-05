@@ -11,7 +11,7 @@ const { hashingPassword } = require("../../helpers/encryption-helper")
 
 
 // Sign-up
-module.exports.passengerSignUp = async (req, res) => {
+module.exports.passengerLogin = async (req, res) => {
     //check if the passenger information is valid.
     let { error, value } = validatePassenger(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -46,7 +46,7 @@ module.exports.passengerSignUp = async (req, res) => {
 };
 
 // Sign-in
-module.exports.passengerSignIn = async (req, res) => {
+module.exports.passengerRegister = async (req, res) => {
     //Validate the data of user
     const { error } = validateLogin(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -65,5 +65,8 @@ module.exports.passengerSignIn = async (req, res) => {
 };
 
 module.exports.passengerForgottenPass = async (req, res) => {
+
+}
+module.exports.passengerSetNewPass = async (req, res) => {
 
 }

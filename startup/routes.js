@@ -8,12 +8,12 @@ const authentication = require("../middlewares/authentication");
 
 // Import Routes
 // Login & Registration
-const passengerLogin = require("../routes/home/passenger-login");
+const passengerSigningRoute = require("../routes/signing/passenger-signing-route");
 // Home Screen Section
-const passengers = require("../routes/home/passengers");
-const pastTrips = require("../routes/home/past-trips");
-const family = require("../routes/home/family");
-const offers = require("../routes/home/offers");
+const settingsRoute = require("../routes/home/settings-route");
+const pastTripsRoute = require("../routes/home/past-trips-route");
+const familyRoute = require("../routes/home/family-route");
+const offersRoute = require("../routes/home/offers-route");
 // Payments & Complains Section
 const complaintRoute = require("../routes/payment/complains-route");
 const manageFinancialsRoute = require("../routes/payment/manage-financials-route");
@@ -38,12 +38,12 @@ module.exports = function (app) {
 
   // Apply Routes
   // Login & Registration
-  app.use("/api/login", passengerLogin);
+  app.use("/api/passengers/signing", passengerSigningRoute);
   // Home Screen Section
-  app.use("/api/passengers", passengers);
-  app.use("/api/family", family);
-  app.use("/api/offers", offers);
-  app.use("/api/past-trips", pastTrips);
+  app.use("/api/passengers/settings", authentication, settingsRoute);
+  app.use("/api/passengers/family", authentication, familyRoute);
+  app.use("/api/passengers/offers", authentication, offersRoute);
+  app.use("/api/passengers/past-trips", authentication, pastTripsRoute);
   // Payments & Complains Section
   app.use("/api/passengers/complains", authentication, complaintRoute);
   app.use("/api/passengers/payments/manage-financials", authentication, manageFinancialsRoute);

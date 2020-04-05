@@ -1,7 +1,6 @@
 const { Passengers } = require("../../models/passengers-model");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
-const winston = require("winston");
 
 let getFamilyMembers = async (req, res) => {
   let familyMembers = await Passengers.findOne({
@@ -157,14 +156,14 @@ const sentRequestSchema = Joi.object().keys({
     .max(11)
     .required()
 });
-const validateSentRequest = function(reqBody) {
+const validateSentRequest = function (reqBody) {
   return sentRequestSchema.validate(reqBody);
 };
 
 const cancelledRequestSchema = Joi.object().keys({
   recipientId: Joi.objectId().required()
 });
-const validateCancelledRequest = function(reqBody) {
+const validateCancelledRequest = function (reqBody) {
   return cancelledRequestSchema.validate(reqBody);
 };
 

@@ -1,3 +1,4 @@
+const Joi = require("@hapi/joi");
 const RegExps = require("./regExps")
 ////****************** Login Validation  ******************
 // Set Login Schema
