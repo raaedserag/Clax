@@ -1,5 +1,9 @@
+// Modules
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const _ = require("lodash");
+// Secrets
+const { userJwt } = require("../../startup/config").jwtKeys()
 // Models & Validators
 const { Passengers,
     validatePassenger } = require("../../models/passengers-model");
@@ -7,8 +11,9 @@ const { validateLogin } = require("../../validators/signing-validators")
 // Helpers & Services
 const createStripeAccount = require('../../services/stripe').createCustomer
 const { hashingPassword } = require("../../helpers/encryption-helper")
+const sms = require("../../services/nexmo-sms")
 //---------------------
-
+//gedo was here.
 
 // Sign-up
 module.exports.passengerSignUp = async (req, res) => {
@@ -34,7 +39,7 @@ module.exports.passengerSignUp = async (req, res) => {
     passenger.stripeId = customerToken.id;
     passenger.pass = await hashingPassword(passenger.pass)
     passenger = _.pick(passenger, ["name", "mail", "pass", "passLength", "phone", "stripeId"])
-    console.log(passenger)
+
     //save user to the database.
     passenger = new Passengers(passenger)
     await passenger.save();
@@ -76,6 +81,15 @@ module.exports.passengerSignIn = async (req, res) => {
 
 module.exports.passengerForgottenPass = async (req, res) => {
 
+    const passenger = await Passengers.findOne({ phone: req.body.phone })
+    if (!passenger) return res.sendStatus(404)
+
+    const code = parseInt(Math.random() * (999999 - 100000) + 100000).toString()
+    await sms.sendVerificationCode(req.body.phone, code)
+
+    // Respond with header token and code 
+    const webToken = jwt.sign({ _id: passenger._id }, userJwt, { expiresIn: "1h" })
+    res.header("x-temp-token", webToken).send(code)
 }
 
 module.exports.setNewPassword = async (req, res) => {
