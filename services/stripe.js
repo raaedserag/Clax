@@ -6,7 +6,7 @@ const stripe = require("stripe")(stripeSecretKey);
 
 // Creates a Customer and return the customer object.
 module.exports.createCustomer = async function (user) {
-  return await stripe.customers.create(
+  await stripe.customers.create(
     {
       name: user.name.first.concat(" ", user.name.last),
       email: user.mail,

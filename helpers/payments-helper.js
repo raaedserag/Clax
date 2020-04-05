@@ -20,18 +20,18 @@ module.exports.chargePassengerBalance = async function (userId, request) {
   let session = null;
   try {
     // Start Transaction
-    session = await startTransaction();
+    await session.startTransaction();
     const payment = await Payments.create([{
       amount: parseFloat(request.amount),
       _passenger: userId,
       description: request.source,
       type: "Charge"
-    }], { session });
+    }], { session }).lean();
 
     await Passengers.findByIdAndUpdate(userId, {
       $inc: { balance: request.amount },
       $push: { _payments: payment._id }
-    }, { session });
+    }).lean();
 
     // All Is well
     await session.commitTransaction();
