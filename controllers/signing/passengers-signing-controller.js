@@ -12,42 +12,41 @@ const { validateLogin } = require("../../validators/signing-validators")
 const createStripeAccount = require('../../services/stripe').createCustomer
 const { hashingPassword } = require("../../helpers/encryption-helper")
 const sms = require("../../services/nexmo-sms")
-    //---------------------
-    /
-    // Sign-up
-    module.exports.passengerSignUp = async (req, res) => {
-        //check if the passenger information is valid.
-        let { error, value } = validatePassenger(req.body);
-        if (error) return res.status(400).send(error.details[0].message);
-        let passenger = value;
 
-        // check if user with the same email already registered.
-        error = await Passengers.findOne({ mail: req.body.mail });
-        if (error) return res.status(409).send("email already exists.");
+// Sign-up
+module.exports.passengerSignUp = async (req, res) => {
+    //check if the passenger information is valid.
+    let { error, value } = validatePassenger(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+    let passenger = value;
 
-        // check if user with the same phone number already registered.
-        error = await Passengers.findOne({ phone: req.body.phone });
-        if (error) return res.status(409).send("Phone number already exists.");
+    // check if user with the same email already registered.
+    error = await Passengers.findOne({ mail: req.body.mail });
+    if (error) return res.status(409).send("email already exists.");
 
-        // Creating Stripe account for the registered user
-        const customerToken = await createStripeAccount(_.pick(req.body, ["firstName", "lastName", "mail", "phone"]))
+    // check if user with the same phone number already registered.
+    error = await Passengers.findOne({ phone: req.body.phone });
+    if (error) return res.status(409).send("Phone number already exists.");
 
-        // Organizig passenger object
-        passenger.name = { first: passenger.firstName, last: passenger.lastName };
-        passenger.stripeId = customerToken.id;
-        passenger.pass = await hashingPassword(passenger.pass)
-        passenger = _.pick(passenger, ["name", "mail", "pass", "passLength", "phone", "stripeId"])
+    // Creating Stripe account for the registered user
+    const customerToken = await createStripeAccount(_.pick(req.body, ["firstName", "lastName", "mail", "phone"]))
 
-        //save user to the database.
-        passenger = new Passengers(passenger)
-        await passenger.save();
+    // Organizig passenger object
+    passenger.name = { first: passenger.firstName, last: passenger.lastName };
+    passenger.stripeId = customerToken.id;
+    passenger.pass = await hashingPassword(passenger.pass)
+    passenger = _.pick(passenger, ["name", "mail", "pass", "passLength", "phone", "stripeId"])
 
-        //create web token and sends it to the user as an http header.
-        const webToken = passenger.generateToken("96h");
+    //save user to the database.
+    passenger = new Passengers(passenger)
+    await passenger.save();
 
-        //pick what you want to send to the user (using lodash).
-        res.header("x-login-token", webToken).sendStatus(200);
-    };
+    //create web token and sends it to the user as an http header.
+    const webToken = passenger.generateToken("96h");
+
+    //pick what you want to send to the user (using lodash).
+    res.header("x-login-token", webToken).sendStatus(200);
+};
 
 // Sign-in
 module.exports.passengerSignIn = async (req, res) => {

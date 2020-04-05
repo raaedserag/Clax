@@ -43,7 +43,7 @@ module.exports = function (app) {
   app.use("/api/passengers/settings", authentication, settingsRoute);
   app.use("/api/passengers/family", authentication, familyRoute);
   app.use("/api/passengers/offers", authentication, offersRoute);
-  app.use("/api/passengers/past-trips", authentication, pastTripsRoute);
+  app.use("/api/passengers/past-trips", pastTripsRoute);
   // Payments & Complains Section
   app.use("/api/passengers/complains", authentication, complaintRoute);
   app.use("/api/passengers/payments/manage-financials", authentication, manageFinancialsRoute);
