@@ -7,7 +7,7 @@ const {
 } = require("../../helpers/encryption-helper");
 const mail = require("../../services/sendgrid-mail");
 const sms = require("../../services/nexmo-sms");
-const { validateUpdateMe } = require("../../validators/settings-validators");
+const { validateUpdateMe } = require("../../validators/settings-validator");
 // Configurations
 const { host, port } = require('../../startup/config').serverConfig()
 //----------------------

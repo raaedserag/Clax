@@ -8,7 +8,7 @@ const stripe = require("stripe")(stripeSecretKey);
 module.exports.createCustomer = async function (user) {
   return await stripe.customers.create(
     {
-      name: user.firstName.concat(" ", user.lastName),
+      name: user.name.first.concat(" ", user.name.last),
       email: user.mail,
       phone: user.phone
     }

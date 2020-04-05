@@ -1,5 +1,5 @@
 const Joi = require("@hapi/joi");
-const RegExps = require("./regExps");
+const RegExps = require("../db/regExps");
 
 ////****************** update-me Validation  ******************
 // Set Validation Schema
@@ -32,6 +32,6 @@ const udateMeSchema = Joi.object().keys({
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number")
 });
-module.exports.validateUpdateMe = function (updateReuest) {
+module.exports.validateUpdateMe = function(updateReuest) {
   return udateMeSchema.validate(updateReuest);
 };
