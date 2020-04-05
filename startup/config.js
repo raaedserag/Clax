@@ -39,6 +39,25 @@ module.exports.stripeKey = function () {
   return key;
 }
 
+
+// get Paypal client id from the environment file
+module.exports.paypalId = function () {
+  const id = process.env.PAYPALID
+  if (!(id)) {
+    throw new Error("FATAL ERROR: paypalId is not defined.");
+  }
+  return id;
+}
+
+// get Paypal client secret from the environment file
+module.exports.paypalSecret = function () {
+  const secret = process.env.PAYPALSECRET
+  if (!(secret)) {
+    throw new Error("FATAL ERROR: paypalSecret is not defined.");
+  }
+  return secret;
+}
+
 //Determine Twilio Credetinals from the environment file
 module.exports.twilioCredentials = function () {
   const sid = process.env.TWILIOSID
