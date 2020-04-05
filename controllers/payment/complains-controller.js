@@ -12,7 +12,7 @@ const { pushPassengerComplain } = require("../../helpers/complains-helper")
 module.exports.complaintsPost = async (req, res) => {
   // Creating new complain object
   let complaint = {
-    _passenger: req.user._id,
+    _passenger: req.passenger._id,
     _trip: req.body._trip,
     text: req.body.text,
     from_passenger: req.body.from_passenger,
@@ -23,12 +23,12 @@ module.exports.complaintsPost = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // Push complain
-  complaint = await pushPassengerComplain(req.user._id, complaint)
+  complaint = await pushPassengerComplain(req.passenger._id, complaint)
   res.send(complaint);
 };
 
 module.exports.complaintsGet = async (req, res) => {
-  const complaints = await Passengers.findById(req.user._id)
+  const complaints = await Passengers.findById(req.passenger._id)
     .select("-_id _complains")
     .populate({
       path: "_complains",
@@ -38,7 +38,7 @@ module.exports.complaintsGet = async (req, res) => {
 };
 
 module.exports.tripGet = async (req, res) => {
-  const result = await Passengers.findById(req.user._id)
+  const result = await Passengers.findById(req.passenger._id)
     .select("-_id _pastTrips")
     .populate({
       path: "_pastTrips",

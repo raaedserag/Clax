@@ -15,7 +15,7 @@ const {
 // Fetch Transfer Money Request
 module.exports.fetchRequests = async (req, res) => {
   const requests = await Transactions.find({
-    loaner: req.user._id
+    loaner: req.passenger._id
   }).select("_id loaneeNamed date amount").lean();
 
   return res.send(requests);
@@ -38,7 +38,7 @@ module.exports.addRequest = async (req, res) => {
   }
 
   // Adjusting body to fit Transaction schema
-  req.body.loanee = req.user._id;
+  req.body.loanee = req.passenger._id;
   req.body.loaneeNamed = req.body.name;
   req.body.loaner = loaner._id.toString();
   req.body.amount = parseFloat(req.body.amount);
@@ -58,12 +58,12 @@ module.exports.cancelRequest = async (req, res) => {
 
   if (req.body.type == "loanee") {
     await Transactions.findOneAndRemove({
-      loanee: req.user._id,
+      loanee: req.passenger._id,
       _id: req.body.transactionId
     });
   } else {
     await Transactions.findOneAndRemove({
-      loaner: req.user._id,
+      loaner: req.passenger._id,
       _id: req.body.transactionId
     });
   }
@@ -78,7 +78,7 @@ module.exports.acceptRequest = async (req, res) => {
 
   // Retrieve request information
   const transferRequest = await Transactions.findOne({
-    loaner: req.user._id,
+    loaner: req.passenger._id,
     _id: req.body.transactionId
   }).lean();
   if (transferRequest == null)

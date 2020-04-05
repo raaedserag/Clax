@@ -5,7 +5,7 @@ const winston = require("winston");
 
 let getFamilyMembers = async (req, res) => {
   let familyMembers = await Passengers.findOne({
-    _id: req.user._id
+    _id: req.passenger._id
   })
     .populate("_family", "name phone")
     .select("_family");
@@ -15,7 +15,7 @@ let getFamilyMembers = async (req, res) => {
 
 let fetchSentRequests = async (req, res) => {
   let MembersSentRequests = await Passengers.find({
-    _familyRequests: req.user._id
+    _familyRequests: req.passenger._id
   }).select("_id name phone");
 
   res.send(MembersSentRequests);
@@ -26,7 +26,7 @@ let deleteFamilyMember = async (req, res) => {
   // if (error) return res.status(400).send(error.details[0].message);
 
   const deletedMember = await Passengers.findOne({
-    _id: req.user._id,
+    _id: req.passenger._id,
     _family: req.body._id
   }).select("_id");
 
@@ -55,12 +55,12 @@ let sendFamilyRequest = async (req, res) => {
 
   if (!receipient) return res.status(404).send("user not found");
 
-  if (receipient._id == req.user._id)
+  if (receipient._id == req.passenger._id)
     return res.status(400).send("you can't add yourself");
 
   //check if the sent passenger is already in user's family
   const familyMember = await Passengers.findOne({
-    _id: req.user._id,
+    _id: req.passenger._id,
     _family: receipient._id
   }).select("_id");
 
@@ -70,7 +70,7 @@ let sendFamilyRequest = async (req, res) => {
   //check if the passenger has already sent a request
   const oldRecepient = await Passengers.findOne({
     _id: receipient._id,
-    _familyRequests: req.user._id
+    _familyRequests: req.passenger._id
   }).select("_id");
 
   if (oldRecepient) return res.status(400).send("You already sent a request");
@@ -80,7 +80,7 @@ let sendFamilyRequest = async (req, res) => {
       _id: receipient._id
     },
     {
-      $push: { _familyRequests: req.user._id }
+      $push: { _familyRequests: req.passenger._id }
     }
   );
 
@@ -93,7 +93,7 @@ let cancelFamilyRequest = async (req, res) => {
 
   const receipient = await Passengers.findOne({
     _id: req.body.recipientId,
-    _familyRequests: req.user._id
+    _familyRequests: req.passenger._id
   }).select("_id");
 
   if (!receipient)
@@ -104,7 +104,7 @@ let cancelFamilyRequest = async (req, res) => {
       _id: req.body.recipientId
     },
     {
-      $pull: { _familyRequests: req.user._id }
+      $pull: { _familyRequests: req.passenger._id }
     }
   );
 
@@ -112,7 +112,7 @@ let cancelFamilyRequest = async (req, res) => {
 };
 
 const fetchRequests = async (req, res) => {
-  const familyRequests = await Passengers.findById(req.user._id)
+  const familyRequests = await Passengers.findById(req.passenger._id)
     .select("_familyRequests -_id")
     .populate({ path: "_familyRequests", select: "name phone" });
   res.send(familyRequests._familyRequests);
@@ -121,7 +121,7 @@ const fetchRequests = async (req, res) => {
 const acceptRequest = async (req, res) => {
   let result = await Passengers.findOneAndUpdate(
     {
-      _id: req.user._id,
+      _id: req.passenger._id,
       _familyRequests: req.body.acceptedId
     },
     {
@@ -137,7 +137,7 @@ const acceptRequest = async (req, res) => {
 const denyRequest = async (req, res) => {
   const result = await Passengers.findOneAndUpdate(
     {
-      _id: req.user._id,
+      _id: req.passenger._id,
       _familyRequests: req.body.deniedId
     },
     {
@@ -157,14 +157,14 @@ const sentRequestSchema = Joi.object().keys({
     .max(11)
     .required()
 });
-const validateSentRequest = function (reqBody) {
+const validateSentRequest = function(reqBody) {
   return sentRequestSchema.validate(reqBody);
 };
 
 const cancelledRequestSchema = Joi.object().keys({
   recipientId: Joi.objectId().required()
 });
-const validateCancelledRequest = function (reqBody) {
+const validateCancelledRequest = function(reqBody) {
   return cancelledRequestSchema.validate(reqBody);
 };
 
