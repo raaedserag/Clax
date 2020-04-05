@@ -12,6 +12,8 @@ const paypalSecret=require("../../startup/config").paypalSecret();
 //Transaction
 const { startTransaction } = require("../../db/db");
 //Validators
+const {validatePaypalRequest} = require("../../validators/manage-financials-validators");
+
 
 
 
@@ -22,12 +24,13 @@ paypal.configure({
   client_secret:paypalSecret
 });
 
-let ChargeOgra = async (req, res) => {
+let ChargeOgra = async function (req, res)  {
 
-
-  //encryprion User id
+try{
+  
+//encryprion User id
   const encryptId=encryption.encodeId(req.body._passenger);
-
+//create payment object
   var create_payment_json = {
     intent: "sale",
     payer: {
@@ -58,7 +61,15 @@ let ChargeOgra = async (req, res) => {
       }
     ]
   };
+  //validate charged amount
+  validateObject={
+    amount:req.body.amount
 
+  }
+  const { error } = validatePaypalRequest( validateObject)
+  if (error) return res.status(400).send(error.details[0].message);
+
+  //create payment process
   paypal.payment.create(create_payment_json, function (error, payment) {
     if (error) {
       throw error;
@@ -70,10 +81,20 @@ let ChargeOgra = async (req, res) => {
       }
     }
   });
-};
+}catch(error){ res.status(400).send("Invalid Data.");}
+
+
+}
+
 module.exports.ChargeOgra = ChargeOgra;
 
-let ChargeSuccess = async (req, res) => {
+let ChargeSuccess = async function (req, res)  {
+  let session=null;
+  
+
+  try{
+  //Start Transaction
+  session=await startTransaction();
   execute_payment_json = {
     transactions: [
       {
@@ -99,14 +120,12 @@ let ChargeSuccess = async (req, res) => {
     if (error) {
       throw error;
     } else {
-      const oldBalance = (
-        await Passengers.findById(decryptId).select("balance -_id ")
-      ).balance;
-      total = parseInt(req.params.amount) + oldBalance;
+    
+      addedBalance= parseInt(req.params.amount);
       await Passengers.updateOne(
         { _id:decryptId},
-        { $set: { balance: total } }
-      );
+        { $inc: { balance: addedBalance } 
+      },{session});
       var confirmedPayment = {
         amount: parseInt(req.params.amount),
         description: "Paypal",
@@ -116,10 +135,15 @@ let ChargeSuccess = async (req, res) => {
     //Save payment in DB on success
     confirmedPayment = new Payments(confirmedPayment);
     confirmedPayment = await confirmedPayment.save();
+    await session.commitTransaction();
     res.send(confirmedPayment);
     }
   });
-};
+}catch(error){
+  await session.abortTransaction();
+  throw new Error("Tranaction Faild !\n" + error.message )
+}
+}
 module.exports.ChargeSuccess = ChargeSuccess;
 
 module.exports.ChargeCancel = async (req, res) => { res.send("Cancelled"); };
