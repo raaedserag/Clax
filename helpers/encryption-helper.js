@@ -23,7 +23,6 @@ module.exports.hashing = async function (pass) {
   return await bcrypt.hash(pass, await bcrypt.genSalt(10));
 };
 
-
 // Temp Token
 module.exports.generateTempToken = function (id, is_passenger = true) {
   return jwt.sign({

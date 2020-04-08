@@ -52,7 +52,7 @@ module.exports = function (app) {
   // Pairing & Tracking Section
   app.use("/api/pairing", pairing);
   // Externals Section
-  app.use("/clients/passenger", passengerExternal)
+  app.use("/clients/passengers", passengerExternal)
 
 
   // Apply Error Middle ware
