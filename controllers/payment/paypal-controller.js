@@ -1,107 +1,149 @@
 // Models
 const { Passengers } = require("../../models/passengers-model");
-const { Payment } = require("../../models/payment-model");
+const { Payments } = require("../../models/payment-model");
 // Controllers
 const paypal = require("paypal-rest-sdk");
-const { host, port } = require("../../startup/config").serverConfig()
+const { host, port } = require("../../startup/config").serverConfig();
+//Helpers
+const encryption = require("../../helpers/encryption-helper");
+//Secrets
+const { paypalId, paypalSecret } = require("../../startup/config").paypalCredentials()
+//Transaction
+const { startTransaction } = require("../../db/db");
+//Validators
+const { validatePaypalRequest } = require("../../validators/manage-financials-validators");
+
+
+
+
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
-  client_id:
-    "Afz2ZG4x08P1iadRg9EjWYIbHSwwzZtpYknahjk88d3Vujz3PVG_PhHtta_LdNzZEdMn1mnbz7GdTLJL",
-  client_secret:
-    "EOjDIHOxb4CkPstrtjU8kW1os5_y_PTEEF05aVgZrNsE7L_V6S7VuAf-VJNFhMRIy4Q7pSTTFZAQh6u3"
+  client_id: paypalId,
+  client_secret: paypalSecret
 });
 
-let ChargeOgra = async (req, res) => {
-  var create_payment_json = {
-    intent: "sale",
-    payer: {
-      payment_method: "paypal"
-    },
-    redirect_urls: {
-      return_url: `http://${host}:${port}/api/paypal/success/${req.body._passenger}/${req.body.amount}`,
-      cancel_url: `http://${host}:${port}/api/paypal/cancel`
-    },
-    transactions: [
-      {
-        item_list: {
-          items: [
-            {
-              name: "Balance Adjustment",
-              sku: "001",
-              price: parseInt(req.body.amount),
-              currency: "USD",
-              quantity: 1
-            }
-          ]
-        },
-        amount: {
-          total: parseInt(req.body.amount),
-          currency: "USD"
-        },
-        description: "Balance Adjustment"
-      }
-    ]
-  };
+let ChargeOgra = async function (req, res) {
 
-  paypal.payment.create(create_payment_json, function (error, payment) {
-    if (error) {
-      throw error;
-    } else {
-      for (let i = 0; i < payment.links.length; i++) {
-        if (payment.links[i].rel === "approval_url") {
-          res.send(payment.links[i].href);
+  try {
+
+    //encryprion User id
+    const encryptId = encryption.encodeId(req.body._passenger);
+    //create payment object
+    var create_payment_json = {
+      intent: "sale",
+      payer: {
+        payment_method: "paypal"
+      },
+      redirect_urls: {
+        return_url: `http://${host}:${port}/api/passengers/paypal/success/${encryptId}/${req.body.amount}`,
+        cancel_url: `http://${host}:${port}/api/passengers/paypal/cancel`
+      },
+      transactions: [
+        {
+          item_list: {
+            items: [
+              {
+                name: "Balance Adjustment",
+                sku: "001",
+                price: parseInt(req.body.amount),
+                currency: "USD",
+                quantity: 1
+              }
+            ]
+          },
+          amount: {
+            total: parseInt(req.body.amount),
+            currency: "USD"
+          },
+          description: "Balance Adjustment"
+        }
+      ]
+    };
+    //validate charged amount
+    validateObject = {
+      amount: req.body.amount
+
+    }
+    const { error } = validatePaypalRequest(validateObject)
+    if (error) return res.status(400).send(error.details[0].message);
+
+    //create payment process
+    paypal.payment.create(create_payment_json, function (error, payment) {
+      if (error) {
+        throw error;
+      } else {
+        for (let i = 0; i < payment.links.length; i++) {
+          if (payment.links[i].rel === "approval_url") {
+            res.send(payment.links[i].href);
+          }
         }
       }
-    }
-  });
-};
+    });
+  } catch (error) { res.status(400).send("Invalid Data."); }
+
+
+}
+
 module.exports.ChargeOgra = ChargeOgra;
 
-let ChargeSuccess = async (req, res) => {
-  execute_payment_json = {
-    transactions: [
-      {
-        amount: {
-          total: parseInt(req.params.amount),
-          currency: "USD"
-        }
-      }
-    ]
-  };
-  const payerId = req.query.PayerID;
-  const paymentId = req.query.paymentId;
-  execute_payment_json.payer_id = payerId;
+let ChargeSuccess = async function (req, res) {
+  let session = null;
 
-  paypal.payment.execute(paymentId, execute_payment_json, async function (
-    error,
-    payment
-  ) {
-    if (error) {
-      throw error;
-    } else {
-      const oldBalance = (
-        await Passengers.findById(req.params.id).select("balance -_id ")
-      ).lean().balance;
-      total = parseInt(req.params.amount) + oldBalance;
-      await Passengers.updateOne(
-        { _id: req.params.id },
-        { $set: { balance: total } }
-      );
-      var confirmedPayment = {
-        amount: parseInt(req.params.amount),
-        description: "Paypal",
-        type: "Charge",
-        _passenger: req.params.id
-      };
-      //Save payment in DB on success
-      confirmedPayment = new Payment(confirmedPayment);
-      confirmedPayment = await confirmedPayment.save();
-      res.send(confirmedPayment);
-    }
-  });
-};
+
+  try {
+    //Start Transaction
+    session = await startTransaction();
+    execute_payment_json = {
+      transactions: [
+        {
+          amount: {
+            total: parseInt(req.params.amount),
+            currency: "USD"
+          }
+        }
+      ]
+    };
+    const payerId = req.query.PayerID;
+    const paymentId = req.query.paymentId;
+    execute_payment_json.payer_id = payerId;
+
+    //decryprion User id
+    const decryptId = encryption.decodeId(req.params.id);
+
+    //confirm paypal payment
+    paypal.payment.execute(paymentId, execute_payment_json, async function (
+      error,
+      payment
+    ) {
+      if (error) {
+        throw error;
+      } else {
+
+        addedBalance = parseInt(req.params.amount);
+        await Passengers.updateOne(
+          { _id: decryptId },
+          {
+            $inc: { balance: addedBalance }
+          }, { session });
+        var confirmedPayment = {
+          amount: parseInt(req.params.amount),
+          description: "Paypal",
+          type: "Charge",
+          _passenger: decryptId
+        };
+        //Save payment in DB on success
+        confirmedPayment = new Payments(confirmedPayment);
+        confirmedPayment = await confirmedPayment.save();
+        await session.commitTransaction();
+        res.send(confirmedPayment);
+      }
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    throw new Error("Tranaction Faild !\n" + error.message)
+  }
+}
 module.exports.ChargeSuccess = ChargeSuccess;
 
 module.exports.ChargeCancel = async (req, res) => { res.send("Cancelled"); };

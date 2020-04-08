@@ -58,3 +58,21 @@ const chargeSchema = Joi.object().keys({
 module.exports.validateChargeRequest = function(charge) {
   return chargeSchema.validate(charge);
 };
+
+
+//  paypal
+const validatePaypalRequest = Joi.object().keys({
+  amount: Joi.string()
+  .required()
+  .custom((amount, helpers) => {
+    amount = parseFloat(amount);
+    if (isNaN(amount) || amount <= 0) return helpers.error("any.invalid");
+    // else
+    return amount;
+  }, "Amount Validation"),
+  
+  });
+module.exports.validatePaypalRequest = function(charge) {
+  return validatePaypalRequest.validate(charge);
+};
+

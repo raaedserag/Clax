@@ -78,3 +78,13 @@ module.exports.cryptoKey = function () {
   }
   return cryptoKey;
 }
+
+// Get paypal client id and secret from the environment file
+module.exports.paypalCredentials = function () {
+  const paypalId = process.env.PAYPAL_ID
+  const paypalSecret = process.env.PAYPAL_SECRET
+  if (!(paypalId && paypalSecret)) {
+    throw new Error("FATAL ERROR: paypal creddentials is not defined.");
+  }
+  return { paypalId, paypalSecret };
+}
