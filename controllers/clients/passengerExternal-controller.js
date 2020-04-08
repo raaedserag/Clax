@@ -1,8 +1,7 @@
 // Models
 const { Passengers } = require("../../models/passengers-model");
 // Helpers
-const { decodeId,
-    hashingPassword } = require("../../helpers/encryption-helper")
+const { decodeId } = require("../../helpers/encryption-helper")
 //----------------
 
 module.exports.verifyPassengerMail = async (req, res) => {
@@ -14,14 +13,12 @@ module.exports.verifyPassengerMail = async (req, res) => {
 
     await Passengers.findByIdAndUpdate(userId, { mail_verified: true })
     // render confirmation
-    return res.send("Done")
+    return res.send("Mail Verified")
 }
 
-module.exports.CreatePasswordPage = async (req, res) => {
-    // Decode passenger id
-    const userId = decodeId(req.params.id)
-    // Update password
-    const passenger = await Passengers.findByIdAndUpdate(userId, {
-        pass: await hashingPassword(req.body.pass)
-    })
+module.exports.getPasswordPage = async (req, res) => {
+    // Render page, create header with temp toke
+    res.header("x-login-token", generateTempToken(req.params.id)).
+        send("Set new password");
+    // 
 };

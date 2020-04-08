@@ -3,7 +3,7 @@ const { Passengers } = require("../../models/passengers-model");
 // Helpers
 const {
   encodeId,
-  hashingPassword
+  hashing
 } = require("../../helpers/encryption-helper");
 const mail = require("../../services/sendgrid-mail");
 const sms = require("../../services/nexmo-sms");
@@ -14,7 +14,7 @@ const { host, port } = require('../../startup/config').serverConfig()
 
 // Get passenger info
 module.exports.getMe = async (req, res) => {
-  const passenger = await Passengers.findById(req.passenger._id).select(
+  const passenger = await Passengers.findById(req.user._id).select(
     "-_id name mail phone pass passLength phone_verified mail_verified"
   );
   return res.send(passenger);
@@ -29,7 +29,7 @@ module.exports.updateMe = async (req, res) => {
   // Format update request
   if (request.mail) request.mail_verified = false;
   if (request.phone) request.phone_verified = false;
-  if (request.pass) request.pass = await hashingPassword(request.pass);
+  if (request.pass) request.pass = await hashing(request.pass);
 
   if (request.firstName) {
     let name = {};
@@ -40,7 +40,7 @@ module.exports.updateMe = async (req, res) => {
     request.name = name;
   }
 
-  await Passengers.findByIdAndUpdate(req.passenger._id, request);
+  await Passengers.findByIdAndUpdate(req.user._id, request);
 
   return res.sendStatus(200);
 };
@@ -48,7 +48,7 @@ module.exports.updateMe = async (req, res) => {
 // Request mail verification
 module.exports.requestMailVerification = async (req, res) => {
   // Update mail and set to unverified
-  const userUpdate = await Passengers.findByIdAndUpdate(req.passenger._id, {
+  const userUpdate = await Passengers.findByIdAndUpdate(req.user._id, {
     mail: req.body.mail,
     mail_verified: false
   });
@@ -58,7 +58,7 @@ module.exports.requestMailVerification = async (req, res) => {
   ).toString();
 
   const link =
-    `${host}:${port}/clients/passenger/verify-mail/${encodeId(req.passenger._id)}`;
+    `${host}:${port}/clients/passenger/verify-mail/${encodeId(req.user._id)}`;
 
   await mail.sendVerificationCode(req.body.mail, {
     code,
@@ -72,7 +72,7 @@ module.exports.requestMailVerification = async (req, res) => {
 
 // Confirm mail
 module.exports.confirmMail = async (req, res) => {
-  await Passengers.findByIdAndUpdate(req.passenger._id, {
+  await Passengers.findByIdAndUpdate(req.user._id, {
     mail_verified: true
   });
   return res.sendStatus(200);
@@ -81,7 +81,7 @@ module.exports.confirmMail = async (req, res) => {
 // Request phone verification
 module.exports.requestPhoneVerification = async (req, res) => {
   // Update phone and set to unverified
-  const userUpdate = await Passengers.findByIdAndUpdate(req.passenger._id, {
+  const userUpdate = await Passengers.findByIdAndUpdate(req.user._id, {
     phone: req.body.phone,
     phone_verified: false
   });
@@ -96,7 +96,7 @@ module.exports.requestPhoneVerification = async (req, res) => {
 
 // Confirm phone
 module.exports.confirmPhone = async (req, res) => {
-  await Passengers.findByIdAndUpdate(req.passenger._id, {
+  await Passengers.findByIdAndUpdate(req.user._id, {
     phone_verified: true
   });
   return res.sendStatus(200);

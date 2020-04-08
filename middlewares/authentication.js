@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
 
   for (let i = 0; i < jwtKeys.length; i++) {
     try {
-      req.passenger = jwt.verify(token, jwtKeys[i])
+      req.user = jwt.verify(token, jwtKeys[i])
       break;
     } catch (error) {
       // If all verifications failed, return unauthorized

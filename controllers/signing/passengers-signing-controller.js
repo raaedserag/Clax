@@ -1,9 +1,7 @@
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
-const jwt = require("jsonwebtoken");
 // Configuration & Secrets
 const { host, port } = require("../../startup/config").serverConfig()
-const { tempJwt } = require("../../startup/config").jwtKeys()
 // Models & Validators
 const { Passengers,
     validatePassenger, } = require("../../models/passengers-model");
@@ -12,9 +10,9 @@ const { validateLogin,
     validateNewPass } = require("../../validators/signing-validators")
 // Helpers & Services
 const createStripeAccount = require('../../services/stripe').createCustomer
-const { hashingPassword,
+const { hashing,
     encodeId,
-    decodeId } = require("../../helpers/encryption-helper");
+    generateTempToken } = require("../../helpers/encryption-helper");
 const mail = require("../../services/sendgrid-mail");
 const sms = require("../../services/nexmo-sms");
 //---------------------
@@ -43,7 +41,7 @@ module.exports.passengerRegister = async (req, res) => {
     passenger.name = { first: passenger.firstName, last: passenger.lastName };
     passenger.stripeId = customerToken.id;
     passenger.passLength = passenger.pass.length
-    passenger.pass = await hashingPassword(passenger.pass)
+    passenger.pass = await hashing(passenger.pass)
     passenger = _.pick(passenger, ["name", "mail", "pass", "passLength", "phone", "stripeId"])
 
     //save user to the database.
@@ -120,10 +118,7 @@ module.exports.passengerForgottenPass = async (req, res) => {
     }
 
     // Respond with the verification code and give temp token as a header
-    res.header("x-login-token", jwt.sign({
-        _id: passenger._id,
-        is_passenger: true
-    }, tempJwt, { expiresIn: "1h" })).send(code);
+    res.header("x-login-token", generateTempToken(passenger._id)).send(await hashing(code));
 };
 
 // Set new password
@@ -132,8 +127,8 @@ module.exports.passengerSetNewPass = async (req, res) => {
     const { error } = validateNewPass(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    const passenger = await Passengers.findByIdAndUpdate(req.passenger._id, {
-        pass: await hashingPassword(req.body.pass)
+    const passenger = await Passengers.findByIdAndUpdate(req.user._id, {
+        pass: await hashing(req.body.pass)
     })
     res.header("x-login-token", new Passengers(passenger).generateToken()).sendStatus(200)
 };

@@ -23,7 +23,7 @@ const {
 
 // Get balance
 module.exports.getBalance = async (req, res) => {
-  const userBalance = await getPassengerBalance(req.passenger._id);
+  const userBalance = await getPassengerBalance(req.user._id);
   res.status(200).send(parseFloat(userBalance).toFixed(2));
 };
 
@@ -35,11 +35,11 @@ module.exports.chargeBlance = async (req, res) => {
 
   // Charge passenger stripe account
   await chargeStripeBalance(
-    req.passenger.stripeId,
+    req.user.stripeId,
     req.body
   );
   // Adding balance to the passenger account
-  const payment = await chargePassengerBalance(req.passenger._id, req.body);
+  const payment = await chargePassengerBalance(req.user._id, req.body);
 
   // Registering charge operation
 
@@ -50,7 +50,7 @@ module.exports.chargeBlance = async (req, res) => {
 // Get card info
 module.exports.getCardInfo = async (req, res) => {
   // Retreive cards info
-  const cardsQuery = await getCards(req.passenger.stripeId);
+  const cardsQuery = await getCards(req.user.stripeId);
   res
     .status(200)
     .send(
@@ -82,20 +82,20 @@ module.exports.addNewCard = async (req, res) => {
   });
 
   // Generating user card source
-  const sourceTokenId = await createSource(req.passenger.stripeId, cardTokenId);
+  const sourceTokenId = await createSource(req.user.stripeId, cardTokenId);
 
   return res.status(200).send(sourceTokenId);
 };
 
 // Removed a new card
 module.exports.removeCard = async (req, res) => {
-  await removeSource(req.passenger.stripeId, req.body.source);
+  await removeSource(req.user.stripeId, req.body.source);
   return res.status(200).send("Source removed successfully!");
 };
 
 //Get user payments
 module.exports.getUserPayments = async (req, res) => {
-  var payments = await Passengers.findById(req.passenger._id)
+  var payments = await Passengers.findById(req.user._id)
     .select("-_id name")
     .populate({
       path: "_payments",
