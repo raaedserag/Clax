@@ -1,5 +1,5 @@
 //Modules
-const winston = require("winston")
+const winston = require("winston");
 const configuration = require("./startup/config");
 const express = require("express");
 const app = express();
