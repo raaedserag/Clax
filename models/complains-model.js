@@ -8,6 +8,7 @@ Joi.objectId = require("joi-objectid")(Joi);
 const complaintSchema = new mongoose.Schema({
   response: {
     type: String,
+    default: null,
     trim: true
   },
   code: {
@@ -24,10 +25,6 @@ const complaintSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now
-  },
-  image: {
-    type: String,
-    default: "https://www.driverg.com/work/images/driverimage.jpg"
   },
   from_passenger: {
     type: Boolean,

@@ -4,11 +4,11 @@ Joi.objectId = require("joi-objectid")(Joi);
 
 let pastTrips = async (req, res) => {
   //   const trips = await PastTrips.find({
-  //     _passengers: req.passenger._id
+  //     _passengers: req.user._id
   //   }).select("-_driver -_passengers");
 
   let trips = await PastTrips.find({
-    _passengers: req.passenger._id
+    _passengers: req.user._id
   })
     .populate("_line", "from to")
     .select("-_driver -_passengers")
@@ -24,11 +24,11 @@ let pastTrips = async (req, res) => {
 };
 let getFavourtieTrips = async (req, res) => {
   //   const trips = await PastTrips.find({
-  //     _passengers: req.passenger._id
+  //     _passengers: req.user._id
   //   }).select("-_driver -_passengers");
 
   let trips = await PastTrips.find({
-    _passengers: req.passenger._id,
+    _passengers: req.user._id,
     is_favourite: true
   })
     .populate("_line", "from to")
@@ -46,7 +46,7 @@ let getFavourtieTrips = async (req, res) => {
 
 let addToFavourite = async (req, res) => {
   //   const trips = await PastTrips.find({
-  //     _passengers: req.passenger._id
+  //     _passengers: req.user._id
   //   }).select("-_driver -_passengers");
 
   const { error } = validateFavouriteTrips(req.body);
@@ -55,7 +55,7 @@ let addToFavourite = async (req, res) => {
   let result = await PastTrips.updateMany(
     {
       _id: { $in: req.body.tripsIds },
-      _passengers: req.passenger._id
+      _passengers: req.user._id
     },
     {
       $set: { is_favourite: true }
@@ -69,7 +69,7 @@ let addToFavourite = async (req, res) => {
 };
 let removeFromFavourites = async (req, res) => {
   //   const trips = await PastTrips.find({
-  //     _passengers: req.passenger._id
+  //     _passengers: req.user._id
   //   }).select("-_driver -_passengers");
 
   const { error } = validateFavouriteTrips(req.body);
@@ -78,7 +78,7 @@ let removeFromFavourites = async (req, res) => {
   let result = await PastTrips.updateMany(
     {
       _id: { $in: req.body.tripsIds },
-      _passengers: req.passenger._id
+      _passengers: req.user._id
     },
     {
       $set: { is_favourite: false }
@@ -96,7 +96,7 @@ const favouriteTripsSchemas = Joi.object().keys({
     .items(Joi.objectId())
     .required()
 });
-const validateFavouriteTrips = function(tripsRequest) {
+const validateFavouriteTrips = function (tripsRequest) {
   return favouriteTripsSchemas.validate(tripsRequest);
 };
 

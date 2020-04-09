@@ -1,7 +1,7 @@
 const {
   Admins,
   validateAdmin,
-  validateAdminLogin
+  validateAdminLogin,
 } = require("../../models/admins-model");
 const { Passengers } = require("../../models/passengers-model");
 const Joi = require("@hapi/joi");
