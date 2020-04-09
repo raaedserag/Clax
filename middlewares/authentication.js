@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const jwtKeys = Object.values(require("../startup/config.js").jwtKeys())
+const jwtKeys = Object.values(require("../startup/config.js").jwtKeys());
 //-----------------
 
 module.exports = (req, res, next) => {
@@ -9,12 +9,12 @@ module.exports = (req, res, next) => {
 
   for (let i = 0; i < jwtKeys.length; i++) {
     try {
-      req.user = jwt.verify(token, jwtKeys[i])
+      req.user = jwt.verify(token, jwtKeys[i]);
       break;
     } catch (error) {
       // If all verifications failed, return unauthorized
-      if (i == jwtKeys.length - 1) return res.sendStatus(401)
+      if (i == jwtKeys.length - 1) return res.sendStatus(401);
     }
   }
   next();
-}
+};
