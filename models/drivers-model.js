@@ -6,7 +6,7 @@ const passwordComplexity = require("joi-password-complexity");
 const jwt = require("jsonwebtoken");
 // Includes
 const jwtDriverKey = require("../startup/config.js").jwtKeys().driverJwt
-const RegExps = require("../db/regExps");
+const RegExps = require("../validators/regExps")
 // Driver Model
 // Schema
 const driverSchema = new mongoose.Schema({
@@ -24,7 +24,7 @@ const driverSchema = new mongoose.Schema({
       trim: true,
       minlength: 3,
       maxlength: 64
-    } 
+    }
   },
   mail: {
     type: String,
@@ -84,29 +84,29 @@ const driverSchema = new mongoose.Schema({
     //   return Math.round(r);
     // } // Return the integer rate
   },
-  img: {data: Buffer, contentType: String},
+  img: { data: Buffer, contentType: String },
   license: {
-      copy: {data: Buffer, contentType: String},
-      fullName: {type: String},
-      nationalId: {type: String},
-      region: {type: String},
-      released: {type: Date},
-      expires: {type: Date},
+    copy: { data: Buffer, contentType: String },
+    fullName: { type: String },
+    nationalId: { type: String },
+    region: { type: String },
+    released: { type: Date },
+    expires: { type: Date },
   },
   status: {
-      is_available: {type: Boolean},
-      availableSeats: {type: Number},
-      _activeCar: {type: mongoose.ObjectId, ref: 'Cars'},
-      _activeLine: {type: mongoose.ObjectId, ref: 'Lines'}
+    is_available: { type: Boolean },
+    availableSeats: { type: Number },
+    _activeCar: { type: mongoose.ObjectId, ref: 'Cars' },
+    _activeLine: { type: mongoose.ObjectId, ref: 'Lines' }
 
   }
 });
 // JWT generation method
-driverSchema.methods.generateToken = function(expiry) {
+driverSchema.methods.generateToken = function (expiry) {
   return jwt.sign({
-     _id: this._id,
-     is_passenger: false 
-    }, jwtDriverKey, { expiresIn: expiry });
+    _id: this._id,
+    is_passenger: false
+  }, jwtDriverKey, { expiresIn: expiry });
 };
 
 module.exports.Drivers = mongoose.model("Drivers", driverSchema);
@@ -127,15 +127,15 @@ const complexityOptions = {
 const validationSchema = Joi.object().keys({
   name: Joi.object({
     first: Joi.string()
-    .required()
-    .trim()
-    .min(3)
-    .max(64),
+      .required()
+      .trim()
+      .min(3)
+      .max(64),
     last: Joi.string()
-    .required()
-    .trim()
-    .min(3)
-    .max(64)
+      .required()
+      .trim()
+      .min(3)
+      .max(64)
   }),
   mail: Joi.string()
     .email()
@@ -144,7 +144,7 @@ const validationSchema = Joi.object().keys({
     .lowercase()
     .min(6)
     .max(64),
-  pass: passwordComplexity(complexityOptions),  
+  pass: passwordComplexity(complexityOptions),
   phone: Joi.string()
     .required()
     .trim()
@@ -152,15 +152,15 @@ const validationSchema = Joi.object().keys({
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
   tripsCount: Joi.string()
-  .custom((value, helpers) => {
-    value = parseFloat(value);
-    if (isNaN(value) || !Number.isInteger(value) || value < 0)
-      return helpers.error("any.invalid");
-    // else
-    return value;
-  }, "tripsCount Validation"),
+    .custom((value, helpers) => {
+      value = parseFloat(value);
+      if (isNaN(value) || !Number.isInteger(value) || value < 0)
+        return helpers.error("any.invalid");
+      // else
+      return value;
+    }, "tripsCount Validation"),
   rate: Joi.string()
-  .custom((value, helpers) => {
+    .custom((value, helpers) => {
       value = parseFloat(value);
       if (isNaN(value) || value < 0 || value > 5)
         return helpers.error("any.invalid");
@@ -171,18 +171,18 @@ const validationSchema = Joi.object().keys({
   status: Joi.object({
     is_available: Joi.bool(),
     availableSeats: Joi.string()
-    .custom((value, helpers) => {
-      value = parseFloat(value);
-      if (isNaN(value) || !Number.isInteger(value) || value < 0 || value > 15)
-        return helpers.error("any.invalid");
-      // else
-      return value;
-    }, "availableSeats Validation"),
+      .custom((value, helpers) => {
+        value = parseFloat(value);
+        if (isNaN(value) || !Number.isInteger(value) || value < 0 || value > 15)
+          return helpers.error("any.invalid");
+        // else
+        return value;
+      }, "availableSeats Validation"),
     _activeCar: Joi.objectId(),
     _activeLine: Joi.objectId()
   })
-  });
-module.exports.validateDriver = function(driver) {
+});
+module.exports.validateDriver = function (driver) {
   return validationSchema.validate(driver);
 };
 
@@ -201,6 +201,6 @@ const loginSchema = Joi.object().keys({
     .min(8)
     .max(30)
 });
-module.exports.validateDriverLogin = function(driverRequest) {
+module.exports.validateDriverLogin = function (driverRequest) {
   return loginSchema.validate(driverRequest);
 };

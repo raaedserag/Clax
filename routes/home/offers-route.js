@@ -17,12 +17,12 @@ router.post("/", authentication, async (req, res) => {
 
   //check if passenger already used the code.
 
-  const passengerId = offer._passengers.find(x => x == req.passenger._id);
+  const passengerId = offer._passengers.find(x => x == req.user._id);
 
   if (passengerId) return res.status(400).send("لقد استخدمت هذا العرض مسبقاً.");
 
   //push the passenger Id to the offer array.
-  offer._passengers.push(req.passenger._id);
+  offer._passengers.push(req.user._id);
   //save offer to the database.
   await offer.save();
 

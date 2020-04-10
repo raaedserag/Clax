@@ -3,7 +3,7 @@ const connString = require("../startup/config").connectionString();
 require("winston-mongodb");
 require("express-async-errors");
 
-module.exports = function() {
+module.exports = function () {
   // catch an uncaughtException in a file and a database
   winston.exceptions.handle(
     new winston.transports.MongoDB({
@@ -36,8 +36,7 @@ module.exports = function() {
     })
   );
   //  Use Console logging in development mode only
-  if(process.env.NODE_ENV == "development")
-  {
+  if (process.env.NODE_ENV == "development") {
     winston.add(new winston.transports.Console({
       level: "info",
       format: winston.format.combine(
