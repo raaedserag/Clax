@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^2.4.3",
     "@hapi/joi": "^17.1.0",
     "balanced-match": "^1.0.0",
     "bcrypt": "^3.0.7",

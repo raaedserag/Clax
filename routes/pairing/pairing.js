@@ -7,14 +7,8 @@ const {createNewLine} = require('../../controllers/pairing/geoJson')
 
 
 router.post('/station',authentication,locStation);
-
-
 router.get('/line',authentication,lines);
-
-
 router.post('/driver',authentication,drivers);
-
-
 router.post('/create-line',authentication, createNewLine)
 
 module.exports=router;
