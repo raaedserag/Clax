@@ -41,5 +41,8 @@
     "twilio": "^3.41.1",
     "winston": "^3.2.1",
     "winston-mongodb": "^5.0.1"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2"
   }
 }
