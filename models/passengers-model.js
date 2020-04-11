@@ -17,15 +17,15 @@ const passengerSchema = new mongoose.Schema({
       required: true,
       trim: true,
       minlength: 3,
-      maxlength: 64,
+      maxlength: 64
     },
     last: {
       type: String,
       required: true,
       trim: true,
       minlength: 3,
-      maxlength: 64,
-    },
+      maxlength: 64
+    }
   },
   mail: {
     type: String,
@@ -34,20 +34,20 @@ const passengerSchema = new mongoose.Schema({
     lowerCase: true,
     minlength: 6,
     maxlength: 64,
-    match: RegExps.mailRegExp,
+    match: RegExps.mailRegExp
   },
   mail_verified: { type: Boolean, default: false },
   pass: {
     type: String,
     required: true,
     minlength: 8,
-    maxlength: 1024,
+    maxlength: 1024
   },
   passLength: {
     type: Number,
     required: true,
     min: 8,
-    max: 30,
+    max: 30
   },
   phone: {
     type: String,
@@ -56,7 +56,7 @@ const passengerSchema = new mongoose.Schema({
     trim: true,
     minlength: 11,
     maxlength: 11,
-    match: RegExps.phoneRegExp,
+    match: RegExps.phoneRegExp
   },
   phone_verified: { type: Boolean, default: false },
   tripsCount: {
@@ -64,24 +64,24 @@ const passengerSchema = new mongoose.Schema({
     default: 0,
     validate: [
       {
-        validator: (c) => {
+        validator: c => {
           return Number.isInteger(c);
         },
-        message: "tripsCount should be an integer",
+        message: "tripsCount should be an integer"
       },
       {
-        validator: (c) => {
+        validator: c => {
           return c >= 0;
         },
-        message: "tripsCount should be a positive number",
-      },
-    ],
+        message: "tripsCount should be a positive number"
+      }
+    ]
   },
   rate: {
     type: Number,
     min: 0,
     max: 5,
-    default: 0,
+    default: 0
     // Calculate the rate as Average
     // set: function(r) {
     //   return (this.rate * this.tripsCount + r) / (this.tripsCount + 1);
@@ -103,8 +103,8 @@ const passengerSchema = new mongoose.Schema({
       validator: function (b) {
         return b >= this.balance - this.maxLoan;
       },
-      message: "balance can't be less than maxLoan value",
-    },
+      message: "balance can't be less than maxLoan value"
+    }
   },
   loanedAmount: {
     type: Number,
@@ -114,15 +114,15 @@ const passengerSchema = new mongoose.Schema({
         validator: function (l) {
           return l >= 0;
         },
-        message: "loanedAmount should be a positive value",
+        message: "loanedAmount should be a positive value"
       },
       {
         validator: function (l) {
           return l <= this.maxLoan;
         },
-        message: "loanedAmount must be less than or equal maxLoan",
-      },
-    ],
+        message: "loanedAmount must be less than or equal maxLoan"
+      }
+    ]
   },
   maxLoan: {
     type: Number,
@@ -131,12 +131,12 @@ const passengerSchema = new mongoose.Schema({
       validator: function (m) {
         return m >= 0;
       },
-      message: "maxLoan should be a positive value",
-    },
+      message: "maxLoan should be a positive value"
+    }
   },
   stripeId: {
     type: String,
-    default: null,
+    default: null
   },
   _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips" },
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
@@ -144,32 +144,17 @@ const passengerSchema = new mongoose.Schema({
   _complains: [{ type: mongoose.ObjectId, ref: "Complains" }],
   _payments: [{ type: mongoose.ObjectId, ref: "Payments" }],
   _family: [{ type: mongoose.ObjectId, ref: "Passengers" }],
-  _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }],
+  _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }]
 });
 
 // JWT generation methods
 // Login Token
 passengerSchema.methods.generateToken = function (expiry = "96h") {
-  return jwt.sign(
-    {
-      _id: this._id,
-      stripeId: this.stripeId,
-      is_passenger: true,
-    },
-    jwtPassengerKey,
-    { expiresIn: expiry }
-  );
-};
-// JWT generation method
-passengerSchema.methods.generateToken = function (expiry) {
-  return jwt.sign(
-    {
-      _id: this._id,
-      is_passenger: true,
-    },
-    jwtPassengerKey,
-    { expiresIn: expiry }
-  );
+  return jwt.sign({
+    _id: this._id,
+    stripeId: this.stripeId,
+    is_passenger: true
+  }, jwtPassengerKey, { expiresIn: expiry });
 };
 
 ////****************** Passenger Validation  ******************
@@ -180,25 +165,35 @@ const complexityOptions = {
   lowerCase: 1,
   upperCase: 1,
   numeric: 1,
-  requirementCount: 2,
+  requirementCount: 2
 };
 
 // Set Validation Schema
 const validationSchema = Joi.object().keys({
-  firstName: Joi.string().required().trim().min(3).max(64),
-  lastName: Joi.string().required().trim().min(3).max(64),
-  name: Joi.object({
-    first: Joi.string().required().trim().min(3).max(64),
-    last: Joi.string().required().trim().min(3).max(64),
-  }),
-  mail: Joi.string().email().trim().lowercase().min(6).max(64),
+
+  firstName: Joi.string()
+    .required()
+    .trim()
+    .min(3)
+    .max(64),
+  lastName: Joi.string()
+    .required()
+    .trim()
+    .min(3)
+    .max(64),
+  mail: Joi.string()
+    .email()
+    .trim()
+    .lowercase()
+    .min(6)
+    .max(64),
   pass: passwordComplexity(complexityOptions),
   phone: Joi.string()
     .required()
     .trim()
     .min(11)
     .max(11)
-    .pattern(RegExps.phoneRegExp, "Phone Number"),
+    .pattern(RegExps.phoneRegExp, "Phone Number")
 });
 const validatePassenger = function (passenger) {
   return validationSchema.validate(passenger);

@@ -9,7 +9,7 @@ module.exports = function () {
     new winston.transports.MongoDB({
       db: connString,
       level: "error",
-      options: { useUnifiedTopology: true },
+      options: { useUnifiedTopology: true }
     }),
     new winston.transports.File({ filename: "uncaughtExceptions.log" }),
     new winston.transports.Console({
@@ -17,12 +17,12 @@ module.exports = function () {
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.simple()
-      ),
+      )
     })
   );
 
   // catch an unhandled rejection
-  process.on("unhandledRejection", (ex) => {
+  process.on("unhandledRejection", ex => {
     throw ex;
   });
 
@@ -32,19 +32,17 @@ module.exports = function () {
     new winston.transports.MongoDB({
       db: connString,
       level: "info",
-      options: { useUnifiedTopology: true },
+      options: { useUnifiedTopology: true }
     })
   );
   //  Use Console logging in development mode only
   if (process.env.NODE_ENV == "development") {
-    winston.add(
-      new winston.transports.Console({
-        level: "info",
-        format: winston.format.combine(
-          winston.format.colorize(),
-          winston.format.simple()
-        ),
-      })
-    );
+    winston.add(new winston.transports.Console({
+      level: "info",
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      )
+    }))
   }
 };
