@@ -23,12 +23,17 @@ module.exports.serverConfig = function () {
 };
 
 //get connection string from the environment file
-module.exports.connectionString = function () {
-  const connectionString = process.env.URI
-  if (!(connectionString)) {
-    throw new Error("FATAL ERROR: connectionString is not defined.");
+module.exports.connectionStrings = function () {
+  const localUrl = process.env.LOCAL_URL
+  const remoteUrl = process.env.REMOTE_URL
+  const dbType = process.env.DATABASE_TYPE
+  if (!(localUrl && remoteUrl && dbType)) {
+    throw new Error("FATAL ERROR: connectionStrings is not defined.");
   }
-  return connectionString;
+  if (!(dbType == 'local' || dbType == 'remote')) {
+    throw new Error("FATAL ERROR: dbType should be \'local\' or \'remote\' only.");
+  }
+  return { localUrl, remoteUrl, dbType };
 }
 
 // get stripe key from the environment file
