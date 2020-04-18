@@ -25,6 +25,8 @@ const paypal = require("../routes/payment/paypal-route");
 const pairing = require("../routes/pairing/pairing");
 // Externals Section
 const passengerExternal = require("../routes/clients/passengerExternal-route");
+// Server Interface
+const serverInterfaceRoute = require("../routes/clients/serverInterface-route")
 
 module.exports = function (app) {
   // Apply Essential Middlewares
@@ -60,7 +62,11 @@ module.exports = function (app) {
   // Externals Section
   app.use("/clients/passengers", passengerExternal);
   app.use("/api/admin", admin);
+  // Server Interface
+  app.use("/server", serverInterfaceRoute)
 
+  // Handle Not found pages
+  app.all('*', (req, res) => res.sendStatus(404))
   // Apply Error Middle ware
   app.use(error);
 };
