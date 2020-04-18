@@ -8,7 +8,7 @@ module.exports = function () {
   winston.exceptions.handle(
     new winston.transports.MongoDB({
       db: remoteUrl,
-      level: "error",
+      level: "info",
       options: { useUnifiedTopology: true },
     }),
     new winston.transports.File({ filename: "uncaughtExceptions.log" }),
