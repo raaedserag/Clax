@@ -6,7 +6,7 @@
   "scripts": {
     "test": "env-cmd mocha -R spec",
     "start": "node app.js",
-    "develop": "env-cmd node app.js"
+    "dev": "env-cmd node app.js"
   },
   "keywords": [],
   "author": "",

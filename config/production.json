@@ -1,3 +1,4 @@
 {
-  "name": "Clax-prod"
+  "name": "Clax-prod",
+  "dbType": "local"
 }

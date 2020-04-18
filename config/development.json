@@ -1,3 +1,5 @@
 {
-  "name": "Clax-dev"
+  "name": "Clax-dev",
+  "dbType": "remote",
+  "localDb": "mongodb://localhost/clax-local"
 }

@@ -24,9 +24,12 @@ module.exports.serverConfig = function () {
 
 //get connection string from the environment file
 module.exports.connectionStrings = function () {
-  const localUrl = process.env.LOCAL_URL
+  let localUrl;
+  if (process.env.NODE_ENV == "development") localUrl = config.get("localDb");
+  else localUrl = process.env.LOCAL_URL;
+
   const remoteUrl = process.env.REMOTE_URL
-  const dbType = process.env.DATABASE_TYPE
+  const dbType = config.get("dbType")
   if (!(localUrl && remoteUrl && dbType)) {
     throw new Error("FATAL ERROR: connectionStrings is not defined.");
   }

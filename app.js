@@ -4,8 +4,10 @@ const configuration = require("./startup/config");
 const express = require("express");
 const app = express();
 
-//load environment variables
-require("dotenv").config();
+//load environment variables, in development only
+if (process.env.NODE_ENV == 'development') {
+    require("dotenv").config();
+}
 
 //Logging
 require("./startup/logging")();
