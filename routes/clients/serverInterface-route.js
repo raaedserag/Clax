@@ -5,6 +5,6 @@ const router = express.Router();
 const { getServerStatus } = require("../../controllers/clients/serverInterface-controller")
 //---------------------
 
-router.get("/check-status/", getServerStatus)
+router.get("/", getServerStatus)
 
 module.exports = router;
