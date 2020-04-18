@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "env-cmd mocha -R spec",
-    "start": "env-cmd node app.js"
+    "start": "node app.js",
+    "develop": "env-cmd node app.js"
   },
   "keywords": [],
   "author": "",
