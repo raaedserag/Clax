@@ -63,7 +63,7 @@ module.exports = function (app) {
   app.use("/clients/passengers", passengerExternal);
   app.use("/api/admin", admin);
   // Server Interface
-  app.use("/server", serverInterfaceRoute)
+  app.use("/", serverInterfaceRoute)
 
   // Handle Not found pages
   app.all('*', (req, res) => res.sendStatus(404))
