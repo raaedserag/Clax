@@ -1,5 +1,5 @@
 const winston = require("winston");
-const { remoteUrl } = require("../startup/config").connectionStrings();
+const { atlasUri } = require("../startup/config").dbConfig();
 require("winston-mongodb");
 require("express-async-errors");
 
@@ -7,7 +7,7 @@ module.exports = function () {
   // catch an uncaughtException in a file and a database
   winston.exceptions.handle(
     new winston.transports.MongoDB({
-      db: remoteUrl,
+      db: atlasUri,
       level: "info",
       options: { useUnifiedTopology: true },
     }),
@@ -30,7 +30,7 @@ module.exports = function () {
   winston.add(new winston.transports.File({ filename: "logfile.log" }));
   winston.add(
     new winston.transports.MongoDB({
-      db: remoteUrl,
+      db: atlasUri,
       level: "info",
       options: { useUnifiedTopology: true },
     })

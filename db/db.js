@@ -1,29 +1,63 @@
 //*****Modules*****
 const mongoose = require("mongoose");
-const { localUrl, remoteUrl, dbType } = require("../startup/config").connectionStrings();
 const winston = require("winston");
+// Configuration
+const { localUri,
+  atlasUri,
+  cosmosUri,
+  cosmosUser,
+  cosmosPass,
+  dbType } = require("../startup/config").dbConfig();
+//-------------------------------------------------------
 
-//Opening connection
-//Use => call it with async-await before read or write to database, the connection stills open till closing it.
-const connect = async function () {
-  // By default, db is local
-  let url = localUrl;
-  // check if dbType is remote
-  if (dbType == 'remote') url = remoteUrl;
+// Connecting mongoose to Cosmos
+const localConnect = async function () {
+  await mongoose.connect(localUri, {
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+    useCreateIndex: true
+  })
+}
+
+// Connecting mongoose to Cosmos
+const cosmosConnect = async function () {
+  await mongoose.connect(cosmosUri, {
+    auth: {
+      user: cosmosUser,
+      password: cosmosPass
+    },
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+    useCreateIndex: true
+  })
+}
+// Connecting mongoose to Atlas
+const atlasConnect = async function () {
   await mongoose
-    .connect(url, {
+    .connect(atlasUri, {
       useNewUrlParser: true,
       useFindAndModify: false,
       useUnifiedTopology: true,
       useCreateIndex: true
     })
-    .then(() => winston.info(`Connected to ${dbType} DB successfully...`))
-    .catch(err => {
-      winston.info(`Connection to ${dbType} DB failed: ${err} \n Reconnecting...`);
-      setTimeout(connect, 4000);
-    });
+}
+
+//Opening connection
+//Use => call it with async-await before read or write to database, the connection stills open till closing it.
+module.exports.connect = async function () {
+  try {
+    if (dbType == 'cosmos') await cosmosConnect();
+    else if (dbType == 'atlas') await atlasConnect();
+    else await localConnect();
+
+    winston.info(`Connected to ${dbType} DB successfully`)
+  } catch (error) {
+    winston.info(`Connection to ${dbType} DB failed: ${error} \n Reconnecting...`);
+    setTimeout(await this.connect(), 4000);
+  }
 };
-module.exports.connect = connect;
 
 //Closing connection
 //Use => call it with async-await after finishing read or write to database.

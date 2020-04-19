@@ -1,7 +1,7 @@
 // Modules
 const mongoose = require('mongoose');
 // Configuration
-const { dbType } = require("../../startup/config").connectionStrings();
+const { dbType } = require("../../startup/config").dbConfig();
 const dbStatusDict = ["Disconnected", "Connected", "Connecting", "Disconnecting"]
 //----------------
 

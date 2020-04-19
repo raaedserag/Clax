@@ -4,9 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "env-cmd mocha -R spec",
-    "start": "node app.js",
-    "dev": "env-cmd node app.js"
+    "test": "mocha -R spec",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",

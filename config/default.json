@@ -1,6 +1,5 @@
 {
   "name": "Clax",
   "host": "localhost",
-  "port": 3000,
-  "dbType": "remote"
+  "port": 3000
 }
