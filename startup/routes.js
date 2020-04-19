@@ -63,8 +63,8 @@ module.exports = function (app) {
   app.use("/clients/passengers", passengerExternal);
   app.use("/api/admin", admin);
   // Server Interface
-  app.use("/", serverInterfaceRoute)
-
+  //app.use("/", serverInterfaceRoute)
+  app.get('/', (req, res) => res.send("Welcome"))
   // Handle Not found pages
   app.all('*', (req, res) => res.sendStatus(404))
   // Apply Error Middle ware
