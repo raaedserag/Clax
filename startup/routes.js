@@ -10,7 +10,7 @@ const webConfig = require("../middlewares/web-config");
 // Import Routes
 // Login & Registration
 const passengerSigningRoute = require("../routes/signing/passenger-signing-route");
-const admin = require("../routes/home/admin-route");
+const admin = require("../routes/admin/admin-route");
 // Home Screen Section
 const settingsRoute = require("../routes/home/settings-route");
 const pastTripsRoute = require("../routes/home/past-trips-route");

@@ -1,17 +1,16 @@
 const {
   Admins,
   validateAdmin,
-  validateAdminLogin
+  validateAdminLogin,
 } = require("../../models/admins-model");
-const { Passengers } = require("../../models/passengers-model");
 const Joi = require("@hapi/joi");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 Joi.objectId = require("joi-objectid")(Joi);
 
-module.exports.getUsers = async (req, res) => {
-  const users = await Passengers.find().select("name phone balance rate");
-  res.send(users);
+module.exports.addOffer = async (req, res) => {
+  console.log("sadas");
+  res.send("admin");
 };
 module.exports.adminLogin = async (req, res) => {
   //Validate the data of user
@@ -61,9 +60,7 @@ module.exports.adminRegister = async (req, res) => {
   res.header("x-login-token", webToken).send(_.pick(admin, ["_id"]));
 };
 
-module.exports.getPassengerInfo = async (req, res) => {
-  const passenger = await Passengers.findById(req.passenger._id).select(
-    "name mail phone"
-  );
-  res.send(passenger);
+module.exports.getAdminInfo = async (req, res) => {
+  const admin = await Admins.findById(req.admin._id).select("name mail phone");
+  res.send(admin);
 };

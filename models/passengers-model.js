@@ -145,6 +145,7 @@ const passengerSchema = new mongoose.Schema({
   _payments: [{ type: mongoose.ObjectId, ref: "Payments" }],
   _family: [{ type: mongoose.ObjectId, ref: "Passengers" }],
   _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }],
+  _favourites: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
 });
 
 // JWT generation methods
