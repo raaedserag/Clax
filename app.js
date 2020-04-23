@@ -13,6 +13,8 @@ require("./startup/logging")();
 //Data Base
 require("./db/db").connect(); //{connect, close}
 
+app.get("/", (req, res) => res.send("Welcome"));
+
 //Routes
 require("./startup/routes")(app);
 
