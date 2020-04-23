@@ -1,5 +1,5 @@
 //Modules
-const winston = require("winston")
+const winston = require("winston");
 const configuration = require("./startup/config");
 const express = require("express");
 const app = express();
@@ -18,4 +18,4 @@ require("./startup/routes")(app);
 
 // Initiate the server on the selected PORT
 const { host, port } = configuration.serverConfig();
-app.listen(port, host, () => winston.info(`Listening on port ${port}`));
+app.listen(port, () => winston.info(`Listening on port ${port}`));

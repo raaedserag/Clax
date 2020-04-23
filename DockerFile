@@ -1,0 +1,11 @@
+FROM node
+
+WORKDIR /usr/clax-app
+
+COPY ./package.json ./
+
+RUN npm install
+
+COPY ./ ./
+
+CMD [ "npm", "start" ]
