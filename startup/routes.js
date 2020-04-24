@@ -33,7 +33,7 @@ module.exports = function (app) {
   app.use(webConfig);
   app.use(express.json()); // Reparse body of the request into json object
   app.use(express.urlencoded({ extended: true })); // Reparse url to encoded url payload
-  //app.use(express.static("public")); // For static files if needed
+  app.use(express.static("public")); // For static files if needed
 
   // Apply Morgan middleware in development mode
   if (process.env.NODE_ENV == "development") {
