@@ -1,4 +1,5 @@
 {
   "name": "Clax-dev",
-  "dbType": "atlas"
+  "dbType": "atlas",
+  "port": "3000"
 }

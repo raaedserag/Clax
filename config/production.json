@@ -1,4 +1,5 @@
 {
   "name": "Clax-prod",
-  "dbType": "cosmos"
+  "dbType": "cosmos",
+  "port": "8080"
 }
