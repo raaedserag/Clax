@@ -1,7 +1,7 @@
 // Import Modules
 const express = require("express");
 const morgan = require("morgan");
-
+const path = require('path')
 // Import Middlewares
 const error = require("../middlewares/error");
 const authentication = require("../middlewares/authentication");
@@ -33,16 +33,12 @@ module.exports = function (app) {
   app.use(webConfig);
   app.use(express.json()); // Reparse body of the request into json object
   app.use(express.urlencoded({ extended: true })); // Reparse url to encoded url payload
-
+  app.use(express.static('public')); //Serves resources from public folder
   // Apply Morgan middleware in development mode
   if (process.env.NODE_ENV == "development") {
     app.use(morgan("tiny"));
-    app.use(express.static("public")); // Local path static files
+  }
 
-  }
-  else {
-    app.use(express.static("/home/site/wwwroot/public")); // Azure path for static files
-  }
   // Apply Routes
   // Login & Registration
   app.use("/api/signing", passengerSigningRoute);
@@ -69,7 +65,7 @@ module.exports = function (app) {
   //app.use("/", serverInterfaceRoute)
   app.get('/', serverInterfaceRoute)
   // Handle Not found pages
-  app.all('*', (req, res) => res.sendStatus(404))
+  //app.all('*', (req, res) => res.sendStatus(404))
   // Apply Error Middle ware
   app.use(error);
 };
