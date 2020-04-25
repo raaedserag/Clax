@@ -41,7 +41,7 @@ module.exports = function (app) {
 
   }
   else {
-    app.use(express.static("\\home\\site\\wwwroot\\public")); // Azure path for static files
+    app.use(express.static("/home/site/wwwroot/public")); // Azure path for static files
   }
   // Apply Routes
   // Login & Registration
