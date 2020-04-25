@@ -65,7 +65,7 @@ module.exports = function (app) {
   //app.use("/", serverInterfaceRoute)
   app.get('/', serverInterfaceRoute)
   // Handle Not found pages
-  //app.all('*', (req, res) => res.sendStatus(404))
+  app.all('*', (req, res) => res.sendStatus(404))
   // Apply Error Middle ware
   app.use(error);
 };
