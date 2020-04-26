@@ -1,7 +1,7 @@
 // Import Modules
 const express = require("express");
 const morgan = require("morgan");
-const path = require('path')
+
 // Import Middlewares
 const error = require("../middlewares/error");
 const authentication = require("../middlewares/authentication");
