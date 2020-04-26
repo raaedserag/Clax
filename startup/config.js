@@ -2,10 +2,10 @@ const config = require("config");
 
 //Determine Jwt Keys from the environment file
 module.exports.jwtKeys = function () {
-  const passengerJwt = process.env.JWT_PASSENGER,
-    driverJwt = process.env.JWT_DRIVER,
-    adminJwt = process.env.JWT_ADMIN,
-    tempJwt = process.env.JWT_TEMP
+  const passengerJwt = process.env.CLAX_JWT_PASSENGER,
+    driverJwt = process.env.CLAX_JWT_DRIVER,
+    adminJwt = process.env.CLAX_JWT_ADMIN,
+    tempJwt = process.env.CLAX_JWT_TEMP
   if (!(passengerJwt && driverJwt && adminJwt && tempJwt)) {
     throw new Error("FATAL ERROR: jwtPrivateKey is not defined.");
   }
@@ -24,11 +24,11 @@ module.exports.serverConfig = function () {
 
 //get connection string from the environment file
 module.exports.dbConfig = function () {
-  const localUri = process.env.LOCAL_DB_URI,
-    atlasUri = process.env.ATLAS_DB_URI,
-    cosmosUri = process.env.COSMOS_DB_URI,
-    cosmosUser = process.env.COSMOS_DB_USER,
-    cosmosPass = process.env.COSMOS_DB_PASS,
+  const localUri = process.env.CLAX_LOCAL_DB_URI,
+    atlasUri = process.env.CLAX_ATLAS_DB_URI,
+    cosmosUri = process.env.CLAX_COSMOS_DB_URI,
+    cosmosUser = process.env.CLAX_COSMOS_DB_USER,
+    cosmosPass = process.env.CLAX_COSMOS_DB_PASS,
     dbType = config.get("dbType")
   if (!(localUri && atlasUri && cosmosUri && cosmosUser, cosmosPass)) {
     //throw new Error("FATAL ERROR: dbConfig is not defined.");
@@ -41,7 +41,7 @@ module.exports.dbConfig = function () {
 
 // get stripe key from the environment file
 module.exports.stripeKey = function () {
-  const key = process.env.STRIPE_KEY
+  const key = process.env.CLAX_STRIPE_KEY
   if (!(key)) {
     throw new Error("FATAL ERROR: stripeKey is not defined.");
   }
@@ -50,9 +50,9 @@ module.exports.stripeKey = function () {
 
 //Determine Twilio Credetinals from the environment file
 module.exports.twilioCredentials = function () {
-  const sid = process.env.TWILIO_SID,
-    token = process.env.TWILIO_TOKEN,
-    number = process.env.TWILIO_NUMBER
+  const sid = process.env.CLAX_TWILIO_SID,
+    token = process.env.CLAX_TWILIO_TOKEN,
+    number = process.env.CLAX_TWILIO_NUMBER
   if (!(sid && token && number)) {
     throw new Error("FATAL ERROR: twilioCredentials is not defined.");
   }
@@ -61,8 +61,8 @@ module.exports.twilioCredentials = function () {
 
 // Determine Nexmo credentials
 module.exports.nexmoCredentials = function () {
-  const nexmoKey = process.env.NEXMO_KEY,
-    nexmoSecret = process.env.NEXMO_SECRET
+  const nexmoKey = process.env.CLAX_NEXMO_KEY,
+    nexmoSecret = process.env.CLAX_NEXMO_SECRET
   if (!(nexmoKey && nexmoSecret)) {
     throw new Error("FATAL ERROR: nexmoCredentials is not defined.");
   }
@@ -71,7 +71,7 @@ module.exports.nexmoCredentials = function () {
 
 // get SendGrid key from the environment file
 module.exports.sendGridKey = function () {
-  const key = process.env.SENDGRID_KEY
+  const key = process.env.CLAX_SENDGRID_KEY
   if (!(key)) {
     throw new Error("FATAL ERROR: sendGridKey is not defined.");
   }
@@ -80,7 +80,7 @@ module.exports.sendGridKey = function () {
 
 // get cryptos
 module.exports.cryptoKey = function () {
-  const cryptoKey = process.env.EXTERNAL_CRYPTO
+  const cryptoKey = process.env.CLAX_EXTERNAL_CRYPTO
   if (!(cryptoKey)) {
     throw new Error("FATAL ERROR: cryptoKey is not defined.");
   }
@@ -89,8 +89,8 @@ module.exports.cryptoKey = function () {
 
 // Get paypal client id and secret from the environment file
 module.exports.paypalCredentials = function () {
-  const paypalId = process.env.PAYPAL_ID,
-    paypalSecret = process.env.PAYPAL_SECRET
+  const paypalId = process.env.CLAX_PAYPAL_ID,
+    paypalSecret = process.env.CLAX_PAYPAL_SECRET
   if (!(paypalId && paypalSecret)) {
     throw new Error("FATAL ERROR: paypal creddentials is not defined.");
   }

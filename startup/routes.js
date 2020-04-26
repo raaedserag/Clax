@@ -1,6 +1,5 @@
 // Import Modules
 const express = require("express");
-const morgan = require("morgan");
 
 // Import Middlewares
 const error = require("../middlewares/error");
@@ -36,7 +35,7 @@ module.exports = function (app) {
   app.use(express.static('public')); //Serves resources from public folder
   // Apply Morgan middleware in development mode
   if (process.env.NODE_ENV == "development") {
-    app.use(morgan("tiny"));
+    app.use(require("morgan")("tiny"));
   }
 
   // Apply Routes
