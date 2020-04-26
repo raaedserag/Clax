@@ -8,7 +8,7 @@ const dbStatusDict = ["Disconnected", "Connected", "Connecting", "Disconnecting"
 module.exports.getServerStatus = async (req, res) => {
     // Render status web-page
     return res.send({
-        serverStatus: `Hosting ${req.header("host")}`,
+        serverStatus: `Running on ${req.header("host")}`,
         dbType: dbType[0].toUpperCase() + dbType.slice(1),
         dbStatus: dbStatusDict[mongoose.connection.readyState]
     })
