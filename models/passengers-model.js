@@ -151,15 +151,11 @@ const passengerSchema = new mongoose.Schema({
 // JWT generation methods
 // Login Token
 passengerSchema.methods.generateToken = function (expiry = "96h") {
-  return jwt.sign(
-    {
-      _id: this._id,
-      stripeId: this.stripeId,
-      is_passenger: true,
-    },
-    jwtPassengerKey,
-    { expiresIn: expiry }
-  );
+  return jwt.sign({
+    _id: this._id,
+    stripeId: this.stripeId,
+    is_passenger: true
+  }, jwtPassengerKey, { expiresIn: expiry });
 };
 
 ////****************** Passenger Validation  ******************
@@ -175,9 +171,23 @@ const complexityOptions = {
 
 // Set Validation Schema
 const validationSchema = Joi.object().keys({
-  firstName: Joi.string().required().trim().min(3).max(64),
-  lastName: Joi.string().required().trim().min(3).max(64),
-  mail: Joi.string().email().trim().lowercase().min(6).max(64),
+
+  firstName: Joi.string()
+    .required()
+    .trim()
+    .min(3)
+    .max(64),
+  lastName: Joi.string()
+    .required()
+    .trim()
+    .min(3)
+    .max(64),
+  mail: Joi.string()
+    .email()
+    .trim()
+    .lowercase()
+    .min(6)
+    .max(64),
   pass: passwordComplexity(complexityOptions),
   phone: Joi.string()
     .required()

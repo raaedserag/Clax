@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "sanguine-theory-273017",
+  "private_key_id": "41d2304f9edbf751a6b3074878e01e5fb62a34e9",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDBa2hwboCn2uXb\n1ZxHGvDm9+WVWuo2JawhZcH+6USj7JRM3yyEe9LVVhmbW2BTL8KqXJomaQENFUP9\nGyDFLyHNGTJcqomZthHGt9/GOk/8AeJ/cDVVOVeeoBI5mkF5TJ30sPLVZekU+x4z\nzhCSnuBBKX425kR/TYVjzhYZsMMWcxWhCWn9DI0PUEqObs6X5jDp3rNEG4cxIqyB\ns9RgTbYz/K/PC0uRGTSPnQkZXTlfbW1J3FHjqTyBLY4sOwipihA26ri3nTISVuQi\nsqCNiPTVynpasqArsgRLKOL8fs9b3ahU/1fsJgSLFtCrVSmS9+CxG8UcGeANZVFU\n0hGGoR6HAgMBAAECggEABMr8k4ypc39hIslwTfLE9XQ/JCxUkXLtiQZUgFSXdtht\n9FmzaLUIzHCNwePJx0XvtPkGeN0xQXm9bZA2h6xbUhHFxbYUItL4LcxwpyDayovh\naPcG203Idg3RZcwEw1S6tU2NNuyHkhWG8hGxJ3D4baTxk7qxB9aL76Uztv9CVlQI\ntKY7TMl+131niTVRVi2osqx7qnMUlgnt4q4VCUHJUgSbULBq6C+L7bHs5LV3dclI\nQYtEKzzMZRfwySfDCugVaH5b70Ily7pKxmh5QBS43WKtKguYyIDtL07s7k52ybbf\nYd/l9DeRq6I+Rk8Aa3QaqkJ+Dk92FoB+Uze3e3MIQQKBgQDlXbwiDzitAtFVI/lL\nGCPyUmsPf1isGH28FA9/QH8JIHf2Nc6alIhCfFtwq9ATsHGLDCafFqbs0xt3dw6H\nARRsNRCGoAlnTUE0ZnzCLiRDbHD6KnmbNHitsWRCkEVpLbZ1+4V6rxPZA8bGnsj3\nl9EhVeV0lbHLSSLsO436+oI8IwKBgQDX4RrYelAmg6EpVscVO9GN/Mhk4fa2WTGP\n2/3qCUsd+VzKaz/oYRDtdzhcHHhQDC/llCtW+kFsYvu5Nvqpl5KYkQWitEEGYC8k\n59YUgwX2cFue+J110R84TDGsNXZjoUfP3gDTwyLlqgGNHV7/JpN/TIb5Yjn9IIrG\n4NNtECNYTQKBgHzgUMp2YRQJAbGKGXMiHIgVCUbxvXRNDT+16E4O7lsou0doOij9\nD0arcBli4bGmkdrzbZ+V9KHhugWL43PrSZQ0O+AgB56feA2wcuJBvuqagtQhBf5T\nThS7DOwUokXGZp3Lp/uIkJTJspJ25tGubWTp4DheO+OC2SmmrwFjHD7jAoGBAIWQ\nvO9bHeP2ZOwSyLIWhJz43XOtatt/a+66CeuXPGabNhH3MV8xTyvdK32yD65XG/tL\nJVV3GKtawqvhnEz5frXuZDI6nFC5ifGnjwi52CKVedptr96JOGu4mLMXkNwrmSa/\nEHv0q8601Kjelzv+Phvw2UHKyF4YmERcLfO4nGWxAoGBAK479dEKomq+mwzLwj1I\ngxgOh5xfa9IZbRTKOZB8dnH5la3UvUepji8a5VcasZNFfzXCrI8MeyA+PWJFFLKY\n2KtqAvvBsjj0jQ0I0mBCEO0cgcAZTySDXuHdV9D7hJAktWvg2sWA8rm+vJp9TyjZ\nje5UtS4vWrPyGyW35lmijoMm\n-----END PRIVATE KEY-----\n",
+  "client_email": "clax-922@sanguine-theory-273017.iam.gserviceaccount.com",
+  "client_id": "118032143702719656095",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/clax-922%40sanguine-theory-273017.iam.gserviceaccount.com"
+}

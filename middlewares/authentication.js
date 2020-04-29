@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const jwtKeys = Object.values(require("../startup/config.js").jwtKeys());
+const jwtKeys = Object.values(require("../startup/config.js").jwtKeys())
 //-----------------
 
 module.exports = (req, res, next) => {
@@ -17,4 +17,4 @@ module.exports = (req, res, next) => {
     }
   }
   next();
-};
+}

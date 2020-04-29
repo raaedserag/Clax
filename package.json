@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/storage": "^4.7.0",
     "@hapi/joi": "^17.1.1",
     "@sendgrid/mail": "^6.5.5",
     "balanced-match": "^1.0.0",
@@ -29,17 +30,19 @@
     "joi-objectid": "^3.0.1",
     "joi-password-complexity": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
-    "loadash": "^1.0.0",
     "lodash": "^4.17.15",
     "mongoose": "^5.9.6",
     "morgan": "^1.10.0",
+    "nexmo": "^2.6.0",
     "nodemon": "^2.0.2",
     "paypal-rest-sdk": "^1.8.1",
     "pug": "^2.0.4",
     "stripe": "^8.38.0",
-    "nexmo": "^2.6.0",
     "twilio": "^3.41.1",
     "winston": "^3.2.1",
     "winston-mongodb": "^5.0.1"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2"
   }
 }
