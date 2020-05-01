@@ -14,13 +14,5 @@ module.exports.distancematrix =async function (origin,dest) {
     timeout: 1000 // milliseconds
     })
   };
-  //)
-  //   .then(r => {
-  //      return r.data;
-  //   })
-  //   .catch(e => {
-  //     return e ;
-  //   })
-  // };
-
+  
 
