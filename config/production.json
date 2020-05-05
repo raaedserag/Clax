@@ -1,4 +1,4 @@
 {
   "name": "Clax-prod",
-  "dbType": "cosmos"
+  "dbType": "atlas"
 }
