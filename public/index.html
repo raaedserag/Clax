@@ -12,6 +12,122 @@
 	<!--===============================================================================================-->
 		<link rel="stylesheet" type="text/css" href="./index_files/main.css">
 	<!--===============================================================================================-->
+	<!-- Primary Meta Tags -->
+	<title>Clax — Get a Ride Now!</title>
+	<meta name="title" content="Clax — Get a Ride Now!">
+	<meta name="description" content="Clax is finding you faster & better ways to use public transportation in Egypt.">
+	<meta name="keywords" content="transportation, public transportaion, clax, uber, careem">
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://www.clax-egyp.me/">
+	<meta property="og:title" content="Clax — Get a Ride Now!">
+	<meta property="og:description" content="Clax is finding you faster & better ways to use public transportation in Egypt.">
+	<meta property="og:image" content="https://www.clax-egyp.me/index_files/cover.png">
+
+	<!-- Twitter -->
+	<meta property="twitter:card" content="summary_large_image">
+	<meta property="twitter:url" content="https://www.clax-egyp.me/">
+	<meta property="twitter:title" content="Clax — Get a Ride Now!">
+	<meta property="twitter:description" content="Clax is finding you faster & better ways to use public transportation in Egypt.">
+	<meta property="twitter:image" content="https://www.clax-egyp.me/index_files/cover.png">
+
+	<!--===============================================================================================-->
+	</head>
+	<body>
+		<div class="limiter">
+			<div class="container-login100">
+				<div class="wrap-login100">
+					<div class="login100-pic js-tilt" data-tilt="" style="will-change: transform; transform: perspective(300px) rotateX(0deg) rotateY(0deg);">
+						<img src="./index_files/logo.svg" alt="IMG">
+					</div>
+					<div id='head-r'>
+
+					</div>
+				</div>		
+			</div>
+		</div>
+
+		<script>
+			var X= new XMLHttpRequest();
+			console.log(X.getAllResponseHeaders())
+			X.open("HEAD", location);
+			X.send();
+			X.onload= function() { 
+				
+				switch(X.getResponseHeader("x-dbType")){
+					case "local":
+						img_tag = "<img src='./index_files/mognodb.png' height='100px'>"
+						break;
+					case "cosmos":
+						img_tag = "<img src='./index_files/cosmos.png' height='100px'>"
+						break;
+					case "atlas":
+						img_tag = "<img src='./index_files/mognodb.png' height='100px'>"
+						break;
+					default:
+						img_tag = "<img src='./index_files/mognodb.png' height='100px'>"
+				}
+
+				switch(X.getResponseHeader("x-dbStatus")) {
+					case "0": // Disconnectd
+						var status_text = 
+							"<h2 style='display: flex;flex-wrap: wrap;align-items: center;'> server is"+
+							"<span style='color:#ffc107'>&nbsp;disconnectd&nbsp;</span>" 
+							+ "from&nbsp;\n"
+							+ img_tag
+							+ 'database</h2>';
+						break;
+					case "1": // Connected
+						var status_text = 
+							"<h2 style='display: flex;flex-wrap: wrap;align-items: center;'> server is"+
+							"<span style='color:#673ab7'>&nbsp;connected&nbsp;</span>" 
+							+ "to&nbsp;\n"
+							+ img_tag
+							+ 'database</h2>';
+						break;
+					case "2": // Connecting
+						var status_text = 
+							"<h2 style='display: flex;flex-wrap: wrap;align-items: center;'> server is"+
+							"<span style='color:#673ab7'>&nbsp;connecting&nbsp;</span>" 
+							+ "to&nbsp;\n"
+							+ img_tag
+							+ 'database</h2>';
+						break;
+					case "3": // Disconnecting
+						var status_text = 
+							"<h2 style='display: flex;flex-wrap: wrap;align-items: center;'> server is"+
+							"<span style='color:#ffc107'>&nbsp;disconnecting&nbsp;</span>" 
+							+ "from&nbsp;\n"
+							+ img_tag
+							+ 'database</h2>';
+						break;
+					default: // Disconnectd
+						var status_text = 
+							"<h2 style='display: flex;flex-wrap: wrap;align-items: center;'> server is"+
+							"<span style='color:#ffc107'>&nbsp;disconnectd&nbsp;</span>" 
+							+ "from&nbsp;\n"
+							+ img_tag
+							+ 'database</h2>';
+				} 
+				document.getElementById("head-r").innerHTML = status_text;
+				
+			}
+		</script>
+	<!--===============================================================================================-->	
+		<script src="./index_files/jquery-3.2.1.min.js.download"></script>
+	<!--===============================================================================================-->
+		<script src="./index_files/tilt.jquery.min.js.download"></script>
+	</body>
+</html> http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Clax</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--===============================================================================================-->	
+		<link rel="icon" type="image/png" href="./index_files/favicon.ico">
+	<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css" href="./index_files/animate.css">
+	<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css" href="./index_files/main.css">
+	<!--===============================================================================================-->
 	</head>
 	<body>
 		<div class="limiter">
