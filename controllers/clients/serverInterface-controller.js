@@ -9,7 +9,5 @@ module.exports.getServerStatus = async (req, res) => {
     res.set({
         'x-dbType': dbType,
         'x-dbStatus': mongoose.connection.readyState.toString()
-    }).sendFile(path.resolve(__dirname + '../../../views/index.html'));
-
-
+    }).sendFile(path.resolve(__dirname + '../../../public/index.html'));
 }
