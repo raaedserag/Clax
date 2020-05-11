@@ -15,11 +15,13 @@ let drivers = async(req, res) => {
   const line =req.body.lineid;
   const seats = req.body.seats;
   //get user location from post man
-  const loc = [req.body.loc]; 
+  const loc =[req.body.loc]; 
   //const userloc=["1600 Amphitheatre Parkway"];
   
-  //get drivers' locations from web socket 
-  const des = ["1600 Amphitheatre Parkway, Mountain View, CA","5 Infinite Loop, Cupertino, CA 95014, USA"];
+  //get drivers' locations from web socket
+  //enter theese points at map by (latitudes and longitudes) 
+  //must be logic points to calculate distance 
+  const des = [{ "lat": 55, "lng": -110 },{ "lat": 50, "lng": -110 },{ "lat": 40, "lng": -110 }]; 
 
  //first filteration driver by (active and line) and get its id
   const driver= await Drivers.find({'status._activeLine':line,'status.is_available':true,'status.availableSeats': { $gte: seats }});
@@ -31,6 +33,7 @@ let drivers = async(req, res) => {
   //console.log(u_driver);
   //get distances from drivers and user 
   const response =  await googleApi.distancematrix(loc,des);
+ 
  
   // parse these distances
   const distance = await parseResponse(response.data);
