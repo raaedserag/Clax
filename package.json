@@ -4,8 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "env-cmd mocha -R spec",
-    "start": "env-cmd node app.js"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +23,6 @@
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
     "ejs": "^3.0.1",
-    "env-cmd": "^10.1.0",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
     "express-handlebars": "^3.1.0",
@@ -33,9 +31,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "mongoose": "^5.9.6",
-    "morgan": "^1.10.0",
     "nexmo": "^2.6.0",
-    "nodemon": "^2.0.2",
     "paypal-rest-sdk": "^1.8.1",
     "pug": "^2.0.4",
     "stripe": "^8.38.0",
@@ -44,6 +40,7 @@
     "winston-mongodb": "^5.0.1"
   },
   "devDependencies": {
-    "gulp": "^4.0.2"
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.3"
   }
 }
