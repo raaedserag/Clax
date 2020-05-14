@@ -1,6 +1,5 @@
 // Import Modules
 const express = require("express");
-const morgan = require("morgan");
 
 // Import Middlewares
 const error = require("../middlewares/error");
@@ -25,17 +24,18 @@ const paypal = require("../routes/payment/paypal-route");
 const pairing = require("../routes/pairing/pairing");
 // Externals Section
 const passengerExternal = require("../routes/clients/passengerExternal-route");
+// Server Interface
+const serverInterfaceRoute = require("../routes/clients/serverInterface-route")
 
 module.exports = function (app) {
   // Apply Essential Middlewares
   app.use(webConfig);
   app.use(express.json()); // Reparse body of the request into json object
   app.use(express.urlencoded({ extended: true })); // Reparse url to encoded url payload
-  //app.use(express.static("public")); // For static files if needed
-
+  app.use(express.static('public', options = { redirect: false, index: '_' })); //Serves resources from public folder
   // Apply Morgan middleware in development mode
   if (process.env.NODE_ENV == "development") {
-    app.use(morgan("tiny"));
+    app.use(require("morgan")("tiny"));
   }
 
   // Apply Routes
@@ -60,7 +60,11 @@ module.exports = function (app) {
   // Externals Section
   app.use("/clients/passengers", passengerExternal);
   app.use("/api/admin", admin);
-
+  // Server Interface
+  //app.use("/", serverInterfaceRoute)
+  app.get('/', serverInterfaceRoute)
+  // Handle Not found pages
+  app.all('*', (req, res) => res.sendStatus(404))
   // Apply Error Middle ware
   app.use(error);
 };
