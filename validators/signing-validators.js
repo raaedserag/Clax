@@ -18,7 +18,10 @@ const loginSchema = Joi.object().keys({
     pass: Joi.string()
         .required()
         .min(8)
-        .max(30)
+        .max(30),
+    fireBaseId: Joi.string()
+        .trim()
+        .required()
 });
 module.exports.validateLogin = function (loginRequest) {
     return loginSchema.validate(loginRequest);
