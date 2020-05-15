@@ -9,6 +9,7 @@ const { validateLogin,
     validateForgetPassword,
     validateNewPass } = require("../../validators/signing-validators")
 // Helpers & Services
+const { subscribeToTopic } = require('../../services/fcm')
 const createStripeAccount = require('../../services/stripe').createCustomer
 const { hashing,
     encodeId,
@@ -42,7 +43,7 @@ module.exports.passengerRegister = async (req, res) => {
     passenger.stripeId = customerToken.id;
     passenger.passLength = passenger.pass.length
     passenger.pass = await hashing(passenger.pass)
-    passenger = _.pick(passenger, ["name", "mail", "pass", "passLength", "phone", "stripeId"])
+    passenger = _.pick(passenger, ["name", "mail", "pass", "passLength", "phone", "stripeId", "fireBaseId"])
 
     //save user to the database.
     passenger = new Passengers(passenger)
@@ -51,6 +52,8 @@ module.exports.passengerRegister = async (req, res) => {
     //create web token and sends it to the user as an http header.
     const webToken = passenger.generateToken("96h");
 
+    // Subscribe registered passenger to passengers topic
+    await subscribeToTopic(passenger.fireBaseId, "passengers")
     //pick what you want to send to the user (using lodash).
     res.header("x-login-token", webToken).sendStatus(200);
 };
@@ -80,6 +83,8 @@ module.exports.passengerLogin = async (req, res) => {
     const validPassword = await bcrypt.compare(req.body.pass, passenger.pass);
     if (!validPassword) return res.status(401).send("Invalid login credentials");
 
+    // Change fireBaseId and respond with header token
+    await Passengers.findByIdAndUpdate(passenger._id, { fireBaseId: req.body.fireBaseId })
     res.header("x-login-token", passenger.generateToken()).sendStatus(200)
 };
 
