@@ -11,79 +11,54 @@ const offerSchema = new mongoose.Schema({
     required: true,
     trim: true,
     minlength: 4,
-    maxlength: 64
+    maxlength: 64,
   },
   code: {
     type: String,
     required: true,
     trim: true,
     minlength: 3,
-    maxlength: 30
+    maxlength: 30,
+  },
+  description: {
+    type: String,
+    required: true,
+
+    minlength: 10,
+    maxlength: 300,
   },
   start: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   end: {
     type: Date,
-    required: true
+    required: true,
   },
-  is_public: { type: Boolean, default: false },
+
   offerType: {
     type: String,
     required: true,
-    enum: ["freeTrips", "cash", "discount"]
+    enum: ["Free Trips", "Cash Amount", "Discount"],
   },
-  tripsCount: {
+  value: {
     type: Number,
     default: 0,
     min: 0,
     validate: [
       {
-        validator: c => {
+        validator: (c) => {
           return Number.isInteger(c);
         },
-        message: "tripsCount should be an integer"
-      }
+        message: "value should be an integer",
+      },
       /*,
             {
                 validator: (c)=> {return !(c > 0 && this.offerType !== "freeTrips");},
                 message: "tripsCount can be only set if the offerType is 'freeTrips'"
             }
             */
-    ]
-  },
-  cashAmount: {
-    type: Number,
-    min: 0,
-    default: 0
-    /*,
-        validate:{
-            validator: (a)=> {return !(a > 0 && this.offerType !== "cash");},
-            message: "cashAmount can be only set if the offerType is ''"
-        }
-          */
-  },
-  discount: {
-    type: Number,
-    default: 0,
-    min: 0,
-    max: 100,
-    validate: [
-      {
-        validator: d => {
-          return Number.isInteger(d);
-        },
-        message: "discount should be an integer"
-      }
-      /*
-            ,
-            {
-                validator: (d)=> {return !(d > 0 && this.offerType !== "discount");},
-                message: "discount can be only set if the offerType is 'discount'"
-            }
-            */
-    ]
+    ],
   },
   _line: {
     type: mongoose.ObjectId,
@@ -93,51 +68,33 @@ const offerSchema = new mongoose.Schema({
         return this.offerType === "freeTrips" || this.offerType === "discount";
       },
       message:
-        "line can be only set if the offerType is 'freeTrip' or 'discount'"
-    }
+        "line can be only set if the offerType is 'freeTrip' or 'discount'",
+    },
   },
-  _passengers: [{ type: mongoose.ObjectId, ref: "Passengers" }]
+  _passengers: [{ type: mongoose.ObjectId, ref: "Passengers" }],
 });
 
 ////****************** Passenger Validation  ******************
 // Set Validation Schema
 const validationSchema = Joi.object().keys({
-  title: Joi.string()
-    .required()
-    .trim()
-    .min(4)
-    .max(64),
-  code: Joi.string()
-    .required()
-    .trim()
-    .min(3)
-    .max(30),
+  title: Joi.string().required().trim().min(4).max(64),
+  code: Joi.string().required().trim().min(3).max(30),
+  description: Joi.string().required().min(10).max(300),
   start: Joi.date(),
   end: Joi.date(),
   offerType: Joi.string()
     .required()
-    .valid("freeTrips", "cash", "discount"),
-  tripsCount: Joi.number()
-    .integer()
-    .min(0),
-  cashAmount: Joi.number().min(0),
-  discount: Joi.number()
-    .integer()
-    .min(0)
-    .max(100),
+    .valid("Free Trips", "Cash Amount", "Discount"),
+  value: Joi.number().integer().min(0),
   _line: Joi.objectId(),
-  _passengers: Joi.array().items(Joi.objectId())
+  _passengers: Joi.array().items(Joi.objectId()),
 });
-const validateOffer = function(offer) {
+const validateOffer = function (offer) {
   return validationSchema.validate(offer);
 };
-const validateOfferCode = function(offer) {
+const validateOfferCode = function (offer) {
   const codeSchema = Joi.object().keys({
-    code: Joi.string()
-      .required()
-      .trim()
-      .min(3)
-      .max(30)
+    code: Joi.string().required().trim().min(3).max(30),
   });
   return codeSchema.validate(offer);
 };

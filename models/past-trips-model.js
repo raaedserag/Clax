@@ -6,10 +6,9 @@ const pastTripSchema = new mongoose.Schema({
   end: { type: Date, default: Date.now() },
   rate: { type: Number },
   price: { type: Number },
-  is_favourite: { type: Boolean, default: false },
   _line: { type: mongoose.ObjectId, ref: "Lines" },
   _driver: { type: mongoose.ObjectId, ref: "Drivers" },
-  _passengers: [{ type: mongoose.ObjectId, ref: "Passengers" }]
+  _passengers: [{ type: mongoose.ObjectId, ref: "Passengers" }],
 });
 const PastTrips = mongoose.model("PastTrips", pastTripSchema);
 
