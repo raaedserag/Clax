@@ -9,7 +9,7 @@ const { validateLogin,
     validateForgetPassword,
     validateNewPass } = require("../../validators/signing-validators")
 // Helpers & Services
-const { subscribeToTopic } = require('../../services/fcm')
+const { subscribeToTopic } = require('../../services/fireBase')
 const createStripeAccount = require('../../services/stripe').createCustomer
 const { hashing,
     encodeId,
