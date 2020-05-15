@@ -10,8 +10,6 @@ require("./startup/logging")();
 //Data Base
 require("./db/db").connect(); //{connect, close}
 
-//Routes
-require("./startup/routes")(app);
 
 // Initiate the server on the selected PORT
 const { port } = configuration.serverConfig();
