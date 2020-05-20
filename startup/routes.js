@@ -15,8 +15,8 @@ const settingsRoute = require("../routes/home/settings-route");
 const pastTripsRoute = require("../routes/home/past-trips-route");
 const familyRoute = require("../routes/home/family-route");
 const offersRoute = require("../routes/home/offers-route");
-// Payments & Complains Section
-const complaintRoute = require("../routes/payment/complains-route");
+// Payments & Complaints Section
+const complaintRoute = require("../routes/payment/complaints-route");
 const manageFinancialsRoute = require("../routes/payment/manage-financials-route");
 const loaningRoute = require("../routes/payment/loaning-route");
 const paypal = require("../routes/payment/paypal-route");
@@ -48,8 +48,8 @@ module.exports = function (app) {
   app.use("/api/passengers/family", authentication, familyRoute);
   app.use("/api/passengers/offers", authentication, offersRoute);
   app.use("/api/passengers/past-trips", authentication, pastTripsRoute);
-  // Payments & Complains Section
-  app.use("/api/passengers/complains", authentication, complaintRoute);
+  // Payments & Complaints Section
+  app.use("/api/passengers/complaints", authentication, complaintRoute);
   app.use(
     "/api/passengers/payments/manage-financials",
     authentication,
