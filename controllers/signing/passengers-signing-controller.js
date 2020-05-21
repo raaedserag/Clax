@@ -13,12 +13,11 @@ const {
   validateNewPass,
 } = require("../../validators/signing-validators");
 // Helpers & Services
-const createStripeAccount = require("../../services/stripe").createCustomer;
-const {
-  hashing,
+const { subscribeToTopic } = require('../../services/fireBase')
+const createStripeAccount = require('../../services/stripe').createCustomer
+const { hashing,
   encodeId,
-  generateTempToken,
-} = require("../../helpers/encryption-helper");
+  generateTempToken } = require("../../helpers/encryption-helper");
 const mail = require("../../services/sendgrid-mail");
 const sms = require("../../services/nexmo-sms");
 //---------------------
@@ -39,31 +38,25 @@ module.exports.passengerRegister = async (req, res) => {
   if (error) return res.status(409).send("Phone number already exists.");
 
   // Creating Stripe account for the registered user
-  const customerToken = await createStripeAccount(
-    _.pick(req.body, ["firstName", "lastName", "mail", "phone"])
-  );
+  const customerToken = await createStripeAccount(_.pick(req.body,
+    ["firstName", "lastName", "mail", "phone"]))
 
   // Organizig passenger object
   passenger.name = { first: passenger.firstName, last: passenger.lastName };
   passenger.stripeId = customerToken.id;
-  passenger.passLength = passenger.pass.length;
-  passenger.pass = await hashing(passenger.pass);
-  passenger = _.pick(passenger, [
-    "name",
-    "mail",
-    "pass",
-    "passLength",
-    "phone",
-    "stripeId",
-  ]);
+  passenger.passLength = passenger.pass.length
+  passenger.pass = await hashing(passenger.pass)
+  passenger = _.pick(passenger, ["name", "mail", "pass", "passLength", "phone", "stripeId", "fireBaseId"])
 
   //save user to the database.
-  passenger = new Passengers(passenger);
+  passenger = new Passengers(passenger)
   await passenger.save();
 
   //create web token and sends it to the user as an http header.
   const webToken = passenger.generateToken("96h");
 
+  // Subscribe registered passenger to passengers topic
+  await subscribeToTopic(passenger.fireBaseId, "passengers")
   //pick what you want to send to the user (using lodash).
   res.header("x-login-token", webToken).sendStatus(200);
 };
@@ -79,23 +72,23 @@ module.exports.passengerLogin = async (req, res) => {
   if (value.user == true) {
     passenger = await Passengers.findOne({ phone: req.body.user });
     if (!passenger) return res.status(401).send("Invalid login credentials");
-    if (!passenger.phone_verified)
-      return res.status(401).send("This phone hasn't been activated yet");
+    if (!passenger.phone_verified) return res.status(401).send("This phone hasn't been activated yet")
   }
   // value = flase => user is a mail
   else {
     //Checkin if the email exists
     passenger = await Passengers.findOne({ mail: req.body.user });
     if (!passenger) return res.status(401).send("Invalid login credentials");
-    if (!passenger.mail_verified)
-      return res.status(401).send("This mail hasn't been activated yet");
+    if (!passenger.mail_verified) return res.status(401).send("This mail hasn't been activated yet")
   }
 
   //Checkin if Password is correct
   const validPassword = await bcrypt.compare(req.body.pass, passenger.pass);
   if (!validPassword) return res.status(401).send("Invalid login credentials");
 
-  res.header("x-login-token", passenger.generateToken()).sendStatus(200);
+  // Change fireBaseId and respond with header token
+  await Passengers.findByIdAndUpdate(passenger._id, { fireBaseId: req.body.fireBaseId })
+  res.header("x-login-token", passenger.generateToken()).sendStatus(200)
 };
 
 // Forget password

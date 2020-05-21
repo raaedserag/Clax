@@ -138,6 +138,7 @@ const passengerSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  fireBaseId: {type: String, required: true},
   _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips" },
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
@@ -185,6 +186,9 @@ const validationSchema = Joi.object().keys({
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
+  fireBaseId: Joi.string()
+    .required()
+    .trim()
 });
 const validatePassenger = function (passenger) {
   return validationSchema.validate(passenger);
