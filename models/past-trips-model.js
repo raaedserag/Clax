@@ -4,7 +4,7 @@ Joi.objectId = require("joi-objectid")(Joi);
 // PastTrips Model
 const pastTripSchema = new mongoose.Schema({
   start: { type: Date, required: true },
-  end: { type: Date, default: new Date.now() },
+  end: { type: Date, required: true },
   rates: [{ type: Number, default: null, min: 0, max: 5 }],
   prices: [{ type: Number, required: true, min: 0 }],
   feedbacks: [{ type: String, default: null }],
@@ -19,7 +19,8 @@ module.exports.PastTrips = mongoose.model("PastTrips", pastTripSchema);
 const validationSchema = Joi.object().keys({
   start: Joi.date()
     .required(),
-  end: Joi.date(),
+  end: Joi.date()
+    .required(),
   rates: Joi.array().items(Joi.number().min(0).max(5)),
   prices: Joi.array().items(Joi.number().min(0))
     .required(),

@@ -4,7 +4,7 @@ Joi.objectId = require("joi-objectid")(Joi);
 
 // CurrentTrips Model
 const tripsSchema = new mongoose.Schema({
-    start: { type: Date, default: new Date.now() },
+    start: { type: Date, required: true },
     end: { type: Date, default: null },
     prices: [{ type: Number, default: null, min: 0 }],
     feedbacks: [{ type: String, default: null }],
@@ -17,8 +17,8 @@ module.exports.Trips = mongoose.model("Trips", tripsSchema);
 
 // Set validation Schema
 const validationSchema = Joi.object().keys({
-    start: Joi.date(),
-    end: Joi.date(),
+    start: Joi.date()
+        .required(),
     rates: Joi.array().items(Joi.number().min(0).max(5)),
     prices: Joi.array().items(Joi.number().min(0)),
     feedbacks: Joi.array().items(Joi.string()),

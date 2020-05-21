@@ -39,7 +39,7 @@ const complaintSchema = new mongoose.Schema({
   _trip: { type: mongoose.ObjectId, ref: "PastTrips" },
   // driver _id can be returned from _trip collection
 });
-const Complaints = mongoose.model("Complaints", complaintSchema);
+module.exports.Complaints = mongoose.model("Complaints", complaintSchema);
 
 ////****************** Complain Validation  ******************
 // Set Validation Schema
@@ -58,5 +58,4 @@ const validateComplaint = function (complaint) {
   return validationSchema.validate(complaint);
 };
 
-module.exports.Complaints = Complaints;
 module.exports.validateComplaint = validateComplaint;
