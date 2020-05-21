@@ -1,20 +1,28 @@
-const { firebaseAccount,
-  fireBaseUrl } = require("../startup/config").firebaseCredentials();
+const {firebaseAccount,
+  fireBaseUrl} = require("../startup/config").firebaseCredentials();
 const admin = require("firebase-admin");
 admin.initializeApp({
   credential: admin.credential.cert(firebaseAccount),
   databaseURL: fireBaseUrl,
 });
-// ------------------------ FCM ------------------------
+
 // Push notifications to one user(token string) or multiple users (Array of tokens strings)
-module.exports.sendTargetedNotification = async function (tokens, notification) {
+module.exports.sendTargetedNotification = async function (tokens,notification) {
   try {
     // Push to one device
-    if (!(typeof tokens == "string" || Array.isArray(tokens)))
-      throw new Error("'tokens' type must be a string or an array of strings");
-    else {
-      const response = await admin.messaging().sendToDevice(tokens, {
+    if (typeof tokens == "string") {
+      return await admin.messaging().send({
         data: { click_action: "FLUTTER_NOTIFICATION_CLICK" },
+        token: tokens,
+        notification,
+      });
+    }
+
+    // Push to multiple device
+    else if (Array.isArray(tokens)) {
+      const response = await admin.messaging().sendMulticast({
+        data: { click_action: "FLUTTER_NOTIFICATION_CLICK" },
+        tokens,
         notification,
       });
       if (response.failureCount > 0) {
@@ -26,8 +34,7 @@ module.exports.sendTargetedNotification = async function (tokens, notification) 
         });
         return { response, failedTokens };
       }
-      return response;
-    }
+    } else throw new Error("\'tokens\' type must be a string or an array of strings");
   } catch (error) {
     throw new Error(error.message);
   }
@@ -92,9 +99,9 @@ module.exports.subscribeToTopic = async function (tokens, topic) {
   try {
     if (!(Array.isArray(tokens) || typeof topic == "string"))
       throw new Error("\'tokens\' type must be a string or an array of strings");
-    else {
-      return await admin.messaging().subscribeToTopic(tokens, topic);
-    }
+    else{
+      return await admin.messaging().subscribeToTopic(tokens,topic);
+    } 
   } catch (error) {
     throw new Error(error.message);
   }
@@ -105,12 +112,10 @@ module.exports.unsubscribeFromTopic = async function (tokens, topic) {
   try {
     if (!(Array.isArray(tokens) || typeof topic == "string"))
       throw new Error("\'tokens\' type must be a string or an array of strings");
-    else {
-      return await admin.messaging().unsubscribeFromTopic(tokens, topic);
-    }
+    else{
+      return await admin.messaging().unsubscribeFromTopic(tokens,topic);
+    } 
   } catch (error) {
     throw new Error(error.message);
   }
 };
-
-// ------------------------ Real Time DataBase ------------------------
