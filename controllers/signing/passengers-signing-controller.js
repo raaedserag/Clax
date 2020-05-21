@@ -72,14 +72,14 @@ module.exports.passengerLogin = async (req, res) => {
   if (value.user == true) {
     passenger = await Passengers.findOne({ phone: req.body.user });
     if (!passenger) return res.status(401).send("Invalid login credentials");
-    if (!passenger.phone_verified) return res.status(401).send("This phone hasn't been activated yet")
+    //if (!passenger.phone_verified) return res.status(401).send("This phone hasn't been activated yet")
   }
   // value = flase => user is a mail
   else {
     //Checkin if the email exists
     passenger = await Passengers.findOne({ mail: req.body.user });
     if (!passenger) return res.status(401).send("Invalid login credentials");
-    if (!passenger.mail_verified) return res.status(401).send("This mail hasn't been activated yet")
+    //if (!passenger.mail_verified) return res.status(401).send("This mail hasn't been activated yet")
   }
 
   //Checkin if Password is correct
