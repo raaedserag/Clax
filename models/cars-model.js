@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const Joi = require("@hapi/joi");
+Joi.objectId = require("joi-objectid")(Joi);
 
 // Car Model
 const carSchema = new mongoose.Schema({

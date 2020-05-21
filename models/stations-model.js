@@ -5,7 +5,7 @@ const Joi = require("@hapi/joi");
 // Schema
 const stationSchema = new mongoose.Schema({
     name: {
-        type: String, 
+        type: String,
         required: true,
         trim: true,
         minlength: 3,
@@ -17,10 +17,10 @@ const stationSchema = new mongoose.Schema({
         maxLength: 120
     },
     type: {
-        type:String, 
+        type: String,
         required: true,
-        enum:['Point', 'Polygon']
-    }, 
+        enum: ['Point', 'Polygon']
+    },
     coordinates: {
         type: Array,
         required: true,
@@ -32,36 +32,36 @@ module.exports.Stations = mongoose.model("Stations", stationSchema);
 // Set one station Validation Schema
 const validateStationSchema = Joi.object().keys({
     name: Joi.string()
-    .required()
-    .trim()
-    .min(3)
-    .max(30),
+        .required()
+        .trim()
+        .min(3)
+        .max(30),
     description: Joi.string()
-    .max(120),
+        .max(120),
     type: Joi.string()
-    .required()
-    .valid('Point', 'Polygon'),
+        .required()
+        .valid('Point', 'Polygon'),
     coordinates: Joi.array().items(Joi.number())
 });
-module.exports.validateStation = function(station){
+module.exports.validateStation = function (station) {
     return validateStationSchema.validate(station);
 }
 
 // Set Array of Stations Validation Schema
 const validateStationsSchema = Joi.array().items({
     name: Joi.string()
-    .required()
-    .trim()
-    .min(3)
-    .max(50),
+        .required()
+        .trim()
+        .min(3)
+        .max(50),
     description: Joi.string()
-    .max(120),
+        .max(120),
     type: Joi.string()
-    .required()
-    .valid('Point', 'Polygon'),
+        .required()
+        .valid('Point', 'Polygon'),
     coordinates: Joi.array().items(Joi.number())
 });
-module.exports.validateStations = function(stations){
+module.exports.validateStations = function (stations) {
     return validateStationsSchema.validate(stations);
 }
 
