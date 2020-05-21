@@ -1,6 +1,6 @@
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
-const { Complaints } = require("../../models/complaints-model");
+const { Complaints } = require("../../models/complains-model");
 module.exports.getComplaints = async (req, res) => {
   const complaints = await Complaints.find()
     .populate([
