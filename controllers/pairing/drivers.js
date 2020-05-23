@@ -10,7 +10,9 @@ let last=[];
 let nearest=[];
 let driver_info=[];
 let driv_info=[];
-
+let car;
+let img='';
+let target;
 
 
 
@@ -105,13 +107,11 @@ async function parseResponse (response) {
 
 //driver info function
 async function info (nearest){
-  const driver_info=await Drivers.findById(nearest[0]);
+  const driver_info=await Drivers.findById(nearest[0]).select("_id name phone img");
   if(!driver_info) return res.status(404).send('no driver is  available');
-  driv_info[0]=driver_info._id;
-  driv_info[1]=driver_info.name;
-  driv_info[2]=driver_info.phone;
-     
-
+  let car ={color: "red",number:"123"};
+  const driv_info = {driver_info,car}
+  console.log(driv_info);
   return driv_info ;
 
    
