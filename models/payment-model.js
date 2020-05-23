@@ -12,6 +12,4 @@ const paymentSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   _passenger: { type: mongoose.ObjectId, ref: "Passengers", required: true },
 });
-const Payments = mongoose.model("Payments", paymentSchema);
-
-module.exports.Payments = Payments;
+module.exports.Payments = mongoose.model("Payments", paymentSchema);

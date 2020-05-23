@@ -9,6 +9,4 @@ const transactionSchema = new mongoose.Schema({
   status: { type: String }, // Object Data of status
   amount: { type: Number }
 });
-const Transactions = mongoose.model("Transactions", transactionSchema);
-
-module.exports.Transactions = Transactions;
+module.exports.Transactions = mongoose.model("Transactions", transactionSchema);

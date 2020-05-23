@@ -3,15 +3,14 @@ const {
   validateAdmin,
   validateAdminLogin,
 } = require("../../models/admins-model");
-const { Passengers } = require("../../models/passengers-model");
 const Joi = require("@hapi/joi");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 Joi.objectId = require("joi-objectid")(Joi);
 
-module.exports.getUsers = async (req, res) => {
-  const users = await Passengers.find().select("name phone balance rate");
-  res.send(users);
+module.exports.addOffer = async (req, res) => {
+  console.log("sadas");
+  res.send("admin");
 };
 module.exports.adminLogin = async (req, res) => {
   //Validate the data of user
