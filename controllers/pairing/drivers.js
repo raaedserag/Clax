@@ -7,6 +7,10 @@ let distance=[];
 let index=[];
 let dis=[];
 let last=[];
+let nearest=[];
+let driver_info=[];
+let driv_info=[];
+
 
 
 
@@ -30,7 +34,7 @@ let drivers = async(req, res) => {
   for (i = 0; i < len; i++) {
       u_driver[i]=driver[i]._id;
    };
-  //console.log(u_driver);
+  console.log(u_driver);
   //get distances from drivers and user 
   const response =  await googleApi.distancematrix(loc,des);
  
@@ -42,7 +46,13 @@ let drivers = async(req, res) => {
   //mapping and sorting distances with id
   const nearest = await mapping(distance);
   console.log(nearest);
-  res.send(nearest);  
+  
+
+
+  //driver info
+  const driv_info =await info(nearest);
+  console.log(driv_info);
+  res.send(driv_info);  
 };
 
 
@@ -92,5 +102,21 @@ async function parseResponse (response) {
 
 };
 
+
+//driver info function
+async function info (nearest){
+  const driver_info=await Drivers.findById(nearest[0]);
+  if(!driver_info) return res.status(404).send('no driver is  available');
+  driv_info[0]=driver_info._id;
+  driv_info[1]=driver_info.name;
+  driv_info[2]=driver_info.phone;
+     
+
+  return driv_info ;
+
+   
+
+
+};
 
 module.exports.drivers=drivers;
