@@ -16,3 +16,4 @@ require("./startup/routes")(app);
 // Initiate the server on the selected PORT
 const { port } = configuration.serverConfig();
 app.listen(port, () => winston.info(`Listening on ${port}`));
+
