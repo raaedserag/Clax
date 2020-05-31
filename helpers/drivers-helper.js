@@ -4,7 +4,7 @@ const { Passengers } = require("../models/passengers-model");
 const { Payments } = require("../models/payment-model");
 // Services
 const { distanceMatrix } = require("../services/google-map.js");
-const { dataBase, lineRef } = require("../services/firebase")
+const { dataBase, lineRef } = require("../services/firebase");
 //--------------------------------------------
 
 module.exports.minimumDistanceIndex = async function (origin, dest) {
@@ -14,18 +14,25 @@ module.exports.minimumDistanceIndex = async function (origin, dest) {
   // Runtime: 110.021 ms
   let distance = [];
 
+  distance.sort;
   // Extracting Numeric Distance Value
   elements.forEach((element) => {
     distance.push(element.distance.value);
   });
 
-  // Finding the index of the minimum value
-  var shortest = distance.reduce(
-    (iMin, x, i, distance) => (x < distance[iMin] ? i : iMin),
-    0
-  );
-  // ------------
-  return shortest;
+  // Assigning Index to each valie
+  distance.forEach((element, index) => (distance[index] = [element, index]));
+
+  // Sorting Distance Increasingly
+  distance.sort(function (left, right) {
+    return left[0] < right[0] ? -1 : 1;
+  });
+
+  // Mapping values to index in .sortIndices
+  sortedIndices = [];
+  distance.forEach((element) => sortedIndices.push(element[1]));
+
+  return sortedIndices;
 };
 
 // Approch 2
@@ -97,10 +104,12 @@ module.exports.adjustBalance = async function (passengerId, driverId, trip) {
   }
 };
 
-// Return available drivers(location, seats) of some line who have sufficient number of free seats 
+// Return available drivers(location, seats) of some line who have sufficient number of free seats
 module.exports.getAvailableDrivers = async function (lineId, requiredSeats) {
-  return await (await lineRef(lineId).
-    orderByChild("seats").
-    startAt(requiredSeats).
-    once('value')).val();
-}
+  return await (
+    await lineRef(lineId)
+      .orderByChild("seats")
+      .startAt(requiredSeats)
+      .once("value")
+  ).val();
+};
