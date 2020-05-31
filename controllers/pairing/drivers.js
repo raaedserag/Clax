@@ -22,14 +22,9 @@ module.exports.findDriver = async (req, res) => {
 
   // Retreiving Drivers currently Available
 
-  // =====KINDLY-EDIT-THIS======
-  // Retrieve Ids of Drivers with the constrains below:
-  // 1. currently enrolled on a trip with lineid = req.body.lineId
-  // 2. available seats > req.body.seats
-  var driversIds = await Drivers.find().limit(3).select("_id").lean();
   // =======================
 
-  // =====KINDLY-EDIT-THIS======
+  // =====KINDLY-EDIT-THIS======  
   // Retrieve locations of drivers from firebase using thier ids
   // Dummy Data
   const dummyDestination = [

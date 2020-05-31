@@ -97,6 +97,10 @@ const driverSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  fireBaseId: {
+    type: String,
+    default: null,
+  },
   private_trips: { type: Boolean, default: false },
   _cars: [{ type: mongoose.ObjectId, ref: "Cars" }],
   _currentCar: { type: mongoose.ObjectId, ref: "Cars" },

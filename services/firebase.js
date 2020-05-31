@@ -5,7 +5,6 @@ admin.initializeApp({
   credential: admin.credential.cert(firebaseAccount),
   databaseURL: fireBaseUrl,
 });
-const db = admin.database();
 // ------------------------ FCM ------------------------
 
 // Push notifications to one user(token string) or multiple users (Array of tokens strings)
@@ -123,3 +122,5 @@ module.exports.unsubscribeFromTopic = async function (tokens, topic) {
 };
 
 // ------------------------ Real Time DataBase References ------------------------
+const db = admin.database();
+module.exports.lineRef = function (lineId) { return db.ref(`clax-lines/${lineId}`) }

@@ -1,8 +1,11 @@
-// Services
+// Modles
 const { Drivers } = require("../models/drivers-model");
 const { Passengers } = require("../models/passengers-model");
 const { Payments } = require("../models/payment-model");
+// Services
 const { distanceMatrix } = require("../services/google-map.js");
+const { dataBase, lineRef } = require("../services/firebase")
+//--------------------------------------------
 
 module.exports.minimumDistanceIndex = async function (origin, dest) {
   let elements = await distanceMatrix(origin, dest);
@@ -93,3 +96,11 @@ module.exports.adjustBalance = async function (passengerId, driverId, trip) {
     // throw new Error("Transaction Failed !\n" + error.message);
   }
 };
+
+// Return available drivers(location, seats) of some line who have sufficient number of free seats 
+module.exports.getAvailableDrivers = async function (lineId, requiredSeats) {
+  return await (await lineRef(lineId).
+    orderByChild("seats").
+    startAt(requiredSeats).
+    once('value')).val();
+}

@@ -19,12 +19,12 @@ module.exports.validateFinishTripRequest = function (tripinfo) {
 
 // Find Driver Schema
 const findDriverRequest = Joi.object().keys({
-  lineid: Joi.objectId().required(),
-  loc: Joi.object().keys({
+  lineId: Joi.objectId().required(),
+  stationLoc: Joi.object().keys({
     lat: Joi.number().required(),
     lng: Joi.number().required(),
   }),
-  seats: Joi.number(),
+  requiredSeats: Joi.number(),
 });
 module.exports.validateFindDriverRequest = function (tripinfo) {
   return findDriverRequest.validate(tripinfo);
