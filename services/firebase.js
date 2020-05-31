@@ -121,7 +121,5 @@ module.exports.unsubscribeFromTopic = async function (tokens, topic) {
     throw new Error(error.message);
   }
 };
+
 // ------------------------ Real Time DataBase References ------------------------
-module.exports.lineRef = function (line) {
-  return db.ref(`clax-lines/${line}`);
-} 

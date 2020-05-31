@@ -1,17 +1,8 @@
 // Services
-const { lineRef } = require("../services/fireBase");
 const { Drivers } = require("../models/drivers-model");
 const { Passengers } = require("../models/passengers-model");
 const { Payments } = require("../models/payment-model");
 const { distanceMatrix } = require("../services/google-map.js");
-
-
-module.exports.getDriversLocation = async function (line, seats) {
-  return (await lineRef(line)
-    .orderByChild("seats")
-    .once("value"))
-    .val()
-};
 
 module.exports.minimumDistanceIndex = async function (origin, dest) {
   let elements = await distanceMatrix(origin, dest);

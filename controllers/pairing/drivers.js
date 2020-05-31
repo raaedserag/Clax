@@ -2,7 +2,7 @@
 const { Drivers } = require("../../models/drivers-model");
 const { PastTrips } = require("../../models/past-trips-model");
 // Services
-const { sendTargetedNotification } = require("../../services/fcm");
+const { sendTargetedNotification } = require("../../services/firebase");
 // Helpers
 const {
   minimumDistanceIndex,

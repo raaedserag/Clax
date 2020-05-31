@@ -13,7 +13,7 @@ const {
   validateNewPass,
 } = require("../../validators/signing-validators");
 // Helpers & Services
-const { subscribeToTopic } = require('../../services/fcm')
+const { subscribeToTopic } = require('../../services/firebase')
 const createStripeAccount = require('../../services/stripe').createCustomer
 const { hashing,
   encodeId,
