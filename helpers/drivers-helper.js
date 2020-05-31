@@ -1,13 +1,9 @@
-const { Drivers} = require('../../models/drivers-model');
+// Services
+const { lineRef } = require("../services/fireBase");
 
-
-
-module.exports.getLocation = function(id){
-    var info = [];
-    for (var i=0;i<id.length;i++){
-        var driver = Drivers.id[i];
-        info[i]= {id: id,loc:driver.loc}; // replace it with real-time drivers location
-    }
-
-    return info;
+module.exports.getDriversLocation = async function (line, seats) {
+    return (await lineRef(line)
+        .orderByChild("seats")
+        .once("value"))
+        .val()
 };
