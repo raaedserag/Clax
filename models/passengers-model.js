@@ -138,14 +138,14 @@ const passengerSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  fireBaseId: {type: String, required: true},
-  _currentTrip: { type: mongoose.ObjectId, ref: "CurrentTrips" },
+  fireBaseId: { type: String, required: true },
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
   _complains: [{ type: mongoose.ObjectId, ref: "Complains" }],
   _payments: [{ type: mongoose.ObjectId, ref: "Payments" }],
   _family: [{ type: mongoose.ObjectId, ref: "Passengers" }],
   _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }],
+  _favourites: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
 });
 
 // JWT generation methods

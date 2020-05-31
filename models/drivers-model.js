@@ -5,8 +5,8 @@ Joi.objectId = require("joi-objectid")(Joi);
 const passwordComplexity = require("joi-password-complexity");
 const jwt = require("jsonwebtoken");
 // Includes
-const jwtDriverKey = require("../startup/config.js").jwtKeys().driverJwt
-const RegExps = require("../validators/regExps")
+const jwtDriverKey = require("../startup/config.js").jwtKeys().driverJwt;
+const RegExps = require("../validators/regExps");
 // Driver Model
 // Schema
 const driverSchema = new mongoose.Schema({
@@ -16,15 +16,15 @@ const driverSchema = new mongoose.Schema({
       required: true,
       trim: true,
       minlength: 3,
-      maxlength: 64
+      maxlength: 64,
     },
     last: {
       type: String,
       required: true,
       trim: true,
       minlength: 3,
-      maxlength: 64
-    }
+      maxlength: 64,
+    },
   },
   mail: {
     type: String,
@@ -34,14 +34,14 @@ const driverSchema = new mongoose.Schema({
     lowerCase: true,
     minlength: 6,
     maxlength: 64,
-    match: RegExps.mailRegExp
+    match: RegExps.mailRegExp,
   },
   mail_verified: { type: Boolean, default: false },
   pass: {
     type: String,
     required: true,
     minlength: 8,
-    maxlength: 1024
+    maxlength: 1024,
   },
   phone: {
     type: String,
@@ -50,7 +50,7 @@ const driverSchema = new mongoose.Schema({
     trim: true,
     minlength: 11,
     maxlength: 11,
-    match: RegExps.phoneRegExp
+    match: RegExps.phoneRegExp,
   },
   phone_verified: { type: Boolean, default: false },
   tripsCount: {
@@ -58,24 +58,24 @@ const driverSchema = new mongoose.Schema({
     default: 0,
     validate: [
       {
-        validator: c => {
+        validator: (c) => {
           return Number.isInteger(c);
         },
-        message: "tripsCount should be an integer"
+        message: "tripsCount should be an integer",
       },
       {
-        validator: c => {
+        validator: (c) => {
           return c >= 0;
         },
-        message: "tripsCount should be a positive number"
-      }
-    ]
+        message: "tripsCount should be a positive number",
+      },
+    ],
   },
   rate: {
     type: Number,
     min: 0,
     max: 5,
-    default: 0
+    default: 0,
     // Calculate the rate as Average
     // set: function(r) {
     //   return (this.rate * this.tripsCount + r) / (this.tripsCount + 1);
@@ -93,24 +93,28 @@ const driverSchema = new mongoose.Schema({
     released: { type: Date },
     expires: { type: Date },
   },
-  status: {
-    is_available: { type: Boolean },
-    availableSeats: { type: Number },
-    _activeCar: { type: mongoose.ObjectId, ref: 'Cars' },
-    _activeLine: { type: mongoose.ObjectId, ref: 'Lines' }
-
-  }
+  stripeId: {
+    type: String,
+    default: null,
+  },
+  private_trips: { type: Boolean, default: false },
+  _cars: [{ type: mongoose.ObjectId, ref: "Cars" }],
+  _currentCar: { type: mongoose.ObjectId, ref: "Cars" },
 });
 // JWT generation method
-driverSchema.methods.generateToken = function (expiry) {
-  return jwt.sign({
-    _id: this._id,
-    is_passenger: false
-  }, jwtDriverKey, { expiresIn: expiry });
+driverSchema.methods.generateToken = function (expiry = "96h") {
+  return jwt.sign(
+    {
+      _id: this._id,
+      stripeId: this.stripeId,
+      is_passenger: false,
+    },
+    jwtDriverKey,
+    { expiresIn: expiry }
+  );
 };
 
 module.exports.Drivers = mongoose.model("Drivers", driverSchema);
-
 
 ////****************** Driver Validation  ******************
 // Set Password Complexity
@@ -120,30 +124,16 @@ const complexityOptions = {
   lowerCase: 1,
   upperCase: 1,
   numeric: 1,
-  requirementCount: 2
+  requirementCount: 2,
 };
 
 // Set Validation Schema
 const validationSchema = Joi.object().keys({
   name: Joi.object({
-    first: Joi.string()
-      .required()
-      .trim()
-      .min(3)
-      .max(64),
-    last: Joi.string()
-      .required()
-      .trim()
-      .min(3)
-      .max(64)
+    first: Joi.string().required().trim().min(3).max(64),
+    last: Joi.string().required().trim().min(3).max(64),
   }),
-  mail: Joi.string()
-    .email()
-    .required()
-    .trim()
-    .lowercase()
-    .min(6)
-    .max(64),
+  mail: Joi.string().email().trim().lowercase().min(6).max(64),
   pass: passwordComplexity(complexityOptions),
   phone: Joi.string()
     .required()
@@ -151,36 +141,7 @@ const validationSchema = Joi.object().keys({
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
-  tripsCount: Joi.string()
-    .custom((value, helpers) => {
-      value = parseFloat(value);
-      if (isNaN(value) || !Number.isInteger(value) || value < 0)
-        return helpers.error("any.invalid");
-      // else
-      return value;
-    }, "tripsCount Validation"),
-  rate: Joi.string()
-    .custom((value, helpers) => {
-      value = parseFloat(value);
-      if (isNaN(value) || value < 0 || value > 5)
-        return helpers.error("any.invalid");
-      // else
-      return value;
-    }, "rate Validation"),
-  license: Joi.object(),
-  status: Joi.object({
-    is_available: Joi.bool(),
-    availableSeats: Joi.string()
-      .custom((value, helpers) => {
-        value = parseFloat(value);
-        if (isNaN(value) || !Number.isInteger(value) || value < 0 || value > 15)
-          return helpers.error("any.invalid");
-        // else
-        return value;
-      }, "availableSeats Validation"),
-    _activeCar: Joi.objectId(),
-    _activeLine: Joi.objectId()
-  })
+  fireBaseId: Joi.string().required().trim(),
 });
 module.exports.validateDriver = function (driver) {
   return validationSchema.validate(driver);
@@ -189,17 +150,8 @@ module.exports.validateDriver = function (driver) {
 ////****************** Driver Login Validation  ******************
 // Set Login Schema
 const loginSchema = Joi.object().keys({
-  mail: Joi.string()
-    .email()
-    .required()
-    .trim()
-    .lowercase()
-    .min(6)
-    .max(64),
-  pass: Joi.string()
-    .required()
-    .min(8)
-    .max(30)
+  mail: Joi.string().email().required().trim().lowercase().min(6).max(64),
+  pass: Joi.string().required().min(8).max(30),
 });
 module.exports.validateDriverLogin = function (driverRequest) {
   return loginSchema.validate(driverRequest);

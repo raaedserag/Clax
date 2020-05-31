@@ -1,16 +1,41 @@
 const mongoose = require("mongoose");
-const lineSchema = require("../models/lines-model");
+const Joi = require("@hapi/joi");
+Joi.objectId = require("joi-objectid")(Joi);
 // PastTrips Model
 const pastTripSchema = new mongoose.Schema({
-  start: { type: Date },
-  end: { type: Date, default: Date.now() },
-  rate: { type: Number },
-  price: { type: Number },
-  is_favourite: { type: Boolean, default: false },
-  _line: { type: mongoose.ObjectId, ref: "Lines" },
-  _driver: { type: mongoose.ObjectId, ref: "Drivers" },
-  _passengers: [{ type: mongoose.ObjectId, ref: "Passengers" }]
+  start: { type: Date, required: true },
+  end: { type: Date, required: true },
+  rates: [{ type: Number, default: null, min: 0, max: 5 }],
+  prices: [{ type: Number, required: true, min: 0 }],
+  feedbacks: [{ type: String, default: null }],
+  _passengers: [{ type: mongoose.ObjectId, ref: "Passengers", required: true }],
+  _car: { type: mongoose.ObjectId, ref: "Cars", required: true },
+  _line: { type: mongoose.ObjectId, ref: "Lines", required: true },
+  _driver: { type: mongoose.ObjectId, ref: "Drivers", required: true }
 });
-const PastTrips = mongoose.model("PastTrips", pastTripSchema);
+module.exports.PastTrips = mongoose.model("PastTrips", pastTripSchema);
 
-module.exports.PastTrips = PastTrips;
+// Set validation Schema
+const validationSchema = Joi.object().keys({
+  start: Joi.date()
+    .required(),
+  end: Joi.date()
+    .required(),
+  rates: Joi.array().items(Joi.number().min(0).max(5)),
+  prices: Joi.array().items(Joi.number().min(0))
+    .required(),
+  feedbacks: Joi.array().items(Joi.string()),
+  _passengers: Joi.array().items(Joi.objectId())
+    .required(),
+  _car: Joi.objectId()
+    .required(),
+  _line: Joi.objectId()
+    .required(),
+  _driver: Joi.objectId()
+    .required(),
+});
+module.exports.validatePastTrip = function (pastTrip) {
+  return validationSchema.validate(pastTrip);
+};
+
+
