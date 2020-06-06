@@ -26,17 +26,17 @@ const driverSchema = new mongoose.Schema({
       maxlength: 64,
     },
   },
-  mail: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowerCase: true,
-    minlength: 6,
-    maxlength: 64,
-    match: RegExps.mailRegExp,
-  },
-  mail_verified: { type: Boolean, default: false },
+  //mail: {
+  //   type: String,
+  //   required: true,
+  //   unique: true,
+  //   trim: true,
+  //   lowerCase: true,
+  //   minlength: 6,
+  //   maxlength: 64,
+  //   match: RegExps.mailRegExp,
+  // },
+  //mail_verified: { type: Boolean, default: false },
   pass: {
     type: String,
     required: true,
@@ -84,14 +84,16 @@ const driverSchema = new mongoose.Schema({
     //   return Math.round(r);
     // } // Return the integer rate
   },
-  img: { data: Buffer, contentType: String },
+  profilePic: { data: Buffer, contentType: String },
+  criminalRecord: { data: Buffer, contentType: String },
   license: {
-    copy: { data: Buffer, contentType: String },
-    fullName: { type: String },
-    nationalId: { type: String },
-    region: { type: String },
-    released: { type: Date },
-    expires: { type: Date },
+    data: Buffer,
+    contentType: String,
+  },
+  balance: {
+    type: Number,
+    min: 0,
+    default: 0,
   },
   stripeId: {
     type: String,
@@ -137,7 +139,7 @@ const validationSchema = Joi.object().keys({
     first: Joi.string().required().trim().min(3).max(64),
     last: Joi.string().required().trim().min(3).max(64),
   }),
-  mail: Joi.string().email().trim().lowercase().min(6).max(64),
+  //mail: Joi.string().email().trim().lowercase().min(6).max(64),
   pass: passwordComplexity(complexityOptions),
   phone: Joi.string()
     .required()
@@ -154,7 +156,12 @@ module.exports.validateDriver = function (driver) {
 ////****************** Driver Login Validation  ******************
 // Set Login Schema
 const loginSchema = Joi.object().keys({
-  mail: Joi.string().email().required().trim().lowercase().min(6).max(64),
+  phone: Joi.string()
+    .required()
+    .trim()
+    .min(11)
+    .max(11)
+    .pattern(RegExps.phoneRegExp, "Phone Number"),
   pass: Joi.string().required().min(8).max(30),
 });
 module.exports.validateDriverLogin = function (driverRequest) {
