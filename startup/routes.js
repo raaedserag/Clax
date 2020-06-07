@@ -63,15 +63,14 @@ module.exports = function (app) {
   // Pairing & Tracking Section
   app.use("/api/pairing", pairing);
   // Externals Section
-  app.use("/clients/passengers", passengerExternal);
+  //app.use("/clients/passengers", passengerExternal);
   app.use("/api/admin", admin);
   // Server Interface
   //app.use("/", serverInterfaceRoute)
-  app.get("*", (req, res) => {
+  app.get("/", (req, res) => {
     res.sendFile(process.cwd() + "/dist/index.html");
   });
-  // Handle Not found pages
-  app.all("*", (req, res) => res.sendStatus(404));
+
   // Apply Error Middle ware
   app.use(error);
 };
