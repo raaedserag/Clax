@@ -67,7 +67,7 @@ module.exports = function (app) {
   app.use("/api/admin", admin);
   // Server Interface
   //app.use("/", serverInterfaceRoute)
-  app.get("/", (req, res) => {
+  app.get("/*", (req, res) => {
     res.sendFile(process.cwd() + "/dist/index.html");
   });
 
