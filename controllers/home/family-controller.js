@@ -135,10 +135,10 @@ const acceptRequest = async (req, res) => {
 };
 
 const getFamilyInfo = async (req, res) => {
-  let info = { familyMembers: null, requests: null, sentRequests: null };
-  info.familyMembers = getFamilyMembers(req, res);
-  info.requests = fetchRequests(req, res);
-  info.sentRequests = fetchSentRequests(req, res);
+  let info = { familyMembers: [], requests: [], sentRequests: [] };
+  info.familyMembers = await getFamilyMembers(req, res);
+  info.requests = await fetchRequests(req, res);
+  info.sentRequests = await fetchSentRequests(req, res);
   return res.status(200).send(info);
 };
 
