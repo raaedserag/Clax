@@ -13,7 +13,7 @@ let getFamilyMembers = async (req, res) => {
     familyMemberId = encodeId(familyMemberId);
   });
 
-  res.send(familyMembers._family);
+  return familyMembers._family;
 };
 
 let fetchSentRequests = async (req, res) => {
@@ -23,7 +23,7 @@ let fetchSentRequests = async (req, res) => {
   MembersSentRequests.forEach((familyMember) => {
     familyMember = encodeId(familyMember._id);
   });
-  res.send(MembersSentRequests);
+  return MembersSentRequests;
 };
 
 let deleteFamilyMember = async (req, res) => {
@@ -114,7 +114,7 @@ const fetchRequests = async (req, res) => {
   const familyRequests = await Passengers.findById(req.user._id)
     .select("_familyRequests -_id")
     .populate({ path: "_familyRequests", select: "name phone" });
-  res.send(familyRequests._familyRequests);
+  return familyRequests._familyRequests;
 };
 
 const acceptRequest = async (req, res) => {
@@ -134,6 +134,14 @@ const acceptRequest = async (req, res) => {
   res.send("Request Accepted").status(200);
 };
 
+const getFamilyInfo = async (req, res) => {
+  let info = { familyMembers: null, requests: null, sentRequests: null };
+  info.familyMembers = getFamilyMembers(req, res);
+  info.requests = fetchRequests(req, res);
+  info.sentRequests = fetchSentRequests(req, res);
+  return res.status(200).send(info);
+};
+
 const denyRequest = async (req, res) => {
   const deniedId = decodeId(req.body.deniedId);
   const result = await Passengers.findOneAndUpdate(
@@ -147,7 +155,7 @@ const denyRequest = async (req, res) => {
   );
   if (!result) return res.send("User Not Found !").status(404);
 
-  res.send("Request Denied").status(200);
+  res.status(200).send("Request Denied");
 };
 
 const sentRequestSchema = Joi.object().keys({
@@ -165,11 +173,9 @@ const validateCancelledRequest = function (reqBody) {
   return cancelledRequestSchema.validate(reqBody);
 };
 
-module.exports.getFamilyMembers = getFamilyMembers;
+module.exports.getFamilyInfo = getFamilyInfo;
 module.exports.sendFamilyRequest = sendFamilyRequest;
 module.exports.cancelFamilyRequest = cancelFamilyRequest;
-module.exports.fetchRequests = fetchRequests;
 module.exports.acceptRequest = acceptRequest;
 module.exports.denyRequest = denyRequest;
 module.exports.deleteFamilyMember = deleteFamilyMember;
-module.exports.fetchSentRequests = fetchSentRequests;
