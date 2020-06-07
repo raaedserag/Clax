@@ -1,3 +1,4 @@
+// FireBase Initialization
 const { firebaseAccount,
   fireBaseUrl } = require("../startup/config").firebaseCredentials();
 const admin = require("firebase-admin");
@@ -5,15 +6,26 @@ admin.initializeApp({
   credential: admin.credential.cert(firebaseAccount),
   databaseURL: fireBaseUrl,
 });
+// Definitions
+const db = admin.database();
+const ObjectId = require('mongoose').Types.ObjectId;
+const requestsEvent = new (require("events").EventEmitter);
+module.exports.requestsEvent = requestsEvent;
+//-----------------------------------------
+// FireBase Nodes
+const linesNode = "clax-lines", // {"lineId": {"driverId": {"loc": {"lat": "0.0", "lng": "0.0"}, "seats": "4"}}}
+  requestsNode = "clax-requests",
+  tripsNode = "clax-trips";
 // ------------------------ FCM ------------------------
 
 // Push notifications to one user(token string) or multiple users (Array of tokens strings)
-module.exports.sendTargetedNotification = async function (tokens, notification) {
+module.exports.sendTargetedNotification = async function (tokens, notification, data) {
   try {
+    data.click_action = "FLUTTER_NOTIFICATION_CLICK";
     // Push to one device
     if (typeof tokens == "string") {
       return await admin.messaging().send({
-        data: { click_action: "FLUTTER_NOTIFICATION_CLICK" },
+        data,
         token: tokens,
         notification,
       });
@@ -22,7 +34,7 @@ module.exports.sendTargetedNotification = async function (tokens, notification) 
     // Push to multiple device
     else if (Array.isArray(tokens)) {
       const response = await admin.messaging().sendMulticast({
-        data: { click_action: "FLUTTER_NOTIFICATION_CLICK" },
+        data,
         tokens,
         notification,
       });
@@ -122,5 +134,55 @@ module.exports.unsubscribeFromTopic = async function (tokens, topic) {
 };
 
 // ------------------------ Real Time DataBase References ------------------------
-const db = admin.database();
-module.exports.lineRef = function (lineId) { return db.ref(`clax-lines/${lineId}`) }
+
+// Return available drivers(location, seats) of some line who have sufficient number of free seats
+module.exports.getLineDrivers = async function (lineId, requiredSeats) {
+  try {
+    // Query for the available drivers 
+    const result = await (await db.ref(`${linesNode}/${lineId}`)
+      .orderByChild("seats")
+      .startAt(requiredSeats)
+      .once("value")
+    ).val();
+    if (!result) throw new Error('No available drivers with sufficient seats on this line');
+    return Object.entries(result)
+  } catch (error) {
+    throw new Error(error.message)
+  }
+
+};
+
+// Create new request object (trips-node/line/driver/trip) 
+module.exports.createTripRequest = async function (lineId, seats) {
+  const tripId = new ObjectId;
+  try {
+    await db.ref(`${requestsNode}/${lineId}/${tripId}`)
+      .set({
+        "status": "requesting",
+        "seats": seats
+      })
+    return tripId;
+  } catch (error) {
+    throw new Error(error.message)
+  }
+
+};
+
+// Create new request listener to be triggered if status changed to 'pending'
+module.exports.tripRequestListener = async function (tripRef) {
+  // Define reference
+  const statusRef = db.ref(`${requestsNode}/${tripRef}/status`)
+  // Define the callback fumction to be activated/removed
+  const listenerCallback = (data) => {
+    data = data.val();
+    if (data == "requesting") return true;
+    else if (data == "accepted") {
+      // Stop the listener
+      requestsEvent.emit('request_accepted', tripRef)
+      statusRef.off("value", listenerCallback);
+      return false;
+    }
+  }
+  statusRef.on("value", listenerCallback)
+
+}
