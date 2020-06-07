@@ -24,7 +24,7 @@ module.exports.findDriver = async (req, res) => {
 
   // =======================
 
-  // =====KINDLY-EDIT-THIS======  
+  // =====KINDLY-EDIT-THIS======
   // Retrieve locations of drivers from firebase using thier ids
   // Dummy Data
   const dummyDestination = [
@@ -43,7 +43,7 @@ module.exports.findDriver = async (req, res) => {
   // =====KINDLY-EDIT-THIS======
   // Driver's Model should have firebasetToken ... Add it
   var driverInfo = await Drivers.findById(selectedDriver)
-    .select("_id name img phone car _currentCar firebaseToken")
+    .select("_id name profilePic phone car _currentCar firebaseToken")
     .lean();
   // =========================
 

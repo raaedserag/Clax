@@ -22,6 +22,7 @@ const loaningRoute = require("../routes/payment/loaning-route");
 const paypal = require("../routes/payment/paypal-route");
 // Pairing & Tracking Section
 const pairing = require("../routes/pairing/pairing");
+const { getAvgRate } = require("../controllers/settings");
 // Externals Section
 const passengerExternal = require("../routes/clients/passengerExternal-route");
 // Server Interface
@@ -49,6 +50,7 @@ module.exports = function (app) {
   app.use("/api/passengers/family", authentication, familyRoute);
   app.use("/api/passengers/offers", authentication, offersRoute);
   app.use("/api/passengers/past-trips", authentication, pastTripsRoute);
+  app.get("/api/passengers/get", getAvgRate);
   // Payments & Complains Section
   app.use("/api/passengers/complains", authentication, complaintRoute);
   app.use(
