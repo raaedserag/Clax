@@ -1,13 +1,13 @@
 // Models
 const { Drivers } = require("../../models/drivers-model");
 const { PastTrips } = require("../../models/past-trips-model");
-// Services
-const { sendTargetedNotification } = require("../../services/firebase");
 // Helpers
+const { getAvailableDrivers } = require("../../helpers/drivers-helper");
 const {
-  minimumDistanceIndex,
   adjustBalance,
-} = require("../../helpers/drivers-helper");
+  createNewTrip,
+} = require("../../helpers/pairing-helpers");
+
 // Validators
 const {
   validateFindDriverRequest,
@@ -16,40 +16,33 @@ const {
 //-----------
 
 module.exports.findDriver = async (req, res) => {
-  // Validate request schema
-  const { error } = validateFindDriverRequest(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  try {
+    // Validate request schema
+    const { error } = validateFindDriverRequest(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
 
-  // Retreiving Drivers currently Available
+    // Retrieving sorted array of available drivers, according to line ID and required seats & station Name
+    const result = await getAvailableDrivers(
+      req.body.stationLoc,
+      req.body.lineId,
+      req.body.requiredSeats
+    );
 
-  // =======================
-
-  // =====KINDLY-EDIT-THIS======
-  // Retrieve locations of drivers from firebase using thier ids
-  // Dummy Data
-  const dummyDestination = [
-    { lat: 55, lng: -110 },
-    { lat: 50, lng: -110 },
-    { lat: 40, lng: -110 },
-  ];
-  // =======================
-
-  // Retreive index of Closest Driver
-  let index = await minimumDistanceIndex([req.body.loc], dummyDestination);
-
-  // Get Driver Information
-  let selectedDriver = driversIds[index];
-
-  // =====KINDLY-EDIT-THIS======
-  // Driver's Model should have firebasetToken ... Add it
-  var driverInfo = await Drivers.findById(selectedDriver)
-    .select("_id name profilePic phone car _currentCar firebaseToken")
-    .lean();
-  // =========================
-
-  // Send Notification Message
-  await sendTargetedNotification(driverInfo.firebaseToken);
-  res.status(200).send(driverInfo);
+    // Create new trip request, and respond with the tripId
+    res.send(
+      await createNewTrip(
+        {
+          lineId: req.body.lineId,
+          seats: req.body.requiredSeats,
+          stationLoc: req.body.stationLoc,
+          stationName: result.stationName,
+        },
+        result.drivers
+      )
+    );
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 module.exports.finishTrip = async (req, res) => {

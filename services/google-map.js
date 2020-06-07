@@ -14,10 +14,14 @@ module.exports.distanceMatrix = async function (origin, destination) {
       destinations: destination,
       key: "AIzaSyBkN4KS6PmgIVOwS4p_ceT5SlYqyQ4AsmA",
     },
+    language: 'ar',
     timeout: 1000, // milliseconds
   });
 
-  // Array containing Object of Distance and Duration Data of Each Location
-  let elements = distanceMatrixResponse.data.rows[0]["elements"];
-  return elements;
+  return {
+    // Array containing Object of Distance and Duration Data of Each Location
+    elements: distanceMatrixResponse.data.rows[0]["elements"]
+    // Original station name
+    , originalName: distanceMatrixResponse.data.origin_addresses
+  };
 };

@@ -31,11 +31,11 @@ module.exports.passengerRegister = async (req, res) => {
 
   // check if user with the same email already registered.
   error = await Passengers.findOne({ mail: req.body.mail });
-  if (error) return res.status(409).send("email already exists.");
+  if (error) return res.status(409).send("هذا الإيميل مستخدم من قبل.");
 
   // check if user with the same phone number already registered.
   error = await Passengers.findOne({ phone: req.body.phone });
-  if (error) return res.status(409).send("Phone number already exists.");
+  if (error) return res.status(409).send("هذا الرقم مستخدم من قبل.");
 
   // Creating Stripe account for the registered user
   const customerToken = await createStripeAccount(_.pick(req.body,

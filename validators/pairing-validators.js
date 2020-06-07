@@ -24,7 +24,7 @@ const findDriverRequest = Joi.object().keys({
     lat: Joi.number().required(),
     lng: Joi.number().required(),
   }),
-  requiredSeats: Joi.number(),
+  requiredSeats: Joi.number().required(),
 });
 module.exports.validateFindDriverRequest = function (tripinfo) {
   return findDriverRequest.validate(tripinfo);
