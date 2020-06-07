@@ -1,4 +1,5 @@
 const { Passengers } = require("../../models/passengers-model");
+const { encodeId, decodeId } = require("../../helpers/encryption-helper");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 
@@ -8,6 +9,9 @@ let getFamilyMembers = async (req, res) => {
   })
     .populate("_family", "name phone")
     .select("_family");
+  familyMembers._family.forEach((familyMemberId) => {
+    familyMemberId = encodeId(familyMemberId);
+  });
 
   res.send(familyMembers._family);
 };
@@ -16,14 +20,17 @@ let fetchSentRequests = async (req, res) => {
   let MembersSentRequests = await Passengers.find({
     _familyRequests: req.user._id,
   }).select("_id name phone");
-
+  MembersSentRequests.forEach((familyMember) => {
+    familyMember = encodeId(familyMember._id);
+  });
   res.send(MembersSentRequests);
 };
 
 let deleteFamilyMember = async (req, res) => {
+  const decodedId = decodeId(req.body._id);
   const deletedMember = await Passengers.findOne({
     _id: req.user._id,
-    _family: req.body._id,
+    _family: decodedId,
   }).select("_id");
 
   if (!deletedMember)
@@ -34,7 +41,7 @@ let deleteFamilyMember = async (req, res) => {
       _id: deletedMember._id,
     },
     {
-      $pull: { _family: req.body._id },
+      $pull: { _family: decodedId },
     }
   );
 
@@ -111,14 +118,15 @@ const fetchRequests = async (req, res) => {
 };
 
 const acceptRequest = async (req, res) => {
+  const acceptedId = decodeId(req.body.acceptedId);
   let result = await Passengers.findOneAndUpdate(
     {
       _id: req.user._id,
-      _familyRequests: req.body.acceptedId,
+      _familyRequests: acceptedId,
     },
     {
-      $push: { _family: req.body.acceptedId },
-      $pull: { _familyRequests: req.body.acceptedId },
+      $push: { _family: acceptedId },
+      $pull: { _familyRequests: acceptedId },
     }
   );
   if (!result) return res.send("User Not Found !").status(404);
@@ -127,13 +135,14 @@ const acceptRequest = async (req, res) => {
 };
 
 const denyRequest = async (req, res) => {
+  const deniedId = decodeId(req.body.deniedId);
   const result = await Passengers.findOneAndUpdate(
     {
       _id: req.user._id,
-      _familyRequests: req.body.deniedId,
+      _familyRequests: deniedId,
     },
     {
-      $pull: { _familyRequests: req.body.deniedId },
+      $pull: { _familyRequests: deniedId },
     }
   );
   if (!result) return res.send("User Not Found !").status(404);
