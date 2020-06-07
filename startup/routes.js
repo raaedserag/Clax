@@ -35,6 +35,7 @@ module.exports = function (app) {
   app.use(
     express.static("public", (options = { redirect: false, index: "_" }))
   ); //Serves resources from public folder
+  app.use(express.static(process.cwd() + "/dist/"));
   // Apply Morgan middleware in development mode
   if (process.env.NODE_ENV == "development") {
     app.use(require("morgan")("tiny"));
@@ -64,7 +65,9 @@ module.exports = function (app) {
   app.use("/api/admin", admin);
   // Server Interface
   //app.use("/", serverInterfaceRoute)
-  app.get("/", serverInterfaceRoute);
+  app.get("*", (req, res) => {
+    res.sendFile(process.cwd() + "/dist/index.html");
+  });
   // Handle Not found pages
   app.all("*", (req, res) => res.sendStatus(404));
   // Apply Error Middle ware
