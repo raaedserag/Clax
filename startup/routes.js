@@ -27,6 +27,8 @@ const { getAvgRate } = require("../controllers/settings");
 const passengerExternal = require("../routes/clients/passengerExternal-route");
 // Server Interface
 const serverInterfaceRoute = require("../routes/clients/serverInterface-route");
+//driver
+const driver = require("../routes/driver/driver-settings");
 
 module.exports = function (app) {
   // Apply Essential Middlewares
@@ -65,6 +67,8 @@ module.exports = function (app) {
   // Externals Section
   //app.use("/clients/passengers", passengerExternal);
   app.use("/api/admin", admin);
+  //drivers
+  app.use("/api/drivers", authentication, driver);
   // Server Interface
   //app.use("/", serverInterfaceRoute)
   app.get("/*", (req, res) => {
