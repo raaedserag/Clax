@@ -47,3 +47,21 @@ module.exports.getComplaintById = async (req, res) => {
 
   res.send(complaints);
 };
+module.exports.respondToComplaint = async (req, res) => {
+  let params = { id: req.params.id, response: req.body.response };
+  const schema = Joi.object().keys({
+    id: Joi.objectId().required(),
+    response: Joi.string().required(),
+  });
+  console.log(req.body);
+  const { error } = schema.validate(params);
+  if (error) return res.status(400).send(error.details[0].message);
+  const complaints = await Complaints.updateOne(
+    { _id: req.params.id },
+    {
+      $set: { status: "resolved", response: req.body.text },
+    }
+  );
+
+  res.send("successful");
+};
