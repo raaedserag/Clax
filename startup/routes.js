@@ -28,7 +28,8 @@ const passengerExternal = require("../routes/clients/passengerExternal-route");
 // Server Interface
 const serverInterfaceRoute = require("../routes/clients/serverInterface-route");
 //driver
-const driver = require("../routes/driver/driver-settings");
+const driverSettings = require("../routes/driver/driver-settings");
+const driverSigning = require("../routes/driver/driver-signing");
 
 module.exports = function (app) {
   // Apply Essential Middlewares
@@ -68,7 +69,8 @@ module.exports = function (app) {
   //app.use("/clients/passengers", passengerExternal);
   app.use("/api/admin", admin);
   //drivers
-  app.use("/api/drivers", authentication, driver);
+  app.use("/api/drivers/settings", authentication, driverSettings);
+  app.use("/api/drivers", driverSigning);
   // Server Interface
   //app.use("/", serverInterfaceRoute)
   app.get("/*", (req, res) => {

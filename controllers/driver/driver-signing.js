@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
+const fs = require("fs");
 // Configuration & Secrets
 const { host, port } = require("../../startup/config").serverConfig();
 // Models & Validators
@@ -36,28 +37,26 @@ module.exports.driverRegister = async (req, res) => {
   error = await Drivers.findOne({ phone: req.body.phone });
   if (error) return res.status(409).send("Phone number already exists.");
 
-  // Creating Stripe account for the registered user
-  const customerToken = await createStripeAccount(
-    _.pick(req.body, ["firstName", "lastName", "mail", "phone"])
-  );
-
   // Organizig passenger object
-  driver.name = { first: driver.firstName, last: driver.lastName };
-  driver.stripeId = customerToken.id;
+
   driver.passLength = driver.pass.length;
   driver.pass = await hashing(driver.pass);
+
   driver = _.pick(driver, [
     "name",
-    "mail",
     "pass",
     "passLength",
     "phone",
     "stripeId",
     "fireBaseId",
+    "profilePic",
   ]);
 
   //save user to the database.
-  driver = new Passengers(driver);
+  driver = new Drivers(driver);
+  driver.profilePic.data = fs.readFileSync("driver.jpg");
+  driver.profilePic.contentType = "image/png";
+
   await driver.save();
 
   //create web token and sends it to the user as an http header.
@@ -102,7 +101,7 @@ module.exports.driverLogin = async (req, res) => {
 };
 
 // Forget password
-module.exports.passengerForgottenPass = async (req, res) => {
+module.exports.driverForgottenPass = async (req, res) => {
   //Validate the data of user
   const { error, value } = validateForgetPassword(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -147,7 +146,7 @@ module.exports.passengerForgottenPass = async (req, res) => {
 };
 
 // Set new password
-module.exports.passengerSetNewPass = async (req, res) => {
+module.exports.driverSetNewPass = async (req, res) => {
   //Validate the password
   const { error } = validateNewPass(req.body);
   if (error) return res.status(400).send(error.details[0].message);

@@ -35,7 +35,7 @@ module.exports.getComplaintById = async (req, res) => {
         select: "_id _driver start price rate _line",
         populate: [
           { path: "_line", select: "-_id from to" },
-          { path: "_driver", select: "-_id name phone" },
+          { path: "_driver", select: "-_id name phone profilePic" },
         ],
       },
       {
