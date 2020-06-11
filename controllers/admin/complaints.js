@@ -53,7 +53,7 @@ module.exports.respondToComplaint = async (req, res) => {
     id: Joi.objectId().required(),
     response: Joi.string().required(),
   });
-  console.log(req.body);
+
   const { error } = schema.validate(params);
   if (error) return res.status(400).send(error.details[0].message);
   const complaints = await Complaints.updateOne(
