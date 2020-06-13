@@ -38,6 +38,6 @@ router.get("/complaints/:id", authorization, getComplaintById);
 router.post("/complaints/respond/:id", authorization, respondToComplaint);
 
 //statistics
-router.get("/statistics", getStatistics);
+router.get("/statistics", authorization, getStatistics);
 
 module.exports = router;
