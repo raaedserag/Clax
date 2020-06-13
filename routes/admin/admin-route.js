@@ -15,6 +15,7 @@ const {
   getComplaintById,
   respondToComplaint,
 } = require("../../controllers/admin/complaints");
+const { getStatistics } = require("../../controllers/admin/statistics");
 const express = require("express");
 const router = express.Router();
 
@@ -35,5 +36,8 @@ router.post("/delete-offer", authentication, deleteOffer);
 router.get("/complaints", authentication, getComplaints);
 router.get("/complaints/:id", authentication, getComplaintById);
 router.post("/complaints/respond/:id", authentication, respondToComplaint);
+
+//statistics
+router.get("/statistics", authorization, getStatistics);
 
 module.exports = router;
