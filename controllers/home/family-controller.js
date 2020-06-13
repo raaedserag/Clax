@@ -27,25 +27,29 @@ let fetchSentRequests = async (req, res) => {
 };
 
 let deleteFamilyMember = async (req, res) => {
-  const decodedId = decodeId(req.body._id);
-  const deletedMember = await Passengers.findOne({
-    _id: req.user._id,
-    _family: decodedId,
-  }).select("_id");
+  try {
+    const decodedId = decodeId(req.body._id);
+    const deletedMember = await Passengers.findOne({
+      _id: req.user._id,
+      _family: decodedId,
+    }).select("_id");
 
-  if (!deletedMember)
-    return res.status(404).send("user not found in your family");
+    if (!deletedMember)
+      return res.status(404).send("user not found in your family");
 
-  result = await Passengers.updateOne(
-    {
-      _id: deletedMember._id,
-    },
-    {
-      $pull: { _family: decodedId },
-    }
-  );
+    result = await Passengers.updateOne(
+      {
+        _id: deletedMember._id,
+      },
+      {
+        $pull: { _family: decodedId },
+      }
+    );
 
-  res.status(200).send("member deleted");
+    res.status(200).send("member deleted");
+  } catch (error) {
+    return res.status(400).send("Wrong ID Format");
+  }
 };
 
 let sendFamilyRequest = async (req, res) => {
@@ -118,20 +122,24 @@ const fetchRequests = async (req, res) => {
 };
 
 const acceptRequest = async (req, res) => {
-  const acceptedId = decodeId(req.body.acceptedId);
-  let result = await Passengers.findOneAndUpdate(
-    {
-      _id: req.user._id,
-      _familyRequests: acceptedId,
-    },
-    {
-      $push: { _family: acceptedId },
-      $pull: { _familyRequests: acceptedId },
-    }
-  );
-  if (!result) return res.send("User Not Found !").status(404);
+  try {
+    const acceptedId = decodeId(req.body.acceptedId);
+    let result = await Passengers.findOneAndUpdate(
+      {
+        _id: req.user._id,
+        _familyRequests: acceptedId,
+      },
+      {
+        $push: { _family: acceptedId },
+        $pull: { _familyRequests: acceptedId },
+      }
+    );
+    if (!result) return res.send("User Not Found !").status(404);
 
-  res.send("Request Accepted").status(200);
+    res.send("Request Accepted").status(200);
+  } catch (error) {
+    return res.status(400).send("Wrong ID Format");
+  }
 };
 
 const getFamilyInfo = async (req, res) => {
@@ -143,19 +151,23 @@ const getFamilyInfo = async (req, res) => {
 };
 
 const denyRequest = async (req, res) => {
-  const deniedId = decodeId(req.body.deniedId);
-  const result = await Passengers.findOneAndUpdate(
-    {
-      _id: req.user._id,
-      _familyRequests: deniedId,
-    },
-    {
-      $pull: { _familyRequests: deniedId },
-    }
-  );
-  if (!result) return res.send("User Not Found !").status(404);
+  try {
+    const deniedId = decodeId(req.body.deniedId);
+    const result = await Passengers.findOneAndUpdate(
+      {
+        _id: req.user._id,
+        _familyRequests: deniedId,
+      },
+      {
+        $pull: { _familyRequests: deniedId },
+      }
+    );
+    if (!result) return res.send("User Not Found !").status(404);
 
-  res.status(200).send("Request Denied");
+    res.status(200).send("Request Denied");
+  } catch (error) {
+    return res.status(400).send("Wrong ID Format");
+  }
 };
 
 const sentRequestSchema = Joi.object().keys({
