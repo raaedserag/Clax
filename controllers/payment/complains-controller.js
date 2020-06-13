@@ -14,6 +14,7 @@ module.exports.complaintsPost = async (req, res) => {
     _passenger: req.user._id,
     _trip: req.body._trip,
     text: req.body.text,
+    subject: req.body.subject,
     from_passenger: req.body.from_passenger,
     code: Date.now(),
     date: Date.now(),
@@ -31,7 +32,7 @@ module.exports.complaintsGet = async (req, res) => {
     .select("-_id _complains")
     .populate({
       path: "_complains",
-      select: "-_id response text date status code _trip",
+      select: "-_id response subject text date status code _trip",
     })
     .lean();
   res.send(complaints["_complains"]);
