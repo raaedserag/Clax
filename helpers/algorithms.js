@@ -107,6 +107,7 @@ const sendNextCallback = function (trip, drivers, index) {
                     },
                     // Notification's data
                     {
+                        type: "tripRequest",
                         request: trip.requestRef,
                         station_name: trip.stationName,
                         station_location: JSON.stringify(trip.stationLoc),

@@ -1,4 +1,4 @@
-const authorization = require("../../middlewares/authorization");
+const authentication = require("../../middlewares/authentication");
 const {
   adminLogin,
   adminRegister,
@@ -21,19 +21,19 @@ const router = express.Router();
 //admin account routes
 router.post("/register", adminRegister);
 router.post("/login", adminLogin);
-router.get("/me", authorization, getAdminInfo);
+router.get("/me", authentication, getAdminInfo);
 
 //passengers
-router.get("/get-passengers", authorization, getPassengers);
+router.get("/get-passengers", authentication, getPassengers);
 
 //passengers offers
-router.post("/add-offer", authorization, addOffer);
-router.get("/get-offers", authorization, getOffers);
-router.post("/delete-offer", authorization, deleteOffer);
+router.post("/add-offer", authentication, addOffer);
+router.get("/get-offers", authentication, getOffers);
+router.post("/delete-offer", authentication, deleteOffer);
 
 //complaints
-router.get("/complaints", authorization, getComplaints);
-router.get("/complaints/:id", authorization, getComplaintById);
-router.post("/complaints/respond/:id", authorization, respondToComplaint);
+router.get("/complaints", authentication, getComplaints);
+router.get("/complaints/:id", authentication, getComplaintById);
+router.post("/complaints/respond/:id", authentication, respondToComplaint);
 
 module.exports = router;

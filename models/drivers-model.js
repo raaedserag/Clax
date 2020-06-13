@@ -109,14 +109,11 @@ const driverSchema = new mongoose.Schema({
 });
 // JWT generation method
 driverSchema.methods.generateToken = function (expiry = "96h") {
-  return jwt.sign(
-    {
-      _id: this._id,
-      stripeId: this.stripeId,
-      is_passenger: false,
-    },
-    jwtDriverKey,
-    { expiresIn: expiry }
+  return jwt.sign({
+    _id: this._id,
+    stripeId: this.stripeId,
+    type: "driver"
+  }, jwtDriverKey, { expiresIn: expiry }
   );
 };
 

@@ -1,18 +1,16 @@
-const jwt = require("jsonwebtoken");
-const { adminJwt } = require("../startup/config.js").jwtKeys();
-async function authorize(req, res, next) {
-  const token = req.header("x-login-token");
-  //if token isn't included in the header
-  if (!token) return res.status(401).send("Access Denied. No token Provided");
+// Passenger Authorization
+module.exports.authorizePassenger = (req, res, next) => {
+  if (req.user.type != "passenger") return res.sendStatus(403);
+  next();
+};
+// Driver Authorization
+module.exports.authorizeDriver = (req, res, next) => {
+  if (req.user.type != "driver") return res.sendStatus(403);
+  next();
+};
 
-  try {
-    //if token is valid include decoded info in the request.
-    const decoded = jwt.verify(token, adminJwt);
-    req.admin = decoded;
-    next();
-  } catch (ex) {
-    //if token is invalid send error message to the user.
-    res.status(400).send("Invalid Token.");
-  }
-}
-module.exports = authorize;
+// Admin Authorization
+module.exports.authorizeAdmin = (req, res, next) => {
+  if (req.user.type != "admin") return res.sendStatus(403);
+  next();
+};

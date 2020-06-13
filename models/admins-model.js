@@ -49,9 +49,8 @@ adminSchema.methods.generateToken = function (expiry) {
   return jwt.sign(
     {
       _id: this._id,
-    },
-    adminJwt,
-    { expiresIn: expiry }
+      type: "admin"
+    }, adminJwt, { expiresIn: expiry }
   );
 };
 module.exports.Admins = mongoose.model("Admins", adminSchema);

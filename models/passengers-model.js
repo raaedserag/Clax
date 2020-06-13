@@ -154,7 +154,7 @@ passengerSchema.methods.generateToken = function (expiry = "96h") {
   return jwt.sign({
     _id: this._id,
     stripeId: this.stripeId,
-    is_passenger: true
+    type: "passenger"
   }, jwtPassengerKey, { expiresIn: expiry });
 };
 
