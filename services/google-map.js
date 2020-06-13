@@ -1,27 +1,26 @@
 //googleMaps library
-const { Client } = require("@googlemaps/google-maps-services-js");
-const GoogleMap = new Client();
+const GoogleMap = new (require("@googlemaps/google-maps-services-js").Client);
+const { googleMapsKey } = require("../startup/config").googleMapsCredentials()
+//------------------------
 
 // Calculate Distance between user and drivers && access api key
 
-module.exports.distanceMatrix = async function (origin, destination) {
+module.exports.calculateDistances = async function (userLoc, destLoc, drivers) {
   // More Info Distance Matrix Api:
   // https://developers.google.com/maps/documentation/distance-matrix/start
 
-  let distanceMatrixResponse = await GoogleMap.distancematrix({
+  let response = await GoogleMap.distancematrix({
     params: {
-      origins: origin,
-      destinations: destination,
-      key: "AIzaSyBkN4KS6PmgIVOwS4p_ceT5SlYqyQ4AsmA",
+      origins: [destLoc],
+      destinations: [userLoc].concat(drivers),
+      key: googleMapsKey
     },
     language: 'ar',
     timeout: 1000, // milliseconds
   });
-
   return {
-    // Array containing Object of Distance and Duration Data of Each Location
-    elements: distanceMatrixResponse.data.rows[0]["elements"]
-    // Original station name
-    , originalName: distanceMatrixResponse.data.origin_addresses
-  };
+    userDistance: response.data.rows[0].elements[0],
+    driversDistances: response.data.rows[0].elements.slice(1),
+    stationName: response.data.destination_addresses[0]
+  }
 };

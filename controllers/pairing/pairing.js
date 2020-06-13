@@ -1,10 +1,11 @@
 // Models
 const { Drivers } = require("../../models/drivers-model");
 const { PastTrips } = require("../../models/past-trips-model");
+const { Cars } = require('../../models/cars-model')
 // Helpers
-const { getAvailableDrivers } = require("../../helpers/drivers-helper");
 const {
   adjustBalance,
+  getAvailableDrivers,
   createNewTrip,
 } = require("../../helpers/pairing-helpers");
 
@@ -12,6 +13,7 @@ const {
 const {
   validateFindDriverRequest,
   validateFinishTripRequest,
+  validateGetDriverInfo
 } = require("../../validators/pairing-validators");
 //-----------
 
@@ -23,27 +25,41 @@ module.exports.findDriver = async (req, res) => {
 
     // Retrieving sorted array of available drivers, according to line ID and required seats & station Name
     const result = await getAvailableDrivers(
-      req.body.stationLoc,
-      req.body.lineId,
+      { user: req.body.pickupLoc, dest: req.body.destLoc },
+      { id: req.body.lineId, direction: req.body.direction },
       req.body.requiredSeats
     );
 
     // Create new trip request, and respond with the tripId
-    res.send(
-      await createNewTrip(
-        {
-          lineId: req.body.lineId,
-          seats: req.body.requiredSeats,
-          stationLoc: req.body.stationLoc,
-          stationName: result.stationName,
-        },
-        result.drivers
-      )
-    );
+    const tripId = await createNewTrip(
+      {
+        lineId: req.body.lineId,
+        seats: req.body.requiredSeats,
+        stationLoc: req.body.pickupLoc,
+        stationName: result.stationName,
+      },
+      result.drivers
+    )
+    res.send(tripId);
+
   } catch (error) {
     throw new Error(error.message);
   }
 };
+
+// Get Driver Info (as a passenger)
+module.exports.getDriverInfo = async (req, res) => {
+  // Validate request schema
+  const { error } = validateGetDriverInfo(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+
+  const result = await Drivers.findById(req.body.driverId)
+    .select('-_id name phone profilePic')
+    .populate('_currentCar', '-_id color plateNumber')
+
+  res.send(result)
+}
 
 module.exports.finishTrip = async (req, res) => {
   // Validate request schema

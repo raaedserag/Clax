@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const Joi = require("@hapi/joi");
 // Car Model
 const carSchema = new mongoose.Schema({
     // Hex color

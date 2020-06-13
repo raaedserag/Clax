@@ -15,6 +15,13 @@ const complaintSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  subject: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 4,
+    maxlength: 40,
+  },
   text: {
     type: String,
     required: true,
@@ -46,6 +53,7 @@ module.exports.Complaints = mongoose.model("Complaints", complaintSchema);
 const validationSchema = Joi.object().keys({
   response: Joi.string().trim(),
   code: Joi.number(),
+  subject: Joi.string().required().trim().min(4).max(40),
   text: Joi.string().required().trim().min(4).max(500),
   date: Joi.date().required(),
   from_passenger: Joi.bool(),

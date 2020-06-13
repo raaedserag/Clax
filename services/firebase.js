@@ -9,8 +9,7 @@ admin.initializeApp({
 // Definitions
 const db = admin.database();
 const ObjectId = require('mongoose').Types.ObjectId;
-const requestsEvent = new (require("events").EventEmitter);
-module.exports.requestsEvent = requestsEvent;
+// Helpers
 //-----------------------------------------
 // FireBase Nodes
 const linesNode = "clax-lines", // {"lineId": {"driverId": {"loc": {"lat": "0.0", "lng": "0.0"}, "seats": "4"}}}
@@ -133,7 +132,7 @@ module.exports.unsubscribeFromTopic = async function (tokens, topic) {
   }
 };
 
-// ------------------------ Real Time DataBase References ------------------------
+// ------------------------ Real Time DataBase Functions ------------------------
 
 // Return available drivers(location, seats) of some line who have sufficient number of free seats
 module.exports.getLineDrivers = async function (lineId, requiredSeats) {
@@ -169,20 +168,29 @@ module.exports.createTripRequest = async function (lineId, seats) {
 };
 
 // Create new request listener to be triggered if status changed to 'pending'
-module.exports.tripRequestListener = async function (tripRef) {
-  // Define reference
+module.exports.reqStatusListener = function (tripRef, callback) {
   const statusRef = db.ref(`${requestsNode}/${tripRef}/status`)
-  // Define the callback fumction to be activated/removed
-  const listenerCallback = (data) => {
-    data = data.val();
-    if (data == "requesting") return true;
-    else if (data == "accepted") {
-      // Stop the listener
-      requestsEvent.emit('request_accepted', tripRef)
-      statusRef.off("value", listenerCallback);
-      return false;
-    }
+  // Arrise the listener
+  statusRef.on("value", callback(tripRef, statusRef))
+};
+
+// Set status member of some request to refused
+module.exports.setRequestStatus = async function (tripRef, status) {
+  try {
+    await db.ref(`${requestsNode}/${tripRef}/status`)
+      .set(status)
+    return true;
+  } catch (error) {
+    throw new Error(error.message)
   }
-  statusRef.on("value", listenerCallback)
+};
+
+module.exports.removeTripRequest = async function (tripRef) {
+  try {
+    await db.ref(`${requestsNode}/${tripRef}`)
+      .set(null)
+  } catch (error) {
+    throw new Error(error.message)
+  }
 
 }

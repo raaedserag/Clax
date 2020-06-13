@@ -61,7 +61,7 @@ module.exports = function (app) {
   app.use("/api/passengers/payments/loaning", authentication, loaningRoute);
   app.use("/api/passengers/paypal", paypal);
   // Pairing & Tracking Section
-  app.use("/api/pairing", pairing);
+  app.use("/api/passengers/pairing", pairing);
   // Externals Section
   //app.use("/clients/passengers", passengerExternal);
   app.use("/api/admin", admin);

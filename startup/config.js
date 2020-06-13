@@ -22,6 +22,15 @@ module.exports.serverConfig = function () {
   return { host, port };
 };
 
+//get app-settings from the configuration file
+module.exports.appConfig = function () {
+  const appSettings = config.get("app_settings");
+  if (!(appSettings)) {
+    throw new Error("FATAL ERROR: app_settings is not defined.");
+  }
+  return { appSettings };
+};
+
 //get connection string from the environment file
 module.exports.dbConfig = function () {
   const localUri = process.env.CLAX_LOCAL_DB_URI,
@@ -118,4 +127,13 @@ module.exports.firebaseCredentials = function () {
     },
     fireBaseUrl
   }
+}
+
+// Google Maps API key
+module.exports.googleMapsCredentials = function () {
+  const googleMapsKey = process.env.CLAX_GOOGLE_MAPS_SECRETS
+  if (!(googleMapsKey)) {
+    throw new Error("FATAL ERROR: google maps creddentials is not defined.");
+  }
+  return { googleMapsKey };
 }
