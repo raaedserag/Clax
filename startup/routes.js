@@ -27,6 +27,13 @@ const passengerExternal = require("../routes/clients/passengerExternal-route");
 // Server Interface
 const serverInterfaceRoute = require("../routes/clients/serverInterface-route");
 
+
+
+
+//driver setting
+const driverHome = require("../routes/driverHome/settings");
+
+
 module.exports = function (app) {
   // Apply Essential Middlewares
   app.use(webConfig);
@@ -62,6 +69,10 @@ module.exports = function (app) {
   // Externals Section
   app.use("/clients/passengers", passengerExternal);
   app.use("/api/admin", admin);
+  
+  //driver setting
+  app.use("/api/driver/settings", authentication, driverHome);
+
   // Server Interface
   //app.use("/", serverInterfaceRoute)
   app.get("/", serverInterfaceRoute);
