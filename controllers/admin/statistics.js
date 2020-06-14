@@ -70,8 +70,8 @@ module.exports.getStatistics = async (req, res) => {
   const capacity =
     (await Drivers.find().countDocuments()) +
     (await Passengers.find().countDocuments());
-  const errorsNumber = await Log.find().countDocuments();
-  console.log(errorsNumber);
+  const errorsNumber = await Log.find({ level: "error" }).countDocuments();
+
   data.usersActivity.usersNumber = usersNumber;
   data.usersActivity.driversNumber = driversNumber;
   data.usersActivity.tripsNumber = tripsNumber;

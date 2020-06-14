@@ -11,4 +11,4 @@ const logSchema = new mongoose.Schema({
   message: { type: String },
   meta: { type: String },
 });
-module.exports.Log = mongoose.model("Log", logSchema);
+module.exports.Log = mongoose.model("Logs", logSchema);
