@@ -11,6 +11,7 @@ module.exports.getStatistics = async (req, res) => {
       driversNumber: 0,
       tripsNumber: 0,
     },
+    capacity: 0,
   };
   const usersNumber = await Passengers.aggregate([
     {
@@ -63,8 +64,11 @@ module.exports.getStatistics = async (req, res) => {
       },
     },
   ]);
+  const capacity =
+    (await Drivers.find().count()) + (await Passengers.find().count());
   data.usersActivity.usersNumber = usersNumber;
   data.usersActivity.driversNumber = driversNumber;
   data.usersActivity.tripsNumber = tripsNumber;
+  data.capacity = capacity;
   res.send(data);
 };
