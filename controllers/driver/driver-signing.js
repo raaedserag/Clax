@@ -50,6 +50,7 @@ module.exports.driverRegister = async (req, res) => {
     "stripeId",
     "fireBaseId",
     "profilePic",
+    "govern",
   ]);
 
   //save user to the database.
