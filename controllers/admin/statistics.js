@@ -13,10 +13,11 @@ module.exports.getStatistics = async (req, res) => {
       driversNumber: 0,
       tripsNumber: 0,
     },
+    revenue: 0,
     capacity: 0,
     errorsNumber: 0,
   };
-  const usersNumber = await Passengers.aggregate([
+  data.usersActivity.usersNumber = await Passengers.aggregate([
     {
       $group: {
         _id: {
@@ -33,7 +34,7 @@ module.exports.getStatistics = async (req, res) => {
       },
     },
   ]);
-  const driversNumber = await Drivers.aggregate([
+  data.usersActivity.driversNumber = await Drivers.aggregate([
     {
       $group: {
         _id: {
@@ -50,7 +51,7 @@ module.exports.getStatistics = async (req, res) => {
       },
     },
   ]);
-  const tripsNumber = await PastTrips.aggregate([
+  data.usersActivity.tripsNumber = await PastTrips.aggregate([
     {
       $group: {
         _id: {
@@ -67,16 +68,28 @@ module.exports.getStatistics = async (req, res) => {
       },
     },
   ]);
-  const capacity =
+  data.capacity =
     (await Drivers.find().countDocuments()) +
     (await Passengers.find().countDocuments());
-  const errorsNumber = await Log.find({ level: "error" }).countDocuments();
+  data.errorsNumber = await Log.find({ level: "error" }).countDocuments();
 
-  data.usersActivity.usersNumber = usersNumber;
-  data.usersActivity.driversNumber = driversNumber;
-  data.usersActivity.tripsNumber = tripsNumber;
-  data.capacity = capacity;
-  data.errorsNumber = errorsNumber;
+  data.revenue = await PastTrips.aggregate([
+    {
+      $group: {
+        _id: {
+          $month: { $toDate: "$_id" },
+        },
+        revenue: { $sum: "$price" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        month: "$_id",
+        revenue: 1,
+      },
+    },
+  ]);
 
   res.send(data);
 };
