@@ -1,8 +1,10 @@
 const { Passengers } = require("../../models/passengers-model");
 const { Drivers } = require("../../models/drivers-model");
 const { PastTrips } = require("../../models/past-trips-model");
+const { Log } = require("../../models/Log-model");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
+var { atlasUri } = require("../../startup/config").dbConfig();
 
 module.exports.getStatistics = async (req, res) => {
   let data = {
@@ -12,6 +14,7 @@ module.exports.getStatistics = async (req, res) => {
       tripsNumber: 0,
     },
     capacity: 0,
+    errorsNumber: 0,
   };
   const usersNumber = await Passengers.aggregate([
     {
@@ -65,10 +68,15 @@ module.exports.getStatistics = async (req, res) => {
     },
   ]);
   const capacity =
-    (await Drivers.find().count()) + (await Passengers.find().count());
+    (await Drivers.find().countDocuments()) +
+    (await Passengers.find().countDocuments());
+  const errorsNumber = await Log.find().countDocuments();
+  console.log(errorsNumber);
   data.usersActivity.usersNumber = usersNumber;
   data.usersActivity.driversNumber = driversNumber;
   data.usersActivity.tripsNumber = tripsNumber;
   data.capacity = capacity;
+  data.errorsNumber = errorsNumber;
+
   res.send(data);
 };
