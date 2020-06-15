@@ -4,9 +4,15 @@ const { PastTrips } = require("../../models/past-trips-model");
 const { Log } = require("../../models/Log-model");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
-var { atlasUri } = require("../../startup/config").dbConfig();
 
 module.exports.getStatistics = async (req, res) => {
+  let governs = {
+    Alexandria: "الإسكندرية",
+    Cairo: "القاهرة",
+    Aswan: "أسوان",
+    Elbehera: "البحيرة",
+    Asyut: "أسيوط",
+  };
   let data = {
     usersActivity: {
       usersNumber: 0,
@@ -33,6 +39,12 @@ module.exports.getStatistics = async (req, res) => {
       },
     },
   ]);
+  function getKeyByValue(object, value) {
+    return Object.keys(object).find((key) => object[key] === value);
+  }
+  data.usersGoverns.forEach((element) => {
+    element.govern = getKeyByValue(governs, element.govern);
+  });
   data.usersActivity.usersNumber = await Passengers.aggregate([
     {
       $group: {
