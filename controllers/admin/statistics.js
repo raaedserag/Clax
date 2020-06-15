@@ -16,7 +16,23 @@ module.exports.getStatistics = async (req, res) => {
     revenue: 0,
     capacity: 0,
     errorsNumber: 0,
+    usersGoverns: 0,
   };
+  data.usersGoverns = await Passengers.aggregate([
+    {
+      $group: {
+        _id: "$govern",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        govern: "$_id",
+        count: 1,
+      },
+    },
+  ]);
   data.usersActivity.usersNumber = await Passengers.aggregate([
     {
       $group: {
