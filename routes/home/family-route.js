@@ -1,18 +1,18 @@
 const router = require("express").Router();
 
 const {
-  getFamilyMembers,
+  getFamilyInfo,
   sendFamilyRequest,
   cancelFamilyRequest,
-  fetchRequests,
+  deleteFamilyMember,
   acceptRequest,
-  denyRequest
+  denyRequest,
 } = require("../../controllers/home/family-controller");
 
-router.get("/", getFamilyMembers);
+router.get("/", getFamilyInfo);
 router.put("/add", sendFamilyRequest);
 router.put("/cancel", cancelFamilyRequest);
-router.get("/fetch-requests", fetchRequests);
+router.put("/delete", deleteFamilyMember);
 router.put("/accept-request", acceptRequest);
 router.put("/deny-request", denyRequest);
 

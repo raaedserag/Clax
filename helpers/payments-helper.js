@@ -26,7 +26,7 @@ module.exports.chargePassengerBalance = async function (userId, request) {
       _passenger: userId,
       description: request.source,
       type: "Charge"
-    }], { session }).lean();
+    }], { session });
 
     await Passengers.findByIdAndUpdate(userId, {
       $inc: { balance: request.amount },
