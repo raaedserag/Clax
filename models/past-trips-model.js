@@ -6,7 +6,7 @@ const pastTripSchema = new mongoose.Schema({
   start: { type: Date, required: true },
   end: { type: Date, required: true },
   rates: [{ type: Number, default: null, min: 0, max: 5 }],
-  prices: [{ type: Number, required: true, min: 0 }],
+  price: [{ type: Number, required: true, min: 0 }],
   seats: [{ type: Number, required: true, min: 0 }],
   feedbacks: [{ type: String, default: null }],
   _passengers: [{ type: mongoose.ObjectId, ref: "Passengers", required: true }],
