@@ -12,6 +12,7 @@ module.exports.getStatistics = async (req, res) => {
     Aswan: "أسوان",
     Elbehera: "البحيرة",
     Asyut: "أسيوط",
+    ElGhrabia: "الغربية",
   };
   let data = {
     usersActivity: {
