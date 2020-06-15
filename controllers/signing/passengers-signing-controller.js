@@ -13,11 +13,13 @@ const {
   validateNewPass,
 } = require("../../validators/signing-validators");
 // Helpers & Services
-const { subscribeToTopic } = require('../../services/firebase')
-const createStripeAccount = require('../../services/stripe').createCustomer
-const { hashing,
+const { subscribeToTopic } = require("../../services/firebase");
+const createStripeAccount = require("../../services/stripe").createCustomer;
+const {
+  hashing,
   encodeId,
-  generateTempToken } = require("../../helpers/encryption-helper");
+  generateTempToken,
+} = require("../../helpers/encryption-helper");
 const mail = require("../../services/sendgrid-mail");
 const sms = require("../../services/nexmo-sms");
 //---------------------
@@ -38,25 +40,35 @@ module.exports.passengerRegister = async (req, res) => {
   if (error) return res.status(409).send("هذا الرقم مستخدم من قبل.");
 
   // Creating Stripe account for the registered user
-  const customerToken = await createStripeAccount(_.pick(req.body,
-    ["firstName", "lastName", "mail", "phone"]))
+  const customerToken = await createStripeAccount(
+    _.pick(req.body, ["firstName", "lastName", "mail", "phone"])
+  );
 
   // Organizig passenger object
   passenger.name = { first: passenger.firstName, last: passenger.lastName };
   passenger.stripeId = customerToken.id;
-  passenger.passLength = passenger.pass.length
-  passenger.pass = await hashing(passenger.pass)
-  passenger = _.pick(passenger, ["name", "mail", "pass", "passLength", "phone", "stripeId", "fireBaseId"])
+  passenger.passLength = passenger.pass.length;
+  passenger.pass = await hashing(passenger.pass);
+  passenger = _.pick(passenger, [
+    "name",
+    "mail",
+    "pass",
+    "passLength",
+    "phone",
+    "stripeId",
+    "fireBaseId",
+    "govern",
+  ]);
 
   //save user to the database.
-  passenger = new Passengers(passenger)
+  passenger = new Passengers(passenger);
   await passenger.save();
 
   //create web token and sends it to the user as an http header.
   const webToken = passenger.generateToken("96h");
 
   // Subscribe registered passenger to passengers topic
-  await subscribeToTopic(passenger.fireBaseId, "passengers")
+  await subscribeToTopic(passenger.fireBaseId, "passengers");
   //pick what you want to send to the user (using lodash).
   res.header("x-login-token", webToken).sendStatus(200);
 };
@@ -87,8 +99,10 @@ module.exports.passengerLogin = async (req, res) => {
   if (!validPassword) return res.status(401).send("Invalid login credentials");
 
   // Change fireBaseId and respond with header token
-  await Passengers.findByIdAndUpdate(passenger._id, { fireBaseId: req.body.fireBaseId })
-  res.header("x-login-token", passenger.generateToken()).sendStatus(200)
+  await Passengers.findByIdAndUpdate(passenger._id, {
+    fireBaseId: req.body.fireBaseId,
+  });
+  res.header("x-login-token", passenger.generateToken()).sendStatus(200);
 };
 
 // Forget password

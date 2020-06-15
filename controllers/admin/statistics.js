@@ -1,8 +1,10 @@
 const { Passengers } = require("../../models/passengers-model");
 const { Drivers } = require("../../models/drivers-model");
 const { PastTrips } = require("../../models/past-trips-model");
+const { Log } = require("../../models/Log-model");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
+var { atlasUri } = require("../../startup/config").dbConfig();
 
 module.exports.getStatistics = async (req, res) => {
   let data = {
@@ -11,8 +13,27 @@ module.exports.getStatistics = async (req, res) => {
       driversNumber: 0,
       tripsNumber: 0,
     },
+    revenue: 0,
+    capacity: 0,
+    errorsNumber: 0,
+    usersGoverns: 0,
   };
-  const usersNumber = await Passengers.aggregate([
+  data.usersGoverns = await Passengers.aggregate([
+    {
+      $group: {
+        _id: "$govern",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        govern: "$_id",
+        count: 1,
+      },
+    },
+  ]);
+  data.usersActivity.usersNumber = await Passengers.aggregate([
     {
       $group: {
         _id: {
@@ -29,7 +50,7 @@ module.exports.getStatistics = async (req, res) => {
       },
     },
   ]);
-  const driversNumber = await Drivers.aggregate([
+  data.usersActivity.driversNumber = await Drivers.aggregate([
     {
       $group: {
         _id: {
@@ -46,7 +67,7 @@ module.exports.getStatistics = async (req, res) => {
       },
     },
   ]);
-  const tripsNumber = await PastTrips.aggregate([
+  data.usersActivity.tripsNumber = await PastTrips.aggregate([
     {
       $group: {
         _id: {
@@ -63,8 +84,28 @@ module.exports.getStatistics = async (req, res) => {
       },
     },
   ]);
-  data.usersActivity.usersNumber = usersNumber;
-  data.usersActivity.driversNumber = driversNumber;
-  data.usersActivity.tripsNumber = tripsNumber;
+  data.capacity =
+    (await Drivers.find().countDocuments()) +
+    (await Passengers.find().countDocuments());
+  data.errorsNumber = await Log.find({ level: "error" }).countDocuments();
+
+  data.revenue = await PastTrips.aggregate([
+    {
+      $group: {
+        _id: {
+          $month: { $toDate: "$_id" },
+        },
+        revenue: { $sum: "$price" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        month: "$_id",
+        revenue: 1,
+      },
+    },
+  ]);
+
   res.send(data);
 };

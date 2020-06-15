@@ -58,6 +58,30 @@ const passengerSchema = new mongoose.Schema({
     maxlength: 11,
     match: RegExps.phoneRegExp,
   },
+  govern: {
+    type: String,
+    required: true,
+    enum: [
+      "الإسكندرية",
+      "الإسماعيلية",
+      "أسوان",
+      "أسيوط",
+      "الأقصر",
+      "البحيرة",
+      "بني سويف",
+      "بورسعيد",
+      "جنوب سيناء",
+      "الجيزة",
+      "الدقهلية",
+      "دمياط",
+      "سوهاج",
+      "السويس",
+      "الشرقية",
+      "الغربية",
+      "القاهرة",
+      "كفر الشيخ",
+    ],
+  },
   phone_verified: { type: Boolean, default: false },
   tripsCount: {
     type: Number,
@@ -151,11 +175,15 @@ const passengerSchema = new mongoose.Schema({
 // JWT generation methods
 // Login Token
 passengerSchema.methods.generateToken = function (expiry = "96h") {
-  return jwt.sign({
-    _id: this._id,
-    stripeId: this.stripeId,
-    type: "passenger"
-  }, jwtPassengerKey, { expiresIn: expiry });
+  return jwt.sign(
+    {
+      _id: this._id,
+      stripeId: this.stripeId,
+      type: "passenger",
+    },
+    jwtPassengerKey,
+    { expiresIn: expiry }
+  );
 };
 
 ////****************** Passenger Validation  ******************
@@ -171,23 +199,9 @@ const complexityOptions = {
 
 // Set Validation Schema
 const validationSchema = Joi.object().keys({
-
-  firstName: Joi.string()
-    .required()
-    .trim()
-    .min(3)
-    .max(64),
-  lastName: Joi.string()
-    .required()
-    .trim()
-    .min(3)
-    .max(64),
-  mail: Joi.string()
-    .email()
-    .trim()
-    .lowercase()
-    .min(6)
-    .max(64),
+  firstName: Joi.string().required().trim().min(3).max(64),
+  lastName: Joi.string().required().trim().min(3).max(64),
+  mail: Joi.string().email().trim().lowercase().min(6).max(64),
   pass: passwordComplexity(complexityOptions),
   phone: Joi.string()
     .required()
@@ -195,9 +209,7 @@ const validationSchema = Joi.object().keys({
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
-  fireBaseId: Joi.string()
-    .required()
-    .trim()
+  fireBaseId: Joi.string().required().trim(),
 });
 const validatePassenger = function (passenger) {
   return validationSchema.validate(passenger);
