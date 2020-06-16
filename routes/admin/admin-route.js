@@ -5,6 +5,7 @@ const {
   getAdminInfo,
 } = require("../../controllers/admin/admin");
 const { getPassengers } = require("../../controllers/admin/passengers");
+const { getDrivers } = require("../../controllers/admin/drivers");
 const {
   addOffer,
   getOffers,
@@ -39,5 +40,8 @@ router.post("/complaints/respond/:id", authentication, respondToComplaint);
 
 //statistics
 router.get("/statistics", authentication, getStatistics);
+
+//statistics
+router.post("/get-drivers", authentication, getDrivers);
 
 module.exports = router;

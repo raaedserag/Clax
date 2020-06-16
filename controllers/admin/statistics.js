@@ -23,6 +23,7 @@ module.exports.getStatistics = async (req, res) => {
     revenue: 0,
     capacity: 0,
     errorsNumber: 0,
+    updatesNumber: 0,
     usersGoverns: 0,
   };
   data.usersGoverns = await Passengers.aggregate([
@@ -101,6 +102,10 @@ module.exports.getStatistics = async (req, res) => {
     (await Drivers.find().countDocuments()) +
     (await Passengers.find().countDocuments());
   data.errorsNumber = await Log.find({ level: "error" }).countDocuments();
+  data.updatesNumber = await Log.find({
+    level: "info",
+    message: "Connected to atlas DB successfully",
+  }).countDocuments();
 
   data.revenue = await PastTrips.aggregate([
     {
