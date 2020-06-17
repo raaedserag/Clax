@@ -98,12 +98,14 @@ const sendNextCallback = function (trip, drivers, index) {
             }
             else {
                 // Send Next Notification
-
+                let bodyText;
+                if (trip.seats == 1) bodyText = "يوجد راكب في انتظارك";
+                else bodyText = "يوجد ركاب في انتظارك";
                 await fireBase.sendTargetedNotification(drivers[index.value], // Token
                     // Notification's title & body
                     {
                         title: "فاضي يسطى؟",
-                        body: `يوجد راكب ينتظرك في ${trip.stationName}`
+                        body: bodyText
                     },
                     // Notification's data
                     {
