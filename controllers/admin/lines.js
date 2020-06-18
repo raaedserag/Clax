@@ -1,4 +1,6 @@
 const { Lines } = require("../../models/lines-model");
+const Joi = require("@hapi/joi");
+Joi.objectId = require("joi-objectid")(Joi);
 module.exports.deleteLine = async (req, res) => {
   const schema = Joi.object().keys({
     lineId: Joi.objectId().required(),
@@ -9,6 +11,6 @@ module.exports.deleteLine = async (req, res) => {
   let line = await Lines.findOne({ _id: req.body.lineId });
   if (!line) return res.status(404).send("line doesn't exist!");
 
-  await offer.remove();
+  await line.remove();
   res.status(200).send("Deleted Successfully");
 };
