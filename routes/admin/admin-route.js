@@ -69,6 +69,6 @@ router.get("/statistics", [authentication, authorizeAdmin], getStatistics);
 router.post("/get-drivers", [authentication, authorizeAdmin], getDrivers);
 
 //lines
-router.post("lines/delete", [authentication, authorizeAdmin], deleteLine);
+router.post("/lines/delete", [authentication, authorizeAdmin], deleteLine);
 
 module.exports = router;
