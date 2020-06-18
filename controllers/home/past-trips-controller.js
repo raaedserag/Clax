@@ -20,7 +20,7 @@ let pastTrips = async (req, res) => {
     else trip._line = trip._line.to.concat("-", trip._line.from);
   }
 
-  res.send(trips._pastTrips);
+  res.send(trips._line);
 };
 let getFavourtieTrips = async (req, res) => {
   //   const trips = await PastTrips.find({
