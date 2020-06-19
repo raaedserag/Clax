@@ -1,4 +1,4 @@
-const { Lines } = require("../../models/lines-model");
+const { Lines, validateLine } = require("../../models/lines-model");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 module.exports.deleteLine = async (req, res) => {
@@ -13,4 +13,13 @@ module.exports.deleteLine = async (req, res) => {
 
   await line.remove();
   res.status(200).send("Deleted Successfully");
+};
+module.exports.addLine = async (req, res) => {
+  const { error } = validateLine(req.body.line);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  line = new Lines(req.body.line);
+  await line.save();
+
+  res.status(200).send("Line added.");
 };

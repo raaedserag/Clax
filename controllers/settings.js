@@ -1,6 +1,6 @@
 //Models
 const { Drivers } = require("../models/drivers-model");
-const { Complains } = require("../models/complains-model");
+const { Complaints } = require("../models/complaints-model");
 const { PastTrips } = require("../models/past-trips-model");
 
 // Helpers
