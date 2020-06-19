@@ -37,6 +37,7 @@ module.exports.pushPassengerComplain = async function (
         "status",
         "code",
         "_trip",
+        "subject",
       ])
     )[0];
   } catch (error) {
