@@ -34,8 +34,7 @@ const distancesMergeSorting = function (drivers, user,
         distancesMergeSorting(drivers.slice(0, middle), user, permit),
         distancesMergeSorting(drivers.slice(middle), user, permit)
     );
-}
-
+};
 // Merge the two arrays: left and right
 const distancesMerging = function (left, right) {
     let resultArray = [], leftIndex = 0, rightIndex = 0;
@@ -66,7 +65,7 @@ const distancesMerging = function (left, right) {
         .concat(right.slice(rightIndex).filter(d => d[0] != null));
 };
 module.exports.sortingDrivers = distancesMergeSorting;
-
+//-------------------------------------------------------
 // Query Drivers one by one, and stop when 1 of them responded by acceptance, cancellation, refusing
 module.exports.queryDrivers = async (trip, driversList) => {
     try {
@@ -86,8 +85,9 @@ module.exports.queryDrivers = async (trip, driversList) => {
         throw new Error(error.message)
     }
 
-}
+};
 
+// Take next notification callback
 const sendNextCallback = function (trip, drivers, index) {
     return async function (requestId) {
         if (requestId == trip.requestRef) {
@@ -98,34 +98,42 @@ const sendNextCallback = function (trip, drivers, index) {
             }
             else {
                 // Send Next Notification
+                await sendTripNotification(drivers[index.value], trip)
 
-                let bodyText;
-                if (trip.seats == 1) bodyText = "يوجد راكب في انتظارك";
-                else bodyText = "يوجد ركاب في انتظارك";
-                await fireBase.sendTargetedNotification(drivers[index.value], // Token
-                    // Notification's title & body
-                    {
-                        title: "فاضي يسطى؟",
-                        body: bodyText
-                    },
-                    // Notification's data
-                    {
-                        type: "tripRequest",
-                        request: trip.requestRef,
-                        station_name: trip.stationName,
-                        station_location: JSON.stringify(trip.stationLoc),
-                        seats: trip.seats.toString()
-                    }
-                )
-
+                // Wait for the driver response
                 await fireBase.setRequestStatus(trip.requestRef, 'pending_driver')
+
                 // Increase counter to point to next driver
                 index.value++;
             }
         }
     }
-}
+};
 
+// Send notification by trip details
+const sendTripNotification = async function (id, trip) {
+    console.log(trip);
+    /* let bodyText;
+    if (trip.seats == 1) bodyText = "يوجد راكب في انتظارك";
+    else bodyText = "يوجد ركاب في انتظارك";
+    await fireBase.sendTargetedNotification(id, // Token
+        // Notification's title & body
+        {
+            title: "فاضي يسطى؟",
+            body: bodyText
+        },
+        // Notification's data
+        {
+            type: "tripRequest",
+            request: trip.requestRef,
+            station_name: trip.stationName,
+            station_location: JSON.stringify(trip.stationLoc),
+            seats: trip.seats.toString()
+        }
+    ) */
+};
+
+// Stooping Sending callback
 const stopSendingCallback = function (requestRef, resumingCallback) {
     const stoppingCallback = function (requestId) {
         // If the requestedId has been accepted, don't send the next notification
@@ -136,4 +144,5 @@ const stopSendingCallback = function (requestRef, resumingCallback) {
         };
     }
     return stoppingCallback;
-}
+};
+//-------------------------------------------------------

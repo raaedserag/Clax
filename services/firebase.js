@@ -13,8 +13,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 //-----------------------------------------
 // FireBase Nodes
 const linesNode = "clax-lines", // {"lineId": {"driverId": {"loc": {"lat": "0.0", "lng": "0.0"}, "seats": "4"}}}
-  requestsNode = "clax-requests",
-  tripsNode = "clax-trips";
+  requestsNode = "clax-requests"
 // ------------------------ FCM ------------------------
 
 // Push notifications to one user(token string) or multiple users (Array of tokens strings)
@@ -158,7 +157,8 @@ module.exports.createTripRequest = async function (lineId, seats) {
     await db.ref(`${requestsNode}/${lineId}/${tripId}`)
       .set({
         "status": "requesting",
-        "seats": seats
+        "seats": seats,
+        expectedTime: 20// To be commented
       })
     return tripId;
   } catch (error) {
@@ -185,12 +185,58 @@ module.exports.setRequestStatus = async function (tripRef, status) {
   }
 };
 
+// Remove some request
 module.exports.removeTripRequest = async function (tripRef) {
   try {
-    await db.ref(`${requestsNode}/${tripRef}`)
-      .set(null)
+    await db.ref(`${requestsNode}/${tripRef}`).remove()
   } catch (error) {
     throw new Error(error.message)
   }
+};
 
-}
+// Remove driver trip
+module.exports.removeDriverTrip = async function (driverId, tripId) {
+  try {
+    await db.ref(`${linesNode}/${driverId}/currentTrips/${tripId}`).remove()
+  } catch (error) {
+    throw new Error(error.message)
+  }
+};
+
+// Crete Trip
+module.exports.startTrip = async function (reqRef) {
+  reqRef = { reqId: reqRef.slice(-24), lineId: reqRef.slice(0, 24) };
+  try {
+    // Start the trip
+    await db.ref(`${requestsNode}/${reqRef.lineId}/${reqRef.reqId}`)
+      .update({
+        status: "on-way", // Change status
+        pin: Number.parseInt(Math.random() * (9999 - 1000) + 1000).toString(), // Generate PIN
+        cash_payed: false,
+        cost: 30, // To be commented
+        _driver: "5ee260f31e23a73cd8196986", // To be commented
+        _passenger: "5eea6b361d0072ce52620eef"// To be commented
+      });
+    let trip = await getTripDetails(`${reqRef.lineId}/${reqRef.reqId}`);
+    // Push the tripId to the current driver trips list
+    db.ref(`${linesNode}/${reqRef.lineId}/${trip._driver}/currentTrips/${reqRef.reqId}`)
+      .set({
+        status: "on-way",
+        seats: trip.seats,
+        _passenger: trip._passenger
+      })
+  } catch (error) {
+    throw new Error(error.message)
+  }
+};
+
+// Get trip Dtails
+const getTripDetails = async function (tripRef) {
+  try {
+    let result = await db.ref(`${requestsNode}/${tripRef}`).once("value")
+    return result.val()
+  } catch (error) {
+    throw new Error(error.message)
+  }
+};
+module.exports.getTripDetails = getTripDetails;

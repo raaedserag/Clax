@@ -19,13 +19,12 @@ module.exports.getAvgRate = async (req, res) => {
     _driver: "5e79060196679e21b8304309",
   }).select("-_id rate");
   //rate = JSON.parse(JSON.stringify(rate));
-  console.log(rate);
   function averageRate(list) {
     let sum = 0;
     let rateCount = 0;
     for (let i = 0; i < list.length; i++) {
       sum += list[i].rate;
-      console.log(sum);
+
       rateCount++;
     }
     if (rateCount == 0) {

@@ -1,12 +1,9 @@
-// Modles
-const { Drivers } = require("../models/drivers-model");
-const { Passengers } = require("../models/passengers-model");
-const { Payments } = require("../models/payment-model");
 // Configurations
 const { appSettings } = require("../startup/config").appConfig()
 const driverTimeOut = (appSettings.pairing_process.driver_timeout + appSettings.pairing_process.network_timeout) * 1000,
+    passengerTimeOut = (appSettings.pairing_process.passenger_timeout + appSettings.pairing_process.network_timeout) * 1000,
     requestTimeOut = (appSettings.pairing_process.request_timeout + appSettings.pairing_process.network_timeout) * 1000
-// Services & Helpers 
+// Services & Helpers
 const { calculateDistances } = require("../services/google-map.js");
 const { sortingDrivers,
     queryDrivers } = require("./algorithms")
@@ -14,9 +11,12 @@ const { createTripRequest,
     getLineDrivers,
     reqStatusListener,
     setRequestStatus,
-    removeTripRequest } = require("../services/firebase");
+    removeTripRequest,
+    removeDriverTrip,
+    startTrip,
+    getTripDetails } = require("../services/firebase");
 const { arriseReqConsume,
-    arriseReqInterrupt } = require("./eventEmitter")
+    arriseReqInterrupt } = require("./eventEmitter");
 
 
 //--------------------------------------------
@@ -77,7 +77,7 @@ module.exports.createNewTrip = async function (trip, drivers) {
 
 // Listener callback, passed to firebase to be activated when the request status changed
 const reqListenerCallback = function (tripRef, statusRef, timerId = { value: null }) {
-    const listenerCallback = function (data) {
+    const listenerCallback = async function (data) {
         data = data.val();
         // Request is idle, no driver is being queried in the moment
         if (data == "idle") {
@@ -88,24 +88,23 @@ const reqListenerCallback = function (tripRef, statusRef, timerId = { value: nul
         }
         // Some driver is being queried
         else if (data == "pending_driver") {
-            // If driver doesn't respond in defined time, Skip response
-            timerId.value = setTimeout(() => setRequestStatus(tripRef, 'idle'),
-                driverTimeOut)
+            // If driver doesn't respond in defined time, Skip driver
+            timerId.value = setTimeout(setRequestStatus,
+                driverTimeOut,
+                tripRef, 'idle')
         }
         // Some driver has accepted the trip
-        else if (data == "accepted") {
+        else if (data == "pending_passenger") {
             // Stop driver timeout timer
             clearTimeout(timerId.value)
-            // Emit interruptance event
-            arriseReqInterrupt(tripRef)
-            // Stop the listener
-            statusRef.off("value", listenerCallback);
-            // Delete request after request timeous
-            setTimeout(removeTripRequest, requestTimeOut, tripRef)
+            // If passenger doesn't respond in defined time, cancel the request
+            timerId.value = setTimeout(setRequestStatus,
+                passengerTimeOut,
+                tripRef, "cancelled")
         }
         // User has cancelled the trip request
         else if (data == "cancelled") {
-            // Stop driver timeout timer
+            // Stop driver/passenger timeout timer
             clearTimeout(timerId.value)
             // Emit interruptance event
             arriseReqInterrupt(tripRef)
@@ -123,67 +122,89 @@ const reqListenerCallback = function (tripRef, statusRef, timerId = { value: nul
             // Delete request after request timeous
             setTimeout(removeTripRequest, requestTimeOut, tripRef)
         }
+        // Some driver has accepted the trip
+        else if (data == "confirmed") {
+            // Stop driver/passenger timeout timer
+            clearTimeout(timerId.value)
+            // Emit interruptance event
+            arriseReqInterrupt(tripRef)
+            // Change Status
+            setRequestStatus(tripRef, "waiting")
+        }
+        else if (data == "waiting") {
+            const trip = await statusRef.parent.once("value")
+            timerId.value = setTimeout(setRequestStatus,
+                parseInt(trip.val().expectedTime * 1000),
+                tripRef, "driver_cancelled")
+        }
+        else if (data == "driver_cancelled") {
+            // Stop arriving timeout timer
+            clearTimeout(timerId.value)
+            // Stop the listener
+            statusRef.off("value", listenerCallback);
+            // Punish the driver
+            await punishDriver(tripRef)
+            // Delete request after request timeous
+            setTimeout(removeTripRequest, requestTimeOut, tripRef)
+        }
+        else if (data == "passenger_cancelled") {
+            // Stop arriving timeout timer
+            clearTimeout(timerId.value)
+            // Stop the listener
+            statusRef.off("value", listenerCallback);
+            // Punish the passenger
+            await punishPassenger(tripRef)
+            // Delete request after request timeous
+            setTimeout(removeTripRequest, requestTimeOut, tripRef)
+        }
+        else if (data == "arrived") {
+            // Stop driver/passenger timeout timer
+            clearTimeout(timerId.value)
+            // Creating the trip
+            startTrip(tripRef)
+        }
+        else if (data == "done") {
+            // Stop the listener
+            statusRef.off("value", listenerCallback);
+            // Punish the passenger
+            await finishTrip(tripRef);
+            // Delete request after request timeous
+            setTimeout(removeTripRequest, requestTimeOut, tripRef)
+        }
     }
     return listenerCallback;
-
-}
-
-// Transfer Money between Passenger & Driver
-module.exports.adjustBalance = async function (passengerId, driverId, trip) {
-    try {
-        //// Passenger Balance Adjustment
-        // Pay balance amount from Passenger's balance
-        let passenger = await Passengers.findByIdAndUpdate(passengerId, {
-            balance: -parseFloat(trip.price),
-        });
-        if (!passenger) throw new Error("Passenger Not Found !");
-
-        // Passenger's Trip payment
-        let tripPayment = await Payments.create([
-            {
-                amount: parseFloat(trip.price),
-                _passenger: passengerId,
-                description: trip.location,
-                type: "Pay",
-                date: Date.now(),
-            },
-        ]);
-        let result = await Passengers.updateOne(
-            { _id: passengerId },
-            { $push: { _payments: tripPayment._id } }
-        );
-        // Driver Balance Adjustment
-        // Charge balance amount to Driver's balance
-        let driver = await Drivers.findByIdAndUpdate(driverId, {
-            $inc: { balance: parseFloat(trip.price) },
-        })
-            .select("-_id balance")
-            .lean();
-        if (!driver) throw new Error("Driver Not Found !");
-
-        // // Passenger's Trip payment
-        // let tripPayment = await Payments.create([
-        //   {
-        //     amount: parseFloat(trip.price),
-        //     _passenger: passengerId,
-        //     description: trip.location,
-        //     type: "Pay",
-        //     date: Date.now(),
-        //   },
-        // ]);
-
-        // await Passengers.updateOne(
-        //   { _id: passengerId },
-        //   { $push: { _payments: tripPayment._id } },
-        //   { session }
-        // );
-        return true;
-    } catch (error) {
-        console.log(error);
-        return false;
-        // throw new Error("Transaction Failed !\n" + error.message);
-    }
 };
 
+// Finishing Trip
+const finishTrip = async function (tripRef) {
+    // Get Trip Dtails
+    const trip = await getTripDetails(tripRef)
+    // Archive Details
+    await archiveTrip(trip)
+    // If cash didn't paid, charge online cash
+    if (!trip.cash_payed) {
+        await chargeOnline(trip)
+    }
+    // Remove driver trip
+    await removeDriverTrip(trip._driver, tripRef.slice(-24))
+};
 
+// Punish driver
+const punishDriver = async function (tripRef) {
+    console.log("Punish Driver")
+};
 
+// Punish passenger
+const punishPassenger = async function (tripRef) {
+    console.log("Punish Passenger")
+};
+
+// Archiving trip
+const archiveTrip = async function (trip) {
+    console.log("خزن يالا")
+};
+
+// Charge online
+const chargeOnline = async function (charge) {
+    console.log("ادفع يالا ")
+};

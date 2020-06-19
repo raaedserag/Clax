@@ -9,7 +9,6 @@ const bcrypt = require("bcrypt");
 Joi.objectId = require("joi-objectid")(Joi);
 
 module.exports.addOffer = async (req, res) => {
-  console.log("sadas");
   res.send("admin");
 };
 module.exports.adminLogin = async (req, res) => {

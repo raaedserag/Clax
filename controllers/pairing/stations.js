@@ -7,10 +7,7 @@ let lineView = [];
 
 
 
-let locStation = async(req, res) => {
-    console.log("Entered backend")
-    console.log(name);
-
+let locStation = async (req, res) => {
     let station = new Stations({
         type: 'Point',
         coordinates: req.body.location
@@ -22,12 +19,10 @@ let locStation = async(req, res) => {
     let hor = locc.latitude;
     let correctStation = "";
     let send = [];
-    console.log(station);
-
     const stations = await Stations.findOne({ 'coordinates.longitude': ver, 'coordinates.latitude': hor });
     if (!stations) return res.status(404).send('the customer with the given name was not found');
     name = stations.name;
-    console.log(name);
+
 
 
 
@@ -49,7 +44,7 @@ let locStation = async(req, res) => {
 
     const len = avaLines.length;
     for (i = 0; i < len; i++) {
-        send[i] = { "id":avaLines[i]._id,"fees": (avaLines[i].cost).toString(), "line": avaLines[i].to };
+        send[i] = { "id": avaLines[i]._id, "fees": (avaLines[i].cost).toString(), "line": avaLines[i].to };
 
     }
     res.send(send);
