@@ -2,6 +2,7 @@
 const _ = require("lodash");
 // Models
 const { Complaints } = require("../models/complaints-model");
+const { Passengers } = require("../models/passengers-model");
 // DB
 const { startTransaction } = require("../db/db");
 //----------------
@@ -20,7 +21,7 @@ module.exports.pushPassengerComplain = async function (
     const updatingResult = await Passengers.findByIdAndUpdate(
       customerId,
       {
-        $push: { _complaints: newComplain._id },
+        $push: { _complaints: newComplain[0]._id },
       },
       { session }
     );

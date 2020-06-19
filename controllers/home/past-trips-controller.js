@@ -4,24 +4,23 @@ const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 
 let pastTrips = async (req, res) => {
-  //   const trips = await PastTrips.find({
-  //     _passengers: req.user._id
-  //   }).select("-_driver -_passengers");
-
-  let trips = await PastTrips.find({
-    _passengers: req.user._id,
-  })
-    .populate("_line", "from to")
-    .select("-_driver -_passengers")
+  var trips = await Passengers.findById(req.user._id)
+    .populate({
+      path: "_pastTrips",
+      select: "_id start rate _line price",
+      populate: { path: "_line", select: "_id from to" },
+    })
+    .select("_pastTrips")
     .lean();
 
-  for await (let trip of trips) {
-    if (!trip._line) trip._line = "";
-    else trip._line = trip._line.to.concat("-", trip._line.from);
+  for (let trip of trips["_pastTrips"]) {
+    if (!trip._line) trip._line = "حدث مشكلة في الخط";
+    else trip._line = trip._line.to.concat(" - ", trip._line.from);
   }
 
-  res.send(trips);
+  res.send(trips["_pastTrips"]);
 };
+
 let getFavourtieTrips = async (req, res) => {
   //   const trips = await PastTrips.find({
   //     _passengers: req.user._id

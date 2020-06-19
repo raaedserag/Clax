@@ -1,6 +1,5 @@
 // Models And Validators
 const {
-  Complaints,
   validateComplaint,
 } = require("../../models/complaints-model");
 const { Passengers } = require("../../models/passengers-model");
