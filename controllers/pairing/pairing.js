@@ -1,17 +1,12 @@
 // Models
 const { Drivers } = require("../../models/drivers-model");
-const { PastTrips } = require("../../models/past-trips-model");
-const { Cars } = require('../../models/cars-model')
 // Helpers
-const {
-  getAvailableDrivers,
+const { getAvailableDrivers,
   createNewTrip,
-} = require("../../helpers/pairing-helpers");
-
+} = require("../../helpers/pairing-helper");
 // Validators
 const {
   validateFindDriverRequest,
-  validateFinishTripRequest,
   validateGetDriverInfo
 } = require("../../validators/pairing-validators");
 //-----------
@@ -37,7 +32,8 @@ module.exports.findDriver = async (req, res) => {
         stationLoc: req.body.pickupLoc,
         stationName: result.stationName,
       },
-      result.drivers
+      result.drivers,
+      req.user._id
     )
     res.send(tripId);
 

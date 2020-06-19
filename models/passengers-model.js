@@ -118,7 +118,8 @@ const passengerSchema = new mongoose.Schema({
   balance: {
     type: Number,
     default: 0,
-    get: function (b) {
+    min: 0,
+    /* get: function (b) {
       return Number.parseFloat(b).toFixed(2);
     },
     set: function (b) {
@@ -129,7 +130,7 @@ const passengerSchema = new mongoose.Schema({
         return b >= this.balance - this.maxLoan;
       },
       message: "balance can't be less than maxLoan value",
-    },
+    }, */
   },
   loanedAmount: {
     type: Number,

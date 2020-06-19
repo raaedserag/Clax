@@ -9,6 +9,7 @@
       "request_timeout": 15,
       "driver_timeout": 20,
       "passenger_timeout": 10,
+      "driver_waiting": 60,
       "network_timeout": 0.1
     }
   }

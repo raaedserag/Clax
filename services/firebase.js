@@ -151,14 +151,17 @@ module.exports.getLineDrivers = async function (lineId, requiredSeats) {
 };
 
 // Create new request object (trips-node/line/driver/trip) 
-module.exports.createTripRequest = async function (lineId, seats) {
+module.exports.createTripRequest = async function (lineId, seats, passengerId) {
   const tripId = new ObjectId;
   try {
     await db.ref(`${requestsNode}/${lineId}/${tripId}`)
       .set({
         "status": "requesting",
         "seats": seats,
-        expectedTime: 20// To be commented
+        _passenger: passengerId,
+        expectedTime: 20,// To be commented
+        _driver: "5ee260f31e23a73cd8196986",// To be commented
+        cost: 42.5// To be commented
       })
     return tripId;
   } catch (error) {
@@ -198,33 +201,6 @@ module.exports.removeTripRequest = async function (tripRef) {
 module.exports.removeDriverTrip = async function (driverId, tripId) {
   try {
     await db.ref(`${linesNode}/${driverId}/currentTrips/${tripId}`).remove()
-  } catch (error) {
-    throw new Error(error.message)
-  }
-};
-
-// Crete Trip
-module.exports.startTrip = async function (reqRef) {
-  reqRef = { reqId: reqRef.slice(-24), lineId: reqRef.slice(0, 24) };
-  try {
-    // Start the trip
-    await db.ref(`${requestsNode}/${reqRef.lineId}/${reqRef.reqId}`)
-      .update({
-        status: "on-way", // Change status
-        pin: Number.parseInt(Math.random() * (9999 - 1000) + 1000).toString(), // Generate PIN
-        cash_payed: false,
-        cost: 30, // To be commented
-        _driver: "5ee260f31e23a73cd8196986", // To be commented
-        _passenger: "5eea6b361d0072ce52620eef"// To be commented
-      });
-    let trip = await getTripDetails(`${reqRef.lineId}/${reqRef.reqId}`);
-    // Push the tripId to the current driver trips list
-    db.ref(`${linesNode}/${reqRef.lineId}/${trip._driver}/currentTrips/${reqRef.reqId}`)
-      .set({
-        status: "on-way",
-        seats: trip.seats,
-        _passenger: trip._passenger
-      })
   } catch (error) {
     throw new Error(error.message)
   }

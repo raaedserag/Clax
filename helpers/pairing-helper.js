@@ -1,14 +1,76 @@
-const fireBase = require("../services/firebase")
+
 // Configurations
 const { appSettings } = require("../startup/config").appConfig()
 const permitVal = appSettings.pairing_process.permit_start,
     permitInter = appSettings.pairing_process.permit_interval
-// Helpers
+// Helpers & Services
+const { getLineDrivers,
+    createTripRequest,
+    reqStatusListener,
+    setRequestStatus,
+} = require("../services/firebase")
+const { calculateDistances } = require("../services/google-map.js");
+const { reqListenerCallback } = require("./trip-helper")
 const { listenReqInterrupt,
     deafReqInterrupt,
     listenReqConsume,
     deafReqConsume } = require("../helpers/eventEmitter")
 //-------------------------------------------------------
+// Returns array of sorted drivers -according to duration- entries, Example:
+/*drivers[][0] => driverobjectId
+  drivers[][1] => {"loc": {"lat": "0.0", "lng": "0.0"}, "seats": "5", "direction", 
+                    "fireBaseId": "rrr", "tripId": "tripObjectId"}
+  drivers[][2] => {"distance": {"text": "5 Km", "value": "5000"},
+                   "duration": {"text": "1 h", "value": "3600"},
+                    "status": "OK"}*/
+module.exports.getAvailableDrivers = async function (originLoc, line, requiredSeats) {
+    try {
+        let drivers = await getLineDrivers(line.id, requiredSeats)
+        // Check if passed 'drivers' is an array
+        if (!Array.isArray(drivers)) throw new Error('\'drivers\' must be an array')
+
+        // Query for drivers distances, storing it with the driver's array
+        const dmResponse = await calculateDistances(originLoc.user,
+            originLoc.dest,
+            drivers.map(d => d[1].loc)) // Pass drivers locations only
+
+        // Map every result to the corresponding driver
+        drivers.map((driver, i) => driver.push(dmResponse.driversDistances[i]))
+
+        // Now drivers array contains distance info, let's sort it 
+        drivers = distancesMergeSorting(drivers,
+            {
+                durValue: dmResponse.userDistance.duration.value,
+                direction: line.direction
+            })
+        // Check if result isn't null, (Can happen when filtering)
+        if (!(drivers && drivers.length && drivers[0][0] != null)) throw new Error('No available drivers');
+
+        // If all is well
+        return { drivers, stationName: dmResponse.stationName };
+    } catch (error) {
+        throw new Error(error.message)
+    }
+};
+
+// Create new trip request
+module.exports.createNewTrip = async function (trip, drivers, passenger) {
+    try {
+        // Create new request
+        const tripId = await createTripRequest(trip.lineId, trip.seats, passenger);
+        trip.requestRef = `${trip.lineId}/${tripId}`
+
+        // Start listening to the request status
+        reqStatusListener(trip.requestRef, reqListenerCallback)
+
+        // Start Quering drivers one by one, depending on the 'idle' status trigger
+        queryDrivers(trip, drivers.map((d) => d[1].fireBaseId))
+        return tripId;
+    } catch (error) {
+        throw new Error(error.message)
+    }
+};
+
 // Customized merge sorting, sorting objects according to 'distance.value'
 // Note, it takes only objects with 'status'=='OK', while ignoring the others
 const distancesMergeSorting = function (drivers, user,
@@ -64,10 +126,10 @@ const distancesMerging = function (left, right) {
         .concat(left.slice(leftIndex).filter(d => d[0] != null))
         .concat(right.slice(rightIndex).filter(d => d[0] != null));
 };
-module.exports.sortingDrivers = distancesMergeSorting;
-//-------------------------------------------------------
+
+
 // Query Drivers one by one, and stop when 1 of them responded by acceptance, cancellation, refusing
-module.exports.queryDrivers = async (trip, driversList) => {
+const queryDrivers = async (trip, driversList) => {
     try {
         // Define indexing start(0) and max(drivers list count)
         let index = { value: 0, max: driversList.length };
@@ -80,11 +142,10 @@ module.exports.queryDrivers = async (trip, driversList) => {
         listenReqInterrupt(stopSendingCallback(trip.requestRef, sendCallback));
 
         // Trigger the first driver sending process, by setting the request status to idle
-        await fireBase.setRequestStatus(trip.requestRef, 'idle')
+        await setRequestStatus(trip.requestRef, 'idle')
     } catch (error) {
         throw new Error(error.message)
     }
-
 };
 
 // Take next notification callback
@@ -94,14 +155,14 @@ const sendNextCallback = function (trip, drivers, index) {
             // If drivers list has been consumed, stop sending;
             if (index.value >= index.max) {
                 // Set trip status to refused
-                return await fireBase.setRequestStatus(trip.requestRef, 'refused');
+                return await setRequestStatus(trip.requestRef, 'refused');
             }
             else {
                 // Send Next Notification
                 await sendTripNotification(drivers[index.value], trip)
 
                 // Wait for the driver response
-                await fireBase.setRequestStatus(trip.requestRef, 'pending_driver')
+                await setRequestStatus(trip.requestRef, 'pending_driver')
 
                 // Increase counter to point to next driver
                 index.value++;
@@ -116,7 +177,7 @@ const sendTripNotification = async function (id, trip) {
     /* let bodyText;
     if (trip.seats == 1) bodyText = "يوجد راكب في انتظارك";
     else bodyText = "يوجد ركاب في انتظارك";
-    await fireBase.sendTargetedNotification(id, // Token
+    await sendTargetedNotification(id, // Token
         // Notification's title & body
         {
             title: "فاضي يسطى؟",
@@ -145,4 +206,3 @@ const stopSendingCallback = function (requestRef, resumingCallback) {
     }
     return stoppingCallback;
 };
-//-------------------------------------------------------

@@ -10,7 +10,7 @@ const { findDriver,
 
 router.post("/station", authentication, locStation);
 router.get("/line", authentication, lines);
-router.post("/find-driver", findDriver);
+router.post("/find-driver", [authentication, authorizePassenger], findDriver);
 router.post("/driver-info", [authentication, authorizePassenger], getDriverInfo)
 router.post("/create-line", authentication, createNewLine);
 
