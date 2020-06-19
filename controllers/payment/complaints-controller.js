@@ -1,11 +1,10 @@
 // Models And Validators
 const {
-  Complains,
   validateComplaint,
-} = require("../../models/complains-model");
+} = require("../../models/complaints-model");
 const { Passengers } = require("../../models/passengers-model");
 // Helpers
-const { pushPassengerComplain } = require("../../helpers/complains-helper");
+const { pushPassengerComplain } = require("../../helpers/complaints-helper");
 //--------------------
 
 module.exports.complaintsPost = async (req, res) => {
@@ -29,13 +28,13 @@ module.exports.complaintsPost = async (req, res) => {
 
 module.exports.complaintsGet = async (req, res) => {
   const complaints = await Passengers.findById(req.user._id)
-    .select("-_id _complains")
+    .select("-_id _complaints")
     .populate({
-      path: "_complains",
+      path: "_complaints",
       select: "-_id response subject text date status code _trip",
     })
     .lean();
-  res.send(complaints["_complains"]);
+  res.send(complaints["_complaints"]);
 };
 
 module.exports.tripGet = async (req, res) => {

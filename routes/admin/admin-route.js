@@ -10,6 +10,7 @@ const {
   getPassengerById,
   editPassengers,
 } = require("../../controllers/admin/passengers");
+const { deleteLine, addLine } = require("../../controllers/admin/lines");
 const { getDrivers } = require("../../controllers/admin/drivers");
 const {
   addOffer,
@@ -66,5 +67,9 @@ router.get("/statistics", [authentication, authorizeAdmin], getStatistics);
 
 //drivers
 router.post("/get-drivers", [authentication, authorizeAdmin], getDrivers);
+
+//lines
+router.post("/lines/delete", [authentication, authorizeAdmin], deleteLine);
+router.post("/lines/add", [authentication, authorizeAdmin], addLine);
 
 module.exports = router;

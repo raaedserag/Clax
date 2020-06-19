@@ -16,7 +16,7 @@ const pastTripsRoute = require("../routes/home/past-trips-route");
 const familyRoute = require("../routes/home/family-route");
 const offersRoute = require("../routes/home/offers-route");
 // Payments & Complains Section
-const complaintRoute = require("../routes/payment/complains-route");
+const complaintRoute = require("../routes/payment/complaints-route");
 const manageFinancialsRoute = require("../routes/payment/manage-financials-route");
 const loaningRoute = require("../routes/payment/loaning-route");
 const paypal = require("../routes/payment/paypal-route");
@@ -37,7 +37,9 @@ module.exports = function (app) {
   app.use(webConfig);
   app.use(express.json()); // Reparse body of the request into json object
   app.use(express.urlencoded({ extended: true })); // Reparse url to encoded url payload
-  app.use(express.static("public", (options = { redirect: false, index: "_" }))); //Serves resources from public folder
+  app.use(
+    express.static("public", (options = { redirect: false, index: "_" }))
+  ); //Serves resources from public folder
   app.use(express.static(process.cwd() + "/dist/"));
 
   // Apply Morgan middleware in development mode
@@ -55,8 +57,12 @@ module.exports = function (app) {
   app.use("/api/passengers/past-trips", authentication, pastTripsRoute);
   app.get("/api/passengers/get", getAvgRate);
   // Payments & Complains Section
-  app.use("/api/passengers/complains", authentication, complaintRoute);
-  app.use("/api/passengers/payments/manage-financials", authentication, manageFinancialsRoute);
+  app.use("/api/passengers/complaints", authentication, complaintRoute);
+  app.use(
+    "/api/passengers/payments/manage-financials",
+    authentication,
+    manageFinancialsRoute
+  );
   app.use("/api/passengers/payments/loaning", authentication, loaningRoute);
   app.use("/api/passengers/paypal", paypal);
   // Pairing & Tracking Section

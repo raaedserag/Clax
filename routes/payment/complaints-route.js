@@ -5,8 +5,8 @@ const router = require("express").Router();
 const {
   complaintsPost,
   complaintsGet,
-  tripGet
-} = require("../../controllers/payment/complains-controller");
+  tripGet,
+} = require("../../controllers/payment/complaints-controller");
 
 // Create a complaint
 router.post("/add", complaintsPost);

@@ -167,7 +167,7 @@ const passengerSchema = new mongoose.Schema({
   fireBaseId: { type: String, required: true },
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
-  _complains: [{ type: mongoose.ObjectId, ref: "Complains" }],
+  _complaints: [{ type: mongoose.ObjectId, ref: "Complaints" }],
   _payments: [{ type: mongoose.ObjectId, ref: "Payments" }],
   _family: [{ type: mongoose.ObjectId, ref: "Passengers" }],
   _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }],
