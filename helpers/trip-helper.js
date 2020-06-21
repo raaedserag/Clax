@@ -1,6 +1,9 @@
+// Modules
+const _ = require("lodash")
 // Models
 const ObjectId = require("mongoose").Types.ObjectId
 const { PastTrips, validatePastTrip } = require("../models/past-trips-model")
+const { PastTour, validatePastTours } = require("../models/past-tours-model")
 const { Passengers } = require("../models/passengers-model")
 // Configurations
 const { appSettings } = require("../startup/config").appConfig()
@@ -150,24 +153,27 @@ const archiveTrip = async function (tripRef) {
         session = await startTransaction();
         // Get Trip Dtails
         let trip = await getTripDetails(tripRef)
+        trip = _.pick(trip,
+            ["rate", "cost", "seats", "feedBack", "_passenger", "_tour"])
+        trip.date = new ObjectId(tripRef.slice(-24)).getTimestamp()
 
         // Validate trip schema
-        const { error, value } = validatePastTrip({
-            date: new ObjectId(tripRef.slice(-24)).getTimestamp(),
-            rate: trip.rate,
-            cost: trip.cost,
-            seats: trip.seats,
-            feedBack: trip.feedBack,
-            _passenger: trip._passenger,
-            _line: tripRef.slice(0, 24),
-            _driver: trip._driver,
-        })
+        const { error, value } = validatePastTrip(trip)
         if (error) throw new Error(error.details[0].message)
+        //_line: tripRef.slice(0, 24),
+        //_driver: trip._driver,
 
-        // Archiving the trip
-        trip = await PastTrips.create([value], { session })
+        // Registering the trip
+        trip = (await PastTrips.create([value], { session }))[0]
+
+        // Pushing the trip to the passenger's past-trips
         await Passengers.findOneAndUpdate({ _id: trip._passenger }, {
-            $push: { _pastTrips: trip[0]._id }
+            $push: { _pastTrips: trip._id }
+        }, { session })
+
+        // Pushing the trip to the tour's trips
+        await PastTour.findOneAndUpdate({ _id: trip._tour }, {
+            $push: { _trips: trip._id }
         }, { session })
         await session.commitTransaction();
     } catch (error) {

@@ -9,7 +9,7 @@ const pastTripsSchema = new mongoose.Schema({
     seats: { type: Number, required: true, min: 0 },
     feedBack: { type: String, default: null },
     _passenger: { type: mongoose.ObjectId, ref: "Passengers", required: true },
-    _tour: { type: mongoose.ObjectId, ref: "PastTours", required: true },
+    _tour: { type: mongoose.ObjectId, ref: "PastTours", required: true }
 });
 module.exports.PastTrips = mongoose.model("PastTrips", pastTripsSchema);
 
@@ -21,6 +21,7 @@ const validationSchema = Joi.object().keys({
     seats: Joi.number().min(0).required(),
     feedBack: Joi.string(),
     _passenger: Joi.objectId().required(),
+    _tour: Joi.objectId().required()
 });
 module.exports.validatePastTrip = function (pastTrip) {
     return validationSchema.validate(pastTrip);

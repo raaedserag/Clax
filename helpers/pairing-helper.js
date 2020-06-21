@@ -1,4 +1,5 @@
-
+// Models
+const { PastTour } = require("../models/past-tours-model")
 // Configurations
 const { appSettings } = require("../startup/config").appConfig()
 const permitVal = appSettings.pairing_process.permit_start,
@@ -17,9 +18,8 @@ const { listenReqInterrupt,
     deafReqConsume } = require("../helpers/eventEmitter")
 //-------------------------------------------------------
 // Returns array of sorted drivers -according to duration- entries, Example:
-/*drivers[][0] => driverobjectId
-  drivers[][1] => {"loc": {"lat": "0.0", "lng": "0.0"}, "seats": "5", "direction", 
-                    "fireBaseId": "rrr", "tripId": "tripObjectId"}
+/*drivers[][0] => tour objectId
+  drivers[][1] => {"loc": {"lat": "0.0", "lng": "0.0"}, "seats": "5", "direction"}
   drivers[][2] => {"distance": {"text": "5 Km", "value": "5000"},
                    "duration": {"text": "1 h", "value": "3600"},
                     "status": "OK"}*/
@@ -64,7 +64,7 @@ module.exports.createNewTrip = async function (trip, drivers, passenger) {
         reqStatusListener(trip.requestRef, reqListenerCallback)
 
         // Start Quering drivers one by one, depending on the 'idle' status trigger
-        queryDrivers(trip, drivers.map((d) => d[1].fireBaseId))
+        queryDrivers(trip, drivers.map((d) => d[0]))
         return tripId;
     } catch (error) {
         throw new Error(error.message)
@@ -172,8 +172,14 @@ const sendNextCallback = function (trip, drivers, index) {
 };
 
 // Send notification by trip details
-const sendTripNotification = async function (id, trip) {
-    console.log(trip);
+const sendTripNotification = async function (tourId, trip) {
+    let result = await PastTour.findById(tourId)
+        .select("-_id _driver")
+        .populate({
+            path: "_driver",
+            select: "-_id fireBaseId"
+        })
+    console.log(result._driver.fireBaseId)
     /* let bodyText;
     if (trip.seats == 1) bodyText = "يوجد راكب في انتظارك";
     else bodyText = "يوجد ركاب في انتظارك";

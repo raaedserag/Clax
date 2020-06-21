@@ -132,6 +132,15 @@ module.exports.unsubscribeFromTopic = async function (tokens, topic) {
 };
 
 // ------------------------ Real Time DataBase Functions ------------------------
+// Add a new tour
+module.exports.addTour = async function (tourRef, tour) {
+  await db.ref(`${linesNode}/${tourRef}`)
+    .set(tour)
+};
+// Remove a tour
+module.exports.removeTour = async function (tourRef) {
+  await db.ref(`${linesNode}/${tourRef}`).remove()
+};
 
 // Return available drivers(location, seats) of some line who have sufficient number of free seats
 module.exports.getLineDrivers = async function (lineId, requiredSeats) {
@@ -160,7 +169,7 @@ module.exports.createTripRequest = async function (lineId, seats, passengerId) {
         "seats": seats,
         _passenger: passengerId,
         expectedTime: 20,// To be commented
-        _driver: "5ee260f31e23a73cd8196986",// To be commented
+        _tour: "5eeeb736798a5eb577d9ecc7",// To be commented
         cost: 42.5// To be commented
       })
     return tripId;
