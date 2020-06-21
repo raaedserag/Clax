@@ -22,7 +22,7 @@ module.exports.validateFindDriverRequest = function (tripinfo) {
 
 //  Get driver Info schema (as a passenger)
 const getDriverInfo = Joi.object().keys({
-  driverId: Joi.objectId().required(),
+  tourId: Joi.objectId().required(),
 });
 module.exports.validateGetDriverInfo = function (tripinfo) {
   return getDriverInfo.validate(tripinfo);

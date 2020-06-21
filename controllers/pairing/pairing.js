@@ -1,5 +1,5 @@
 // Models
-const { Drivers } = require("../../models/drivers-model");
+const { PastTour } = require("../../models/past-tours-model");
 // Helpers
 const { getAvailableDrivers,
   createNewTrip,
@@ -49,10 +49,16 @@ module.exports.getDriverInfo = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
 
-  const result = await Drivers.findById(req.body.driverId)
-    .select('-_id name phone profilePic')
-    .populate('_currentCar', '-_id color plateNumber')
-
-  res.send(result)
+  const result = await PastTour.findById(req.body.tourId)
+    .select("-_id _driver")
+    .populate({
+      path: "_driver",
+      select: "-_id name phone profilePic _currentCar",
+      populate: {
+        path: "_currentCar",
+        select: "-_id color plateNumber",
+      }
+    })
+  res.send(result._driver)
 };
 
