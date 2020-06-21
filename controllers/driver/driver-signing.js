@@ -75,13 +75,11 @@ module.exports.driverLogin = async (req, res) => {
   const { error, value } = validateDriverLogin(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  let driver = null;
-  // value = true => user is a phone number
-  if (value.user == true) {
-    driver = await Drivers.findOne({ phone: req.body.user });
-    if (!driver) return res.status(401).send("Invalid login credentials");
-    //if (!passenger.phone_verified) return res.status(401).send("This phone hasn't been activated yet")
-  }
+  let driver = await Drivers.findOne({ phone: req.body.user });
+  if (!driver) return res.status(401).send("Invalid login credentials");
+  if (!driver.phone_verified)
+    return res.status(401).send("This phone hasn't been activated yet");
+
   // value = flase => user is a mail
   //   else {
   //     //Checkin if the email exists
