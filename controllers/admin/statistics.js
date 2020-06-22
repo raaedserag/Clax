@@ -113,7 +113,7 @@ module.exports.getStatistics = async (req, res) => {
         _id: {
           $month: { $toDate: "$_id" },
         },
-        revenue: { $sum: "$price" },
+        revenue: { $sum: "$cost" },
       },
     },
     {
