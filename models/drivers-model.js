@@ -130,6 +130,8 @@ const driverSchema = new mongoose.Schema({
   private_trips: { type: Boolean, default: false },
   _cars: [{ type: mongoose.ObjectId, ref: "Cars" }],
   _currentCar: { type: mongoose.ObjectId, ref: "Cars" },
+  _payments: [{ type: mongoose.ObjectId, ref: "Payments" }],
+  _tours: [{ type: mongoose.ObjectId, ref: "PastTours", required: true }]
 });
 // JWT generation method
 driverSchema.methods.generateToken = function (expiry = "96h") {

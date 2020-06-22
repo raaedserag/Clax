@@ -4,9 +4,16 @@ const { PastTrips } = require("../../models/past-trips-model");
 const { Log } = require("../../models/Log-model");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
-var { atlasUri } = require("../../startup/config").dbConfig();
 
 module.exports.getStatistics = async (req, res) => {
+  let governs = {
+    Alexandria: "الإسكندرية",
+    Cairo: "القاهرة",
+    Aswan: "أسوان",
+    Elbehera: "البحيرة",
+    Asyut: "أسيوط",
+    ElGhrabia: "الغربية",
+  };
   let data = {
     usersActivity: {
       usersNumber: 0,
@@ -16,6 +23,7 @@ module.exports.getStatistics = async (req, res) => {
     revenue: 0,
     capacity: 0,
     errorsNumber: 0,
+    updatesNumber: 0,
     usersGoverns: 0,
   };
   data.usersGoverns = await Passengers.aggregate([
@@ -33,6 +41,12 @@ module.exports.getStatistics = async (req, res) => {
       },
     },
   ]);
+  function getKeyByValue(object, value) {
+    return Object.keys(object).find((key) => object[key] === value);
+  }
+  data.usersGoverns.forEach((element) => {
+    element.govern = getKeyByValue(governs, element.govern);
+  });
   data.usersActivity.usersNumber = await Passengers.aggregate([
     {
       $group: {
@@ -88,6 +102,10 @@ module.exports.getStatistics = async (req, res) => {
     (await Drivers.find().countDocuments()) +
     (await Passengers.find().countDocuments());
   data.errorsNumber = await Log.find({ level: "error" }).countDocuments();
+  data.updatesNumber = await Log.find({
+    level: "info",
+    message: "Connected to atlas DB successfully",
+  }).countDocuments();
 
   data.revenue = await PastTrips.aggregate([
     {
@@ -95,7 +113,7 @@ module.exports.getStatistics = async (req, res) => {
         _id: {
           $month: { $toDate: "$_id" },
         },
-        revenue: { $sum: "$price" },
+        revenue: { $sum: "$cost" },
       },
     },
     {

@@ -1,10 +1,17 @@
 const authentication = require("../../middlewares/authentication");
+const { authorizeAdmin } = require("../../middlewares/authorization");
 const {
   adminLogin,
   adminRegister,
   getAdminInfo,
 } = require("../../controllers/admin/admin");
-const { getPassengers } = require("../../controllers/admin/passengers");
+const {
+  getPassengers,
+  getPassengerById,
+  editPassengers,
+} = require("../../controllers/admin/passengers");
+const { deleteLine, addLine } = require("../../controllers/admin/lines");
+const { getDrivers } = require("../../controllers/admin/drivers");
 const {
   addOffer,
   getOffers,
@@ -22,22 +29,47 @@ const router = express.Router();
 //admin account routes
 router.post("/register", adminRegister);
 router.post("/login", adminLogin);
-router.get("/me", authentication, getAdminInfo);
+router.get("/me", [authentication, authorizeAdmin], getAdminInfo);
 
 //passengers
-router.get("/get-passengers", authentication, getPassengers);
+router.get("/get-passengers", [authentication, authorizeAdmin], getPassengers);
+router.get(
+  "/get-passengers/:id",
+  [authentication, authorizeAdmin],
+  getPassengerById
+);
+router.post(
+  "/passengers/edit",
+  [authentication, authorizeAdmin],
+  editPassengers
+);
 
 //passengers offers
-router.post("/add-offer", authentication, addOffer);
-router.get("/get-offers", authentication, getOffers);
-router.post("/delete-offer", authentication, deleteOffer);
+router.post("/add-offer", [authentication, authorizeAdmin], addOffer);
+router.get("/get-offers", [authentication, authorizeAdmin], getOffers);
+router.post("/delete-offer", [authentication, authorizeAdmin], deleteOffer);
 
 //complaints
-router.get("/complaints", authentication, getComplaints);
-router.get("/complaints/:id", authentication, getComplaintById);
-router.post("/complaints/respond/:id", authentication, respondToComplaint);
+router.get("/complaints", [authentication, authorizeAdmin], getComplaints);
+router.get(
+  "/complaints/:id",
+  [authentication, authorizeAdmin],
+  getComplaintById
+);
+router.post(
+  "/complaints/respond/:id",
+  [authentication, authorizeAdmin],
+  respondToComplaint
+);
 
 //statistics
-router.get("/statistics", authentication, getStatistics);
+router.get("/statistics", [authentication, authorizeAdmin], getStatistics);
+
+//drivers
+router.post("/get-drivers", [authentication, authorizeAdmin], getDrivers);
+
+//lines
+router.post("/lines/delete", [authentication, authorizeAdmin], deleteLine);
+router.post("/lines/add", [authentication, authorizeAdmin], addLine);
 
 module.exports = router;

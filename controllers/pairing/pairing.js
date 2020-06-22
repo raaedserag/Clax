@@ -1,18 +1,12 @@
 // Models
-const { Drivers } = require("../../models/drivers-model");
-const { PastTrips } = require("../../models/past-trips-model");
-const { Cars } = require('../../models/cars-model')
+const { PastTour } = require("../../models/past-tours-model");
 // Helpers
-const {
-  adjustBalance,
-  getAvailableDrivers,
+const { getAvailableDrivers,
   createNewTrip,
-} = require("../../helpers/pairing-helpers");
-
+} = require("../../helpers/pairing-helper");
 // Validators
 const {
   validateFindDriverRequest,
-  validateFinishTripRequest,
   validateGetDriverInfo
 } = require("../../validators/pairing-validators");
 //-----------
@@ -38,7 +32,8 @@ module.exports.findDriver = async (req, res) => {
         stationLoc: req.body.pickupLoc,
         stationName: result.stationName,
       },
-      result.drivers
+      result.drivers,
+      req.user._id
     )
     res.send(tripId);
 
@@ -53,39 +48,16 @@ module.exports.getDriverInfo = async (req, res) => {
   const { error } = validateGetDriverInfo(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-
-  const result = await Drivers.findById(req.body.driverId)
-    .select('-_id name phone profilePic')
-    .populate('_currentCar', '-_id color plateNumber')
-
-  res.send(result)
-}
-
-module.exports.finishTrip = async (req, res) => {
-  // Validate request schema
-  const { error } = validateFinishTripRequest(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
-  // Add Description if available
-  if (req.body.trip.description != null) {
-    // Retreive TripID
-    const updatingResult = await PastTrips.findByIdAndUpdate(tripId, {
-      $push: { _description: req.body.description },
-    });
-    if (updatingResult.n == 0) throw new Error("Trip Error Occured");
-  }
-
-  // Update Passenger's Balance
-  let result = await adjustBalance(
-    req.user._id,
-    req.body.driverId,
-    req.body.trip
-  );
-  if (!result) return res.status(400).send("Balance Adjustment Error Occured");
-
-  // Real Time Rate System
-  const Rate = await Drivers.findByIdAndUpdate(req.body.driverId, {
-    $inc: { rate: -parseFloat(req.body.trip.rate / 5) },
-  });
-  res.status(200).send("Done");
+  const result = await PastTour.findById(req.body.tourId)
+    .select("-_id _driver")
+    .populate({
+      path: "_driver",
+      select: "-_id name phone profilePic _currentCar",
+      populate: {
+        path: "_currentCar",
+        select: "-_id color plateNumber",
+      }
+    })
+  res.send(result._driver)
 };
+

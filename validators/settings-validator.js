@@ -35,3 +35,27 @@ const udateMeSchema = Joi.object().keys({
 module.exports.validateUpdateMe = function (updateReuest) {
   return udateMeSchema.validate(updateReuest);
 };
+
+// Driver Start tour Request Schema
+const startTourRequestSchema = Joi.object().keys({
+  direction: Joi.number().valid(0, 1).required(),
+  lineId: Joi.objectId().required(),
+  seats: Joi.number().integer().min(0).required(),
+  loc: Joi.object().keys({
+    lat: Joi.number().required(),
+    lng: Joi.number().required(),
+  }),
+});
+module.exports.validateStartTourRequest = function (request) {
+  return startTourRequestSchema.validate(request);
+};
+
+
+// End driver Tour Reqeust Schema
+const endTourRequestSchema = Joi.object().keys({
+  lineId: Joi.objectId().required(),
+  tourId: Joi.objectId().required(),
+});
+module.exports.validateEndTourRequest = function (request) {
+  return endTourRequestSchema.validate(request);
+};

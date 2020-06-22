@@ -13,8 +13,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 //-----------------------------------------
 // FireBase Nodes
 const linesNode = "clax-lines", // {"lineId": {"driverId": {"loc": {"lat": "0.0", "lng": "0.0"}, "seats": "4"}}}
-  requestsNode = "clax-requests",
-  tripsNode = "clax-trips";
+  requestsNode = "clax-requests"
 // ------------------------ FCM ------------------------
 
 // Push notifications to one user(token string) or multiple users (Array of tokens strings)
@@ -133,6 +132,15 @@ module.exports.unsubscribeFromTopic = async function (tokens, topic) {
 };
 
 // ------------------------ Real Time DataBase Functions ------------------------
+// Add a new tour
+module.exports.addTour = async function (tourRef, tour) {
+  await db.ref(`${linesNode}/${tourRef}`)
+    .set(tour)
+};
+// Remove a tour
+module.exports.removeTour = async function (tourRef) {
+  await db.ref(`${linesNode}/${tourRef}`).remove()
+};
 
 // Return available drivers(location, seats) of some line who have sufficient number of free seats
 module.exports.getLineDrivers = async function (lineId, requiredSeats) {
@@ -152,13 +160,17 @@ module.exports.getLineDrivers = async function (lineId, requiredSeats) {
 };
 
 // Create new request object (trips-node/line/driver/trip) 
-module.exports.createTripRequest = async function (lineId, seats) {
+module.exports.createTripRequest = async function (lineId, seats, passengerId) {
   const tripId = new ObjectId;
   try {
     await db.ref(`${requestsNode}/${lineId}/${tripId}`)
       .set({
         "status": "requesting",
-        "seats": seats
+        "seats": seats,
+        _passenger: passengerId,
+        expectedTime: 20,// To be commented
+        _tour: "5eeeb736798a5eb577d9ecc7",// To be commented
+        cost: 42.5// To be commented
       })
     return tripId;
   } catch (error) {
@@ -185,12 +197,31 @@ module.exports.setRequestStatus = async function (tripRef, status) {
   }
 };
 
+// Remove some request
 module.exports.removeTripRequest = async function (tripRef) {
   try {
-    await db.ref(`${requestsNode}/${tripRef}`)
-      .set(null)
+    await db.ref(`${requestsNode}/${tripRef}`).remove()
   } catch (error) {
     throw new Error(error.message)
   }
+};
 
-}
+// Remove driver trip
+module.exports.removeDriverTrip = async function (driverId, tripId) {
+  try {
+    await db.ref(`${linesNode}/${driverId}/currentTrips/${tripId}`).remove()
+  } catch (error) {
+    throw new Error(error.message)
+  }
+};
+
+// Get trip Dtails
+const getTripDetails = async function (tripRef) {
+  try {
+    let result = await db.ref(`${requestsNode}/${tripRef}`).once("value")
+    return result.val()
+  } catch (error) {
+    throw new Error(error.message)
+  }
+};
+module.exports.getTripDetails = getTripDetails;

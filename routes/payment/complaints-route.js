@@ -5,8 +5,8 @@ const router = require("express").Router();
 const {
   complaintsPost,
   complaintsGet,
-  tripGet
-} = require("../../controllers/payment/complains-controller");
+  tripGet,
+} = require("../../controllers/payment/complaints-controller");
 
 // Create a complaint
 router.post("/add", complaintsPost);
@@ -14,6 +14,7 @@ router.post("/add", complaintsPost);
 // Get all passenger complains
 router.get("/all", complaintsGet);
 
+// Unused
 // Get user trips
 router.get("/get-trips", tripGet);
 

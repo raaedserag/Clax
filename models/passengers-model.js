@@ -9,6 +9,26 @@ const jwtPassengerKey = require("../startup/config.js").jwtKeys().passengerJwt;
 const RegExps = require("../validators/regExps");
 
 //****************** Passenger Model ******************
+const governsList = [
+  "الإسكندرية",
+  "الإسماعيلية",
+  "أسوان",
+  "أسيوط",
+  "الأقصر",
+  "البحيرة",
+  "بني سويف",
+  "بورسعيد",
+  "جنوب سيناء",
+  "الجيزة",
+  "الدقهلية",
+  "دمياط",
+  "سوهاج",
+  "السويس",
+  "الشرقية",
+  "الغربية",
+  "القاهرة",
+  "كفر الشيخ",
+]
 // Schema
 const passengerSchema = new mongoose.Schema({
   name: {
@@ -61,26 +81,7 @@ const passengerSchema = new mongoose.Schema({
   govern: {
     type: String,
     required: true,
-    enum: [
-      "الإسكندرية",
-      "الإسماعيلية",
-      "أسوان",
-      "أسيوط",
-      "الأقصر",
-      "البحيرة",
-      "بني سويف",
-      "بورسعيد",
-      "جنوب سيناء",
-      "الجيزة",
-      "الدقهلية",
-      "دمياط",
-      "سوهاج",
-      "السويس",
-      "الشرقية",
-      "الغربية",
-      "القاهرة",
-      "كفر الشيخ",
-    ],
+    enum: governsList,
   },
   phone_verified: { type: Boolean, default: false },
   tripsCount: {
@@ -117,7 +118,8 @@ const passengerSchema = new mongoose.Schema({
   balance: {
     type: Number,
     default: 0,
-    get: function (b) {
+    min: 0,
+    /* get: function (b) {
       return Number.parseFloat(b).toFixed(2);
     },
     set: function (b) {
@@ -128,7 +130,7 @@ const passengerSchema = new mongoose.Schema({
         return b >= this.balance - this.maxLoan;
       },
       message: "balance can't be less than maxLoan value",
-    },
+    }, */
   },
   loanedAmount: {
     type: Number,
@@ -165,7 +167,7 @@ const passengerSchema = new mongoose.Schema({
   fireBaseId: { type: String, required: true },
   _pastTrips: [{ type: mongoose.ObjectId, ref: "PastTrips" }],
   _offers: [{ type: mongoose.ObjectId, ref: "Offers" }],
-  _complains: [{ type: mongoose.ObjectId, ref: "Complains" }],
+  _complaints: [{ type: mongoose.ObjectId, ref: "Complaints" }],
   _payments: [{ type: mongoose.ObjectId, ref: "Payments" }],
   _family: [{ type: mongoose.ObjectId, ref: "Passengers" }],
   _familyRequests: [{ type: mongoose.ObjectId, ref: "Passengers" }],
@@ -209,7 +211,9 @@ const validationSchema = Joi.object().keys({
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
+  govern: Joi.string().required().trim().valid(...governsList),
   fireBaseId: Joi.string().required().trim(),
+
 });
 const validatePassenger = function (passenger) {
   return validationSchema.validate(passenger);
