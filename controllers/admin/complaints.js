@@ -6,10 +6,16 @@ module.exports.getComplaints = async (req, res) => {
     .populate([
       {
         path: "_trip",
-        select: "_id _driver start price rate _line",
+        select: "_id _tour date cost rate",
         populate: [
-          { path: "_line", select: "-_id from to" },
-          { path: "_driver", select: "-_id name phone" },
+          {
+            path: "_tour",
+            select: "-_id _driver _line",
+            populate: [
+              { path: "_driver", select: "-_id name" },
+              { path: "_line", select: "-_id from to" },
+            ],
+          },
         ],
       },
       {
