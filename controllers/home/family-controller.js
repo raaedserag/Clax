@@ -9,21 +9,26 @@ let getFamilyMembers = async (req, res) => {
   })
     .populate("_family", "name phone")
     .select("_family");
-  familyMembers._family.forEach((familyMemberId) => {
-    familyMemberId = encodeId(familyMemberId);
+
+  let family = JSON.parse(JSON.stringify(familyMembers._family));
+
+  await family.forEach((familyMemberId) => {
+    familyMemberId._id = encodeId(familyMemberId._id);
   });
 
-  return familyMembers._family;
+  return family;
 };
 
 let fetchSentRequests = async (req, res) => {
   let MembersSentRequests = await Passengers.find({
     _familyRequests: req.user._id,
   }).select("_id name phone");
-  MembersSentRequests.forEach((familyMember) => {
-    familyMember = encodeId(familyMember._id);
+
+  let family = JSON.parse(JSON.stringify(MembersSentRequests));
+  family.forEach((familyMember) => {
+    familyMember._id = encodeId(familyMember._id);
   });
-  return MembersSentRequests;
+  return family;
 };
 
 let deleteFamilyMember = async (req, res) => {
@@ -118,7 +123,12 @@ const fetchRequests = async (req, res) => {
   const familyRequests = await Passengers.findById(req.user._id)
     .select("_familyRequests -_id")
     .populate({ path: "_familyRequests", select: "name phone" });
-  return familyRequests._familyRequests;
+
+  let family = JSON.parse(JSON.stringify(familyRequests._familyRequests));
+  family.forEach((familyMember) => {
+    familyMember._id = encodeId(familyMember._id);
+  });
+  return family;
 };
 
 const acceptRequest = async (req, res) => {

@@ -39,6 +39,24 @@ const validationSchema = Joi.object().keys({
     }, "Amount Validation"),
   _stations: Joi.array().items(Joi.objectId()),
 });
+
+const validationSchemaAdmin = Joi.object().keys({
+  from: Joi.string().trim().required().min(3).max(30),
+  to: Joi.string().trim().required().min(3).max(30),
+  direction: Joi.bool(),
+  cost: Joi.number()
+    .required()
+    .custom((amount, helpers) => {
+      amount = parseFloat(amount);
+      if (isNaN(amount) || amount <= 0) return helpers.error("any.invalid");
+      // else
+      return amount;
+    }, "Amount Validation"),
+  _stations: Joi.array().required(),
+});
 module.exports.validateLine = function (line) {
   return validationSchema.validate(line);
+};
+module.exports.validateLineAdmin = function (line) {
+  return validationSchemaAdmin.validate(line);
 };
