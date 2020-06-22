@@ -14,6 +14,7 @@ router.post("/add", complaintsPost);
 // Get all passenger complains
 router.get("/all", complaintsGet);
 
+// Unused
 // Get user trips
 router.get("/get-trips", tripGet);
 
