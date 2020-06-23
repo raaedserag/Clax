@@ -124,6 +124,9 @@
 
     \include{003-thanks}
     \cleardoublepage%
+    
+     \include{abstract}
+    \cleardoublepage%
 
 
    \tableofcontents
@@ -162,39 +165,38 @@
     \addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
 
     % Main matter
-    \include{003-general-intro}
+    \include{003-introduction}
     \cleardoublepage%
-        
-     \include{004-chapter1-Intro}
-     \cleardoublepage%
     
-     \include{004-chapter2-AIDL}
-     \cleardoublepage%
+    \include{004-System-overview}
+    \cleardoublepage%
 
-     \include{004-chapter3-NLP}
+    \include{005-mobile-app}
      \cleardoublepage%
     
-     \include{004-chapter4-MRS}
+     \include{006-chapter-4}
      \cleardoublepage%
      
-     \include{004-chapter5-Tech}
+     \include{007-admin-panel}
      \cleardoublepage%
      
-     \include{004-chapter6-Imp}
+     \include{008-Conclusion-and-Future-Work}
      \cleardoublepage%
      
-     \include{004-chapter7-conc}
+    \appendix
+    \chapter{Appendix: Project Code}
+    \input{includes/appendix.tex}
+    
+     \include{009-references}
      \cleardoublepage%
+     
+     
      
     % Back matter
     %\include{005-final-words}
     %\cleardoublepage%
 
-    %\include{006-appendix}
-    \cleardoublepage%
-
-    \include{007-references}
-    \cleardoublepage%
+   
 
     %\includepdf[pages={-}]{008-abstract.pdf}
     %\include{008-abstract}
