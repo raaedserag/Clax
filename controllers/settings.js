@@ -1,10 +1,9 @@
 //Models
 const { Drivers } = require("../models/drivers-model");
 const { Complaints } = require("../models/complaints-model");
-const { PastTrips } = require("../models/past-trips-model");
 
 // Helpers
-
+const _ = require("lodash")
 // Get feedback info
 module.exports.getFeedback = async (req, res) => {
   const feedback = await Drivers.find({ phone: "01258963485" }).select(
@@ -15,15 +14,24 @@ module.exports.getFeedback = async (req, res) => {
 
 // Get avarege rate
 module.exports.getAvgRate = async (req, res) => {
-  let rate = await PastTrips.find({
-    _driver: "5e79060196679e21b8304309",
-  }).select("-_id rate");
+  let rate = await Drivers.findById("5ee260f31e23a73cd8196986")
+    .select("-_id _tours")
+    .populate({
+      path: "_tours",
+      select: "-_id _trips",
+      populate: {
+        path: "_trips",
+        select: "-_id rate"
+      }
+    });
+  rate = _.map(rate._tours, _.partialRight(_.pick, ["_trips"]))
   //rate = JSON.parse(JSON.stringify(rate));
   function averageRate(list) {
     let sum = 0;
     let rateCount = 0;
     for (let i = 0; i < list.length; i++) {
-      sum += list[i].rate;
+      if (list[i].rate)
+        sum += list[i].rate;
 
       rateCount++;
     }

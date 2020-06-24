@@ -48,7 +48,6 @@ module.exports.getDriverInfo = async (req, res) => {
   const { error } = validateGetDriverInfo(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-
   const result = await PastTour.findById(req.body.tourId)
     .select("-_id _driver")
     .populate({

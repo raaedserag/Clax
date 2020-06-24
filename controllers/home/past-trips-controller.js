@@ -7,17 +7,26 @@ let pastTrips = async (req, res) => {
   var trips = await Passengers.findById(req.user._id)
     .populate({
       path: "_pastTrips",
-      select: "_id start rate _line price",
-      populate: { path: "_line", select: "_id from to" },
+      select: "_id date rate feedBack cost seats _tour ",
+      populate: {
+        path: "_tour",
+        select: "_line",
+        populate: {
+          path: "_line",
+          select: "_id from to"
+        }
+      },
     })
-    .select("_pastTrips")
+    .select("-_id _pastTrips")
     .lean();
 
   for (let trip of trips["_pastTrips"]) {
-    if (!trip._line) trip._line = "حدث مشكلة في الخط";
-    else trip._line = trip._line.to.concat(" - ", trip._line.from);
+    if (!trip._tour._line) trip._line = "حدث مشكلة في الخط";
+    else {
+      trip._line = trip._tour._line.to.concat(" - ", trip._tour._line.from);
+      trip._tour = undefined;
+    }
   }
-
   res.send(trips["_pastTrips"]);
 };
 
