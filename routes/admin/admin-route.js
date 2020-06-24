@@ -11,7 +11,12 @@ const {
   editPassengers,
 } = require("../../controllers/admin/passengers");
 const { deleteLine, addLine } = require("../../controllers/admin/lines");
-const { getDrivers } = require("../../controllers/admin/drivers");
+const {
+  getDriversNames,
+  getDrivers,
+  getDriver,
+  deleteDriver,
+} = require("../../controllers/admin/drivers");
 const {
   addOffer,
   getOffers,
@@ -66,7 +71,14 @@ router.post(
 router.get("/statistics", [authentication, authorizeAdmin], getStatistics);
 
 //drivers
-router.post("/get-drivers", [authentication, authorizeAdmin], getDrivers);
+router.post(
+  "/drivers/names",
+  [authentication, authorizeAdmin],
+  getDriversNames
+);
+router.get("/drivers", [authentication, authorizeAdmin], getDrivers);
+router.get("/drivers/:id", [authentication, authorizeAdmin], getDriver);
+router.post("/drivers/delete", [authentication, authorizeAdmin], deleteDriver);
 
 //lines
 router.post("/lines/delete", [authentication, authorizeAdmin], deleteLine);

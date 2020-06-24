@@ -13,6 +13,18 @@ module.exports.getStatistics = async (req, res) => {
     Elbehera: "البحيرة",
     Asyut: "أسيوط",
     ElGhrabia: "الغربية",
+    Isamilia: "الإسماعيلية",
+    Luxor: "الأقصر",
+    BaniSuef: "بني سويف",
+    PortSaid: "بورسعيد",
+    SouthSinai: "جنوب سيناء",
+    Giza: "الجيزة",
+    ElDaqaulia: "الدقهلية",
+    Dumyat: "دمياط",
+    Sohag: "سوهاج",
+    Suez: "السويس",
+    ElSharqia: "الشرقية",
+    KafElsheikh: "كفر الشيخ",
   };
   let data = {
     usersActivity: {
