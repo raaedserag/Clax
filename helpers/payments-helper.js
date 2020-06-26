@@ -4,7 +4,7 @@ const _ = require("lodash");
 const { startTransaction } = require("../db/db");
 // Models
 const { Passengers } = require("../models/passengers-model");
-const { Drivers } = require("../models/drivers-model")
+const { Drivers } = require("../models/drivers-model");
 const { Payments } = require("../models/payment-model");
 const { Transactions } = require("../models/transactions-model");
 
@@ -22,17 +22,26 @@ module.exports.chargePassengerBalance = async function (userId, request) {
   try {
     // Start Transaction
     session = await startTransaction();
-    const payment = await Payments.create([{
-      amount: parseFloat(request.amount),
-      _passenger: userId,
-      description: request.source,
-      type: "Charge"
-    }], { session });
+    var payment = await Payments.create(
+      [
+        {
+          amount: parseFloat(request.amount),
+          _passenger: userId,
+          description: request.source,
+          type: "Charge",
+        },
+      ],
+      { session }
+    );
 
-    await Passengers.findByIdAndUpdate(userId, {
-      $inc: { balance: request.amount },
-      $push: { _payments: payment._id }
-    }, { session }).lean();
+    await Passengers.findByIdAndUpdate(
+      userId,
+      {
+        $inc: { balance: request.amount },
+        $push: { _payments: payment[0].id },
+      },
+      { session }
+    ).lean();
 
     // All Is well
     await session.commitTransaction();
@@ -40,7 +49,6 @@ module.exports.chargePassengerBalance = async function (userId, request) {
       payment,
       _.partialRight(_.pick, ["amount", "description", "type", "date"])
     )[0];
-
   } catch (error) {
     await session.abortTransaction();
     throw new Error("Transaction Failed !\n" + error.message);
@@ -58,10 +66,12 @@ module.exports.transferMoney = async function (transferRequest, req) {
     let loaner = await Passengers.findByIdAndUpdate(
       transferRequest.loaner,
       {
-        $inc: { balance: -parseFloat(transferRequest.amount) }
+        $inc: { balance: -parseFloat(transferRequest.amount) },
       },
       { session }
-    ).select("-_id balance").lean();
+    )
+      .select("-_id balance")
+      .lean();
     if (!loaner) throw new Error("Loaner Not Found !");
 
     // Register loaner payment
@@ -72,15 +82,15 @@ module.exports.transferMoney = async function (transferRequest, req) {
           _passenger: transferRequest.loaner,
           description: req.body.loanerNamed,
           type: "Lend",
-          date: Date.now()
-        }
+          date: Date.now(),
+        },
       ],
       { session }
     );
 
     await Passengers.updateOne(
       { _id: transferRequest.loaner },
-      { $push: { _payments: loanerPayment._id } },
+      { $push: { _payments: loanerPayment[0].id } },
       { session }
     );
 
@@ -88,10 +98,12 @@ module.exports.transferMoney = async function (transferRequest, req) {
     const loanee = await Passengers.findByIdAndUpdate(
       transferRequest.loanee,
       {
-        $inc: { balance: +parseFloat(transferRequest.amount) }
+        $inc: { balance: +parseFloat(transferRequest.amount) },
       },
       { session }
-    ).select("-_id balance").lean();
+    )
+      .select("-_id balance")
+      .lean();
     if (!loanee) throw new Error("Receiver Not Found !");
 
     // Register receiver payment
@@ -100,17 +112,16 @@ module.exports.transferMoney = async function (transferRequest, req) {
         {
           amount: parseFloat(transferRequest.amount),
           _passenger: transferRequest.loanee,
-          description: req.body.loaneeNamed,
+          description: transferRequest.loaneeNamed,
           type: "Borrow",
-          date: Date.now()
-        }
+          date: Date.now(),
+        },
       ],
       { session }
     );
-
     await Passengers.updateOne(
       { _id: transferRequest.loanee },
-      { $push: { _payments: loaneePayment._id } },
+      { $push: { _payments: loaneePayment[0].id } },
       { session }
     );
 
@@ -133,18 +144,17 @@ module.exports.transferMoney = async function (transferRequest, req) {
 module.exports.payPunishment = async function (transferRequest, type = 0) {
   let session, Source, Destination, payType;
   if (type == 0) {
-    transferRequest.passenger = transferRequest.source
-    transferRequest.driver = transferRequest.destination
+    transferRequest.passenger = transferRequest.source;
+    transferRequest.driver = transferRequest.destination;
     Source = Passengers;
     Destination = Drivers;
     payType = "Punish-Passenger";
-  }
-  else {
-    transferRequest.passenger = transferRequest.destination
-    transferRequest.driver = transferRequest.source
+  } else {
+    transferRequest.passenger = transferRequest.destination;
+    transferRequest.driver = transferRequest.source;
     Source = Drivers;
     Destination = Passengers;
-    payType = "Punish-Driver"
+    payType = "Punish-Driver";
   }
   try {
     // Start Transaction Session
@@ -154,7 +164,7 @@ module.exports.payPunishment = async function (transferRequest, type = 0) {
     const sender = await Source.findByIdAndUpdate(
       transferRequest.source,
       {
-        $inc: { balance: -parseFloat(transferRequest.amount) }
+        $inc: { balance: -parseFloat(transferRequest.amount) },
       },
       { session }
     ).select("-_id balance");
@@ -164,10 +174,10 @@ module.exports.payPunishment = async function (transferRequest, type = 0) {
     const receiver = await Destination.findByIdAndUpdate(
       transferRequest.destination,
       {
-        $inc: { balance: +parseFloat(transferRequest.amount) }
+        $inc: { balance: +parseFloat(transferRequest.amount) },
       },
       { session }
-    ).select("-_id balance")
+    ).select("-_id balance");
     if (!receiver) throw new Error("Receiver Not Found !");
 
     // Register payment
@@ -179,10 +189,11 @@ module.exports.payPunishment = async function (transferRequest, type = 0) {
           _driver: transferRequest.driver,
           description: transferRequest.description,
           type: payType,
-          date: Date.now()
-        }
+          date: Date.now(),
+        },
       ],
-      { session });
+      { session }
+    );
     // Pushing Payment to the source and destination
     await Source.updateOne(
       { _id: transferRequest.source },
