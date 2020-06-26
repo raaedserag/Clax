@@ -55,7 +55,7 @@ module.exports.driverRegister = async (req, res) => {
 
   //save user to the database.
   driver = new Drivers(driver);
-  driver.profilePic.data = fs.readFileSync("driver.jpg");
+  //driver.profilePic.data = fs.readFileSync("driver.jpg");
   driver.profilePic.contentType = "image/png";
 
   await driver.save();
