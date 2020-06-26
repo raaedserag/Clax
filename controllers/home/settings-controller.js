@@ -45,13 +45,13 @@ module.exports.updateMe = async (req, res) => {
 
 // Get Passengers Offers
 module.exports.getOffers = async (req, res) => {
-  const passenger = Passengers.findById(req.user._id)
+  const passenger = await Passengers.findById(req.user._id)
     .select("-_id _offers")
     .populate({
       path: "_offers",
       select: "title code description end"
     })
-  if (!passenger._offers) return res.send("لا تمتلك اي عروض حالياً")
+  if (!(passenger._offers && passenger._offers.length > 0)) return res.send("لا تمتلك اي عروض حالياً");
 
   return res.send(passenger._offers)
 };
