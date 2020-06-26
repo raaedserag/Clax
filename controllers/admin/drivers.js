@@ -22,17 +22,20 @@ module.exports.getDrivers = async (req, res) => {
   res.send(drivers);
 };
 module.exports.getDriver = async (req, res) => {
+  let params = { id: req.params.id };
   const schema = Joi.object().keys({
-    driverId: Joi.objectId().required(),
+    id: Joi.objectId().required(),
   });
-  const { error } = schema.validate(req.body);
+  const { error } = schema.validate(params);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const drivers = await Drivers.find({ _id: req.body.driverId }).select(
-    "name profilePic phone license criminalRecord govern is_verified rate balance"
-  );
+  const driver = await Drivers.findOne({ _id: params.id })
+    .select(
+      "name profilePic phone license criminalRecord govern is_verified rate balance _tours phone_verified"
+    )
+    .lean();
 
-  res.send(drivers);
+  res.send(driver);
 };
 module.exports.deleteDriver = async (req, res) => {
   const schema = Joi.object().keys({
@@ -46,4 +49,23 @@ module.exports.deleteDriver = async (req, res) => {
 
   await driver.remove();
   res.status(200).send("Deleted Successfully");
+};
+module.exports.respond = async (req, res) => {
+  let params = { id: req.params.id, response: req.body.response };
+  console.log(params);
+  const schema = Joi.object().keys({
+    id: Joi.objectId().required(),
+    response: Joi.boolean().required(),
+  });
+
+  const { error } = schema.validate(params);
+  if (error) return res.status(400).send(error.details[0].message);
+  const driver = await Drivers.updateOne(
+    { _id: req.params.id },
+    {
+      $set: { is_verified: req.body.response },
+    }
+  );
+
+  res.send("successful");
 };

@@ -16,6 +16,7 @@ const {
   getDrivers,
   getDriver,
   deleteDriver,
+  respond,
 } = require("../../controllers/admin/drivers");
 const {
   addOffer,
@@ -79,6 +80,7 @@ router.post(
 router.get("/drivers", [authentication, authorizeAdmin], getDrivers);
 router.get("/drivers/:id", [authentication, authorizeAdmin], getDriver);
 router.post("/drivers/delete", [authentication, authorizeAdmin], deleteDriver);
+router.post("/drivers/respond/:id", [authentication, authorizeAdmin], respond);
 
 //lines
 router.post("/lines/delete", [authentication, authorizeAdmin], deleteLine);
