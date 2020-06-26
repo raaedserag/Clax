@@ -89,12 +89,14 @@ const validationSchema = Joi.object().keys({
   _line: Joi.objectId(),
   _passengers: Joi.array().items(Joi.objectId()),
 });
+
 const validateOffer = function (offer) {
   return validationSchema.validate(offer);
 };
+
 const validateOfferCode = function (offer) {
   const codeSchema = Joi.object().keys({
-    code: Joi.string().required().trim().min(3).max(30),
+    code: Joi.string().required().trim().min(3).max(6),
   });
   return codeSchema.validate(offer);
 };
