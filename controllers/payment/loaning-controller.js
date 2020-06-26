@@ -7,16 +7,17 @@ const { transferMoney } = require("../../helpers/payments-helper");
 const {
   validateAcceptRequest,
   validateAddRequest,
-  validateCancelRequest
+  validateCancelRequest,
 } = require("../../validators/loaning-validators");
 //-------------
-
 
 // Fetch Transfer Money Request
 module.exports.fetchRequests = async (req, res) => {
   const requests = await Transactions.find({
-    loaner: req.user._id
-  }).select("_id loaneeNamed date amount").lean();
+    loaner: req.user._id,
+  })
+    .select("_id loaneeNamed date amount")
+    .lean();
 
   return res.send(requests);
 };
@@ -28,12 +29,12 @@ module.exports.addRequest = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // Retrieve receiver by Number
-  const loaner = await Passengers.findOne({ phone: req.body.phone }).select(
-    "_id name balance"
-  ).lean();
+  const loaner = await Passengers.findOne({ phone: req.body.phone })
+    .select("_id name balance")
+    .lean();
 
   // Check if user doesn't exist
-  if (!loaner) res.status(400).send("هذا المستخدم غير موجود")
+  if (!loaner) return res.status(400).send("هذا المستخدم غير موجود");
   // Check if sender balance is sufficient
   if (loaner.balance < Number.parseFloat(req.body.amount)) {
     return res.status(204).send("هذا المستخدم لا يوجد لديه رصيد كافي.");
@@ -61,12 +62,12 @@ module.exports.cancelRequest = async (req, res) => {
   if (req.body.type == "loanee") {
     await Transactions.findOneAndRemove({
       loanee: req.user._id,
-      _id: req.body.transactionId
+      _id: req.body.transactionId,
     });
   } else {
     await Transactions.findOneAndRemove({
       loaner: req.user._id,
-      _id: req.body.transactionId
+      _id: req.body.transactionId,
     });
   }
   return res.send("Request was canceled successfully");
@@ -81,7 +82,7 @@ module.exports.acceptRequest = async (req, res) => {
   // Retrieve request information
   const transferRequest = await Transactions.findOne({
     loaner: req.user._id,
-    _id: req.body.transactionId
+    _id: req.body.transactionId,
   }).lean();
   if (transferRequest == null)
     return res
@@ -89,9 +90,9 @@ module.exports.acceptRequest = async (req, res) => {
       .send("هذه الدعوه غير صحيحه. تأكد منها و حاول مره اخرى.");
 
   // Retrieve receiver by Number
-  const loanerBalance = await Passengers.findById(
-    transferRequest.loaner
-  ).select("-_id balance").lean();
+  const loanerBalance = await Passengers.findById(transferRequest.loaner)
+    .select("-_id balance")
+    .lean();
 
   // Check if sender balance is sufficient
   if (
@@ -105,4 +106,3 @@ module.exports.acceptRequest = async (req, res) => {
   // // IF ALL IS WELL
   return res.send(transferTransaction);
 };
-
