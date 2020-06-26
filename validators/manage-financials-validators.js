@@ -39,7 +39,7 @@ const cardSchema = Joi.object().keys({
       return value;
     }, "cvc Validation")
 });
-module.exports.validateCard = function(card) {
+module.exports.validateCard = function (card) {
   return cardSchema.validate(card);
 };
 
@@ -55,7 +55,7 @@ const chargeSchema = Joi.object().keys({
     }, "Amount Validation"),
   source: Joi.string().required()
 });
-module.exports.validateChargeRequest = function(charge) {
+module.exports.validateChargeRequest = function (charge) {
   return chargeSchema.validate(charge);
 };
 
@@ -63,16 +63,16 @@ module.exports.validateChargeRequest = function(charge) {
 //  paypal
 const validatePaypalRequest = Joi.object().keys({
   amount: Joi.string()
-  .required()
-  .custom((amount, helpers) => {
-    amount = parseFloat(amount);
-    if (isNaN(amount) || amount <= 0) return helpers.error("any.invalid");
-    // else
-    return amount;
-  }, "Amount Validation"),
-  
-  });
-module.exports.validatePaypalRequest = function(charge) {
+    .required()
+    .custom((amount, helpers) => {
+      amount = parseFloat(amount);
+      if (isNaN(amount) || amount <= 0) return helpers.error("any.invalid");
+      // else
+      return amount;
+    }, "Amount Validation"),
+
+});
+module.exports.validatePaypalRequest = function (charge) {
   return validatePaypalRequest.validate(charge);
 };
 

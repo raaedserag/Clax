@@ -24,7 +24,7 @@ let pastTrips = async (req, res) => {
     if (!trip._tour._line) trip._line = "حدث مشكلة في الخط";
     else {
       trip._line = trip._tour._line.to.concat(" - ", trip._tour._line.from);
-      trip._tour = undefined;
+      delete trip._tour;
     }
   }
   res.send(trips["_pastTrips"]);

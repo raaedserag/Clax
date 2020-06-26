@@ -11,6 +11,6 @@ const paymentSchema = new mongoose.Schema({
   description: { type: String }, // Object Data of status
   amount: { type: Number, required: true },
   _passenger: { type: mongoose.ObjectId, ref: "Passengers", required: true },
-  _driver: { type: mongoose.ObjectId, ref: "Passengers", required: true },
+  _driver: { type: mongoose.ObjectId, ref: "Passengers" },
 });
 module.exports.Payments = mongoose.model("Payments", paymentSchema);
