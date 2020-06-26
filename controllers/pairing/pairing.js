@@ -53,11 +53,16 @@ module.exports.getDriverInfo = async (req, res) => {
     .populate({
       path: "_driver",
       select: "-_id name phone profilePic _currentCar",
-      populate: {
+      /* populate: {
         path: "_currentCar",
         select: "-_id color plateNumber",
-      }
+      } */
     })
+  // To be commented
+  result._driver._currentCar = {
+    color: "0xff364c6e",
+    plateNumber: "ل ع ب 6342",
+  }
   res.send(result._driver)
 };
 
