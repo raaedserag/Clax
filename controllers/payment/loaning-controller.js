@@ -32,6 +32,8 @@ module.exports.addRequest = async (req, res) => {
     "_id name balance"
   ).lean();
 
+  // Check if user doesn't exist
+  if (!loaner) res.status(400).send("هذا المستخدم غير موجود")
   // Check if sender balance is sufficient
   if (loaner.balance < Number.parseFloat(req.body.amount)) {
     return res.status(204).send("هذا المستخدم لا يوجد لديه رصيد كافي.");
