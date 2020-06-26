@@ -1,6 +1,7 @@
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 const { Offers, validateOffer } = require("../../models/offers-model");
+const { Passengers } = require("../../models/passengers-model")
 
 module.exports.addOffer = async (req, res) => {
   let { error } = validateOffer(req.body.offer);

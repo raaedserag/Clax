@@ -2,12 +2,13 @@
 const express = require("express");
 const router = express.Router();
 // Controllers
-const{getMe,
+const { getMe,
   updateMe,
   requestMailVerification,
   confirmMail,
   requestPhoneVerification,
-  confirmPhone} = require("../../controllers/home/settings-controller")
+  confirmPhone,
+  getOffers } = require("../../controllers/home/settings-controller")
 //---------------------
 
 router.get("/me", getMe);
@@ -19,4 +20,5 @@ router.put("/mail-verification", confirmMail);
 router.post("/phone-verification", requestPhoneVerification)
 router.put("/phone-verification", confirmPhone);
 
+router.get("/get-offers", getOffers)
 module.exports = router;

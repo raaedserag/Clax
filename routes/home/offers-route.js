@@ -1,4 +1,5 @@
 const { Offers, validateOfferCode } = require("../../models/offers-model");
+const { Passengers } = require("../../models/passengers-model")
 const authentication = require("../../middlewares/authentication");
 const express = require("express");
 const _ = require("lodash");
@@ -25,6 +26,12 @@ router.post("/", authentication, async (req, res) => {
   offer._passengers.push(req.user._id);
   //save offer to the database.
   await offer.save();
+
+  // Pushing offers to the passengers offers
+  await Passengers.findByIdAndUpdate(req.user._id,
+    {
+      $push: { _offers: offer._id }
+    })
 
   //send Ok Status to user.
   res.status(200).send("تم تفعيل العرض.");

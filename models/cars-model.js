@@ -6,8 +6,8 @@ const carSchema = new mongoose.Schema({
     color: {
         type: String,
         default: null,
-        minlength: 7,
-        maxlength: 7
+        minlength: 10,
+        maxlength: 10
     },
     plateNumber: {
         type: String,

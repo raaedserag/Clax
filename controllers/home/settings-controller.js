@@ -1,5 +1,6 @@
 // Models
 const { Passengers } = require("../../models/passengers-model");
+
 // Helpers
 const { encodeId, hashing } = require("../../helpers/encryption-helper");
 const mail = require("../../services/sendgrid-mail");
@@ -42,6 +43,19 @@ module.exports.updateMe = async (req, res) => {
   return res.sendStatus(200);
 };
 
+// Get Passengers Offers
+module.exports.getOffers = async (req, res) => {
+  const passenger = Passengers.findById(req.user._id)
+    .select("-_id _offers")
+    .populate({
+      path: "_offers",
+      select: "title code description end"
+    })
+  if (!passenger._offers) return res.send("لا تمتلك اي عروض حالياً")
+
+  return res.send(passenger._offers)
+};
+
 // Request mail verification
 module.exports.requestMailVerification = async (req, res) => {
   //check if email exists.
@@ -60,7 +74,7 @@ module.exports.requestMailVerification = async (req, res) => {
     Math.random() * (999999 - 100000) + 100000
   ).toString();
 
-  const link = `http://localhost:4200/confirm-mail/${encodeId(req.user._id)}`;
+  const link = `https://www.clax-egyp.me/verify-mail/${encodeId(req.user._id)}`;
 
   http: await mail.sendVerificationCode(req.body.mail, {
     code,
@@ -103,3 +117,4 @@ module.exports.confirmPhone = async (req, res) => {
   });
   return res.sendStatus(200);
 };
+
