@@ -8,6 +8,7 @@ const { getMe,
   confirmMail,
   requestPhoneVerification,
   confirmPhone,
+  claimOffer,
   getOffers } = require("../../controllers/home/settings-controller")
 //---------------------
 
@@ -20,5 +21,6 @@ router.put("/mail-verification", confirmMail);
 router.post("/phone-verification", requestPhoneVerification)
 router.put("/phone-verification", confirmPhone);
 
+router.post("/claim-offer", claimOffer)
 router.get("/get-offers", getOffers)
 module.exports = router;

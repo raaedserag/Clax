@@ -30,9 +30,13 @@ module.exports.getAvailableDrivers = async function (originLoc, line, requiredSe
         if (!Array.isArray(drivers)) throw new Error('\'drivers\' must be an array')
 
         // Query for drivers distances, storing it with the driver's array
-        const dmResponse = await calculateDistances(originLoc.user,
-            originLoc.dest,
-            drivers.map(d => d[1].loc)) // Pass drivers locations only
+        let dmResponse = await calculateDistances([originLoc.dest],
+            [originLoc.user].concat(drivers.map(d => d[1].loc)))
+        dmResponse = {
+            userDistance: dmResponse.rows[0].elements[0],
+            driversDistances: dmResponse.rows[0].elements.slice(1),
+            stationName: dmResponse.destination_addresses[0]
+        }
 
         // Map every result to the corresponding driver
         drivers.map((driver, i) => driver.push(dmResponse.driversDistances[i]))

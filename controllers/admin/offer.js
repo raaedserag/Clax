@@ -2,6 +2,7 @@ const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 const { Offers, validateOffer } = require("../../models/offers-model");
 const { Passengers } = require("../../models/passengers-model")
+const { sendTopicNotification } = require("../../services/firebase")
 
 module.exports.addOffer = async (req, res) => {
   let { error } = validateOffer(req.body.offer);
@@ -13,6 +14,18 @@ module.exports.addOffer = async (req, res) => {
   offer = new Offers(req.body.offer);
   await offer.save();
 
+  await sendTopicNotification("passengers",
+    {
+      title: offer.title,
+      body: offer.description
+    },
+    {
+      type: "offer",
+      offer: {
+        type: offer.offerType,
+        value: offer.value
+      }
+    })
   res.status(200).send("Offer added.");
 };
 module.exports.getOffers = async (req, res) => {

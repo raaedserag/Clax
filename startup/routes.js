@@ -14,7 +14,6 @@ const admin = require("../routes/admin/admin-route");
 const settingsRoute = require("../routes/home/settings-route");
 const pastTripsRoute = require("../routes/home/past-trips-route");
 const familyRoute = require("../routes/home/family-route");
-const offersRoute = require("../routes/home/offers-route");
 // Payments & Complains Section
 const complaintRoute = require("../routes/payment/complaints-route");
 const manageFinancialsRoute = require("../routes/payment/manage-financials-route");
@@ -53,7 +52,6 @@ module.exports = function (app) {
   // Home Screen Section
   app.use("/api/passengers/settings", authentication, settingsRoute);
   app.use("/api/passengers/family", authentication, familyRoute);
-  app.use("/api/passengers/offers", authentication, offersRoute);
   app.use("/api/passengers/past-trips", authentication, pastTripsRoute);
   app.get("/api/passengers/get", getAvgRate);
   // Payments & Complains Section

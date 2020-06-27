@@ -6,6 +6,7 @@
     "pairing_process": {
       "permit_start": 30,
       "permit_interval": 20,
+      "permit_arrive": 20,
       "request_timeout": 15,
       "driver_timeout": 20,
       "passenger_timeout": 10,

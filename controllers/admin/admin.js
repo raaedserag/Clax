@@ -8,9 +8,6 @@ const _ = require("lodash");
 const bcrypt = require("bcrypt");
 Joi.objectId = require("joi-objectid")(Joi);
 
-module.exports.addOffer = async (req, res) => {
-  res.send("admin");
-};
 module.exports.adminLogin = async (req, res) => {
   //Validate the data of user
   const { error } = validateAdminLogin(req.body);

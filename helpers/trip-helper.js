@@ -3,21 +3,22 @@ const _ = require("lodash")
 // Models
 const ObjectId = require("mongoose").Types.ObjectId
 const { PastTrips, validatePastTrip } = require("../models/past-trips-model")
-const { PastTour, validatePastTours } = require("../models/past-tours-model")
+const { PastTour } = require("../models/past-tours-model")
 const { Passengers } = require("../models/passengers-model")
 // Configurations
 const { appSettings } = require("../startup/config").appConfig()
 const driverTimeOut = (appSettings.pairing_process.driver_timeout + appSettings.pairing_process.network_timeout) * 1000,
-    passengerTimeOut = (appSettings.pairing_process.passenger_timeout + appSettings.pairing_process.network_timeout) * 1000,
+    passengerTimeOut = (appSettings.pairing_process.passenger_timeout + appSettings.pairing_process.network_timeout) * 1200,
     driverWaiting = (appSettings.pairing_process.driver_waiting + appSettings.pairing_process.network_timeout) * 1000,
-    requestTimeOut = (appSettings.pairing_process.request_timeout + appSettings.pairing_process.network_timeout) * 1000
+    requestTimeOut = (appSettings.pairing_process.request_timeout + appSettings.pairing_process.network_timeout) * 1000,
+    arrivePermit = (appSettings.pairing_process.permit_arrive + appSettings.pairing_process.network_timeout) * 1000
 // Services & Helpers
 const { startTransaction } = require("../db/db")
 const {
     setRequestStatus,
     removeTripRequest,
-    removeDriverTrip,
     getTripDetails } = require("../services/firebase");
+const { calculateDistances } = require("../services/google-map")
 const { arriseReqConsume,
     arriseReqInterrupt } = require("./eventEmitter");
 const { payPunishment } = require("./payments-helper")
@@ -90,7 +91,7 @@ module.exports.reqListenerCallback = function (tripRef, statusRef, timerId = { v
             // Stop the listener
             statusRef.off("value", listenerCallback);
             // Punish the driver
-            await punishDriver(tripRef)
+            await applyPunishment(tripRef, 1)
             // Delete request after request timeous
             setTimeout(removeTripRequest, requestTimeOut, tripRef)
         }
@@ -100,7 +101,7 @@ module.exports.reqListenerCallback = function (tripRef, statusRef, timerId = { v
             // Stop the listener
             statusRef.off("value", listenerCallback);
             // Punish the passenger
-            await punishPassenger(tripRef)
+            await applyPunishment(tripRef, 0)
             // Delete request after request timeous
             setTimeout(removeTripRequest, requestTimeOut, tripRef)
         }
@@ -115,7 +116,7 @@ module.exports.reqListenerCallback = function (tripRef, statusRef, timerId = { v
             clearTimeout(timerId.value)
             // Stop the listener
             statusRef.off("value", listenerCallback);
-            // Punish the passenger
+            // Archiving Trip
             await archiveTrip(tripRef);
             // Delete request after request timeous
             setTimeout(removeTripRequest, requestTimeOut, tripRef)
@@ -124,26 +125,40 @@ module.exports.reqListenerCallback = function (tripRef, statusRef, timerId = { v
     return listenerCallback;
 };
 
-// Punish driver
-const punishDriver = async function (tripRef) {
-    const trip = await getTripDetails(tripRef)
-    await payPunishment({
-        source: trip._driver,
-        destination: trip._passenger,
-        amount: trip.cost,
-        description: "Punishing driver for trip cancellation"
-    }, 1)
-};
+// Punishment function
+const applyPunishment = async function (tripRef, user = 0) { // 0=> passenger, 1 => driver
+    const trip = await getTripDetails(tripRef),
+        tour = await PastTour.findById(trip._tour)
+    //  Called for Pssenger
+    if (user == 0)
+        // Punishing Passenger
+        return await payPunishment({
+            source: trip._passenger,
+            destination: tour._driver,
+            amount: trip.cost,
+            description: "Punishing passenger for trip cancellation"
+        }, 0)
+    // Called for Driver
+    else {
+        const dmResponse = await calculateDistances([trip.passengerLoc], [trip.driverLoc]);
+        if (dmResponse.rows[0].elements[0] <= arrivePermit)
+            // Punishing Passenger
+            return await payPunishment({
+                source: trip._passenger,
+                destination: tour._driver,
+                amount: trip.cost,
+                description: "Punishing passenger for trip cancellation"
+            }, 0)
+        else
+            // Punishing Driver
+            await payPunishment({
+                source: tour._driver,
+                destination: trip._passenger,
+                amount: trip.cost,
+                description: "Punishing driver for trip cancellation"
+            }, 1)
+    }
 
-// Punish passenger
-const punishPassenger = async function (tripRef) {
-    const trip = await getTripDetails(tripRef)
-    await payPunishment({
-        source: trip._passenger,
-        destination: trip._driver,
-        amount: trip.cost,
-        description: "Punishing passenger for trip cancellation"
-    }, 0)
 };
 
 // Archiving trip

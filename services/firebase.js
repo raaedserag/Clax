@@ -52,11 +52,12 @@ module.exports.sendTargetedNotification = async function (tokens, notification, 
 };
 
 // Push notifications to users registered with some topic
-module.exports.sendTopicNotification = async function (topic, notification) {
+module.exports.sendTopicNotification = async function (topic, notification, data) {
   try {
+    data.click_action = "FLUTTER_NOTIFICATION_CLICK";
     if (typeof topic == "string") {
       return await admin.messaging().send({
-        data: { click_action: "FLUTTER_NOTIFICATION_CLICK" },
+        data,
         topic,
         notification
       });
@@ -206,17 +207,8 @@ module.exports.removeTripRequest = async function (tripRef) {
   }
 };
 
-// Remove driver trip
-module.exports.removeDriverTrip = async function (driverId, tripId) {
-  try {
-    await db.ref(`${linesNode}/${driverId}/currentTrips/${tripId}`).remove()
-  } catch (error) {
-    throw new Error(error.message)
-  }
-};
-
 // Get trip Dtails
-const getTripDetails = async function (tripRef) {
+module.exports.getTripDetails = async function (tripRef) {
   try {
     let result = await db.ref(`${requestsNode}/${tripRef}`).once("value")
     return result.val()
@@ -224,4 +216,3 @@ const getTripDetails = async function (tripRef) {
     throw new Error(error.message)
   }
 };
-module.exports.getTripDetails = getTripDetails;
