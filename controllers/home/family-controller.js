@@ -1,5 +1,6 @@
 const { Passengers } = require("../../models/passengers-model");
 const { encodeId, decodeId } = require("../../helpers/encryption-helper");
+const CryptoJS = require("crypto-js");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 
@@ -15,7 +16,7 @@ let getFamilyMembers = async (req, res) => {
   await family.forEach((familyMemberId) => {
     familyMemberId._id = encodeId(familyMemberId._id);
   });
-
+  console.log(family);
   return family;
 };
 
@@ -53,6 +54,7 @@ let deleteFamilyMember = async (req, res) => {
 
     res.status(200).send("member deleted");
   } catch (error) {
+    console.log(error);
     return res.status(400).send("Wrong ID Format");
   }
 };
