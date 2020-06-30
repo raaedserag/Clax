@@ -49,12 +49,12 @@ module.exports.claimOffer = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // check if code exists.
-  let offer = await Offers.findOne({ code: req.body.code });
+  let offer = await Offers.findOne({ code: req.body.code }).lean();
   if (!offer) return res.status(404).send("هذا العرض غير متاح حالياً.");
 
   //check if passenger already used the code.
 
-  const passengerId = offer._passengers.find(x => x == req.user._id);
+  const passengerId = offer._passengers.find((x) => x == req.user._id);
 
   if (passengerId) return res.status(400).send("لقد استخدمت هذا العرض مسبقاً.");
 
@@ -64,25 +64,25 @@ module.exports.claimOffer = async (req, res) => {
   await offer.save();
 
   // Pushing offers to the passengers offers
-  await Passengers.findByIdAndUpdate(req.user._id,
-    {
-      $push: { _offers: offer._id }
-    })
+  await Passengers.findByIdAndUpdate(req.user._id, {
+    $push: { _offers: offer._id },
+  });
 
   //send Ok Status to user.
-  res.status(200).send("تم تفعيل العرض.");
-}
+  res.status(200).send(offer);
+};
 // Get Passengers Offers
 module.exports.getOffers = async (req, res) => {
   const passenger = await Passengers.findById(req.user._id)
     .select("-_id _offers")
     .populate({
       path: "_offers",
-      select: "title code description end"
-    })
-  if (!(passenger._offers && passenger._offers.length > 0)) return res.send("لا تمتلك اي عروض حالياً");
+      select: "title code description end offerType value",
+    });
+  if (!(passenger._offers && passenger._offers.length > 0))
+    return res.send("لا تمتلك اي عروض حالياً");
 
-  return res.send(passenger._offers)
+  return res.send(passenger._offers);
 };
 
 // Request mail verification
@@ -146,4 +146,3 @@ module.exports.confirmPhone = async (req, res) => {
   });
   return res.sendStatus(200);
 };
-

@@ -1,7 +1,5 @@
 // Models And Validators
-const {
-  validateComplaint,
-} = require("../../models/complaints-model");
+const { validateComplaint } = require("../../models/complaints-model");
 const { Passengers } = require("../../models/passengers-model");
 // Helpers
 const { pushPassengerComplain } = require("../../helpers/complaints-helper");
@@ -41,27 +39,35 @@ module.exports.complaintsGet = async (req, res) => {
           populate: [
             {
               path: "_driver",
-              select: "-_id name profilePic"
+              select: "-_id name profilePic",
             },
             {
               path: "_line",
-              select: "-_id from to"
-            }
-          ]
-        }
-      }
+              select: "-_id from to",
+            },
+          ],
+        },
+      },
     })
     .lean();
   for (let complain of complaints["_complaints"]) {
-    if (!complain._trip._tour._line) complain._trip._tour._line = "حدث مشكلة في الخط";
-    else {
-      if (complain._trip._tour.direction == 0)
-        complain._trip._line = complain._trip._tour._line.from + ' - ' + complain._trip._tour._line.to
-      else
-        complain._trip._line = complain._trip._tour._line.to + ' - ' + complain._trip._tour._line.from
+    if (complain._trip) {
+      if (!complain._trip._tour._line)
+        complain._trip._tour._line = "حدث مشكلة في الخط";
+      else {
+        if (complain._trip._tour.direction == 0)
+          complain._trip._line =
+            complain._trip._tour._line.from +
+            " - " +
+            complain._trip._tour._line.to;
+        else
+          complain._trip._line =
+            complain._trip._tour._line.to +
+            " - " +
+            complain._trip._tour._line.from;
+      }
+      complain._trip._driver = complain._trip._tour._driver;
     }
-    complain._trip._driver = complain._trip._tour._driver;
-    delete complain._trip._tour
   }
   res.send(complaints["_complaints"]);
 };
