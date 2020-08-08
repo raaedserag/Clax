@@ -29,6 +29,7 @@ const serverInterfaceRoute = require("../routes/clients/serverInterface-route");
 //driver
 const driverSettings = require("../routes/driver/driver-settings");
 const driverSigning = require("../routes/driver/driver-signing");
+const driverComplaints = require("../routes/driver/complaints");
 const drivertrips = require("../routes/driver/payment");
 
 module.exports = function (app) {
@@ -69,6 +70,7 @@ module.exports = function (app) {
   //app.use("/clients/passengers", passengerExternal);
   app.use("/api/admin", admin);
   //drivers
+  app.use("/api/drivers/complaints", authentication, driverComplaints);
   app.use("/api/drivers/settings", authentication, driverSettings);
   app.use("/api/drivers", driverSigning);
   app.use("/api/drivers", authentication, drivertrips);

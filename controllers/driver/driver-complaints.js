@@ -1,8 +1,8 @@
 // Models And Validators
 const { validateComplaint } = require("../../models/complaints-model");
-const { Passengers } = require("../../models/passengers-model");
+const { Drivers } = require("../../models/drivers-model");
 // Helpers
-const { pushPassengerComplain } = require("../../helpers/complaints-helper");
+const { pushDriverComplain } = require("../../helpers/complaints-helper");
 //--------------------
 
 module.exports.complaintsPost = async (req, res) => {
@@ -12,7 +12,7 @@ module.exports.complaintsPost = async (req, res) => {
     _trip: req.body._trip,
     text: req.body.text,
     subject: req.body.subject,
-    from_passenger: true,
+    from_passenger: false,
     code: Date.now(),
     date: Date.now(),
   };
@@ -20,12 +20,12 @@ module.exports.complaintsPost = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // Push complain
-  complaint = await pushPassengerComplain(req.user._id, complaint);
+  complaint = await pushDriverComplain(req.user._id, complaint);
   res.send(complaint);
 };
 
 module.exports.complaintsGet = async (req, res) => {
-  const complaints = await Passengers.findById(req.user._id)
+  const complaints = await Drivers.findById(req.user._id)
     .select("-_id _complaints")
     .populate({
       path: "_complaints",
@@ -50,6 +50,8 @@ module.exports.complaintsGet = async (req, res) => {
       },
     })
     .lean();
+
+  // TODO: Retrieve Specific User of Complain
   for (let complain of complaints["_complaints"]) {
     if (complain._trip) {
       if (!complain._trip._tour._line)
@@ -70,19 +72,4 @@ module.exports.complaintsGet = async (req, res) => {
     }
   }
   res.send(complaints["_complaints"]);
-};
-
-module.exports.tripGet = async (req, res) => {
-  const result = await Passengers.findById(req.user._id)
-    .select("-_id _pastTrips")
-    .populate({
-      path: "_pastTrips",
-      select: "_id _driver start price",
-      populate: [
-        { path: "_line", select: "-_id from to" },
-        { path: "_driver", select: "-_id name profilePic" },
-      ],
-    })
-    .lean();
-  res.send(result);
 };
