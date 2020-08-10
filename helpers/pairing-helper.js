@@ -201,25 +201,24 @@ const sendTripNotification = async function (tourId, trip) {
       select: "-_id fireBaseId",
     })
     .lean();
-  //   console.log(result._driver.fireBaseId);
-  /* let bodyText;
-    if (trip.seats == 1) bodyText = "يوجد راكب في انتظارك";
-    else bodyText = "يوجد ركاب في انتظارك";
-    await sendTargetedNotification(id, // Token
-        // Notification's title & body
-        {
-            title: "فاضي يسطى؟",
-            body: bodyText
-        },
-        // Notification's data
-        {
-            type: "tripRequest",
-            request: trip.requestRef,
-            station_name: trip.stationName,
-            station_location: JSON.stringify(trip.stationLoc),
-            seats: trip.seats.toString()
-        }
-    ) */
+  let bodyText;
+  if (trip.seats == 1) bodyText = "يوجد راكب في انتظارك";
+  else bodyText = "يوجد ركاب في انتظارك";
+  await sendTargetedNotification(id, // Token
+    // Notification's title & body
+    {
+      title: "فاضي يسطى؟",
+      body: bodyText
+    },
+    // Notification's data
+    {
+      type: "tripRequest",
+      request: trip.requestRef,
+      station_name: trip.stationName,
+      station_location: JSON.stringify(trip.stationLoc),
+      seats: trip.seats.toString()
+    }
+  )
 };
 
 // Stooping Sending callback

@@ -11,12 +11,8 @@ let cache;
 // Initialize Cache
 module.exports.configureCache = () => {
     // Configure local or azure host according to mode
-    if (process.env.NODE_ENV == "production")
-        cache = redis.createClient(redisSslPort, redisAzurelHost,
-            { auth_pass: redisAzureKey, tls: { servername: redisAzurelHost } });
-    else
-        cache = redis.createClient(redisLocalPort, redisLocalHost);
-
+    cache = redis.createClient(redisSslPort, redisAzurelHost,
+        { auth_pass: redisAzureKey, tls: { servername: redisAzurelHost } });
     // Error function
     cache.on("error", (err) => {
         throw new Error("Cache Error");
