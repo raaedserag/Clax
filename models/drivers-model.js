@@ -189,6 +189,7 @@ const loginSchema = Joi.object().keys({
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
   pass: Joi.string().required().min(8).max(30),
+  fireBaseId: Joi.string().required().trim(),
 });
 module.exports.validateDriverLogin = function (driverRequest) {
   return loginSchema.validate(driverRequest);
