@@ -10,6 +10,7 @@ const {
   createTripRequest,
   reqStatusListener,
   setRequestStatus,
+  sendTargetedNotification
 } = require("../services/firebase");
 const { calculateDistances } = require("../services/google-map.js");
 const { reqListenerCallback } = require("./trip-helper");
@@ -204,7 +205,8 @@ const sendTripNotification = async function (tourId, trip) {
   let bodyText;
   if (trip.seats == 1) bodyText = "يوجد راكب في انتظارك";
   else bodyText = "يوجد ركاب في انتظارك";
-  await sendTargetedNotification(id, // Token
+  console.log(result._driver.fireBaseId)
+  await sendTargetedNotification(result._driver.fireBaseId, // Token
     // Notification's title & body
     {
       title: "فاضي يسطى؟",
