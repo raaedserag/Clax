@@ -20,7 +20,7 @@ const { validateUpdateMe } = require("../../validators/settings-validator");
 module.exports.driverInfo = async (req, res) => {
   const driver = await Drivers.findById(req.user._id)
     .populate("_cars", "color plateNumber")
-    .select("-_id name phone profilePic _cars");
+    .select("-_id name phone profilePic _cars passLength phone_verified pass");
   return res.send(driver);
 };
 

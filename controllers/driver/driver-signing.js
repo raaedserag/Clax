@@ -50,13 +50,19 @@ module.exports.driverRegister = async (req, res) => {
     "stripeId",
     "fireBaseId",
     "profilePic",
+    "license",
+    "criminalRecord",
     "govern",
   ]);
 
-  //save user to the database.
+  // Save user to the database.
   driver = new Drivers(driver);
-  //driver.profilePic.data = fs.readFileSync("driver.jpg");
+  // Driver.profilePic.data = fs.readFileSync("driver.jpg");
   driver.profilePic.contentType = "image/png";
+  // Driver.license.data = fs.readFileSync("driver.jpg");
+  driver.license.contentType = "image/png";
+  // Driver.criminalRecord.data = fs.readFileSync("driver.jpg");
+  driver.criminalRecord.contentType = "image/png";
 
   await driver.save();
 
@@ -91,6 +97,10 @@ module.exports.driverLogin = async (req, res) => {
   // Checkin if Password is correct
   const validPassword = await bcrypt.compare(req.body.pass, driver.pass);
   if (!validPassword) return res.status(401).send("Invalid login credentials");
+
+  // Check if Driver has been yet
+  if (!driver.is_verified)
+    return res.status(401).send("Driver isn't verified yet.");
 
   // Change fireBaseId and respond with header token
   await Drivers.findByIdAndUpdate(driver._id, {

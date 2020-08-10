@@ -156,13 +156,23 @@ const validationSchema = Joi.object().keys({
   }),
   //mail: Joi.string().email().trim().lowercase().min(6).max(64),
   pass: passwordComplexity(complexityOptions),
+  passLength: Joi.number().min(8),
   phone: Joi.string()
     .required()
     .trim()
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
-  govern: Joi.string().required().trim().valid(...RegExps.governsList),
+  profilePic: Joi.object({
+    data: Joi.string().required().trim().min(30),
+  }).required(),
+  license: Joi.object({
+    data: Joi.string().required().trim().min(30),
+  }).required(),
+  criminalRecord: Joi.object({
+    data: Joi.string().required().trim().min(30),
+  }).required(),
+  govern: Joi.string().required(),
   fireBaseId: Joi.string().required().trim(),
 });
 module.exports.validateDriver = function (driver) {
@@ -178,7 +188,7 @@ const loginSchema = Joi.object().keys({
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
-  pass: Joi.string().required().min(8).max(30)
+  pass: Joi.string().required().min(8).max(30),
 });
 module.exports.validateDriverLogin = function (driverRequest) {
   return loginSchema.validate(driverRequest);

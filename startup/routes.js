@@ -35,8 +35,8 @@ const drivertrips = require("../routes/driver/payment");
 module.exports = function (app) {
   // Apply Essential Middlewares
   app.use(webConfig);
-  app.use(express.json()); // Reparse body of the request into json object
-  app.use(express.urlencoded({ extended: true })); // Reparse url to encoded url payload
+  app.use(express.json({ limit: "50mb" })); // Reparse body of the request into json object
+  app.use(express.urlencoded({ extended: true, limit: "50mb" })); // Reparse url to encoded url payload
   app.use(
     express.static("public", (options = { redirect: false, index: "_" }))
   ); //Serves resources from public folder
