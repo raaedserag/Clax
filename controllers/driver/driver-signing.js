@@ -71,7 +71,7 @@ module.exports.driverRegister = async (req, res) => {
 
 // Login
 module.exports.driverLogin = async (req, res) => {
-  //Validate the data of user
+  // Validate the data of user
   const { error, value } = validateDriverLogin(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -88,7 +88,7 @@ module.exports.driverLogin = async (req, res) => {
   //     //if (!passenger.mail_verified) return res.status(401).send("This mail hasn't been activated yet")
   //   }
 
-  //Checkin if Password is correct
+  // Checkin if Password is correct
   const validPassword = await bcrypt.compare(req.body.pass, driver.pass);
   if (!validPassword) return res.status(401).send("Invalid login credentials");
 
