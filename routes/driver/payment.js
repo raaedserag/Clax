@@ -4,20 +4,11 @@ const router = express.Router();
 // Middlewares
 const authentication = require("../../middlewares/authentication");
 // Controllers
-const {
-  balance,
-  history,
-  balanceHistory,
-} = require("../../controllers/driver/payment-details");
+const { d_balance, d_history } = require("../../controllers/driver/payment-details");
 //------------
 
-// Balance
-router.get("/balance", balance);
+router.post("/mybalance", d_balance);//req with id to get balance
+router.post("/myhistory", d_history);//req with id to get history
 
-// Payment History
-router.get("/history", history);
-
-// Payment Balance & History
-router.get("/balanceHistory", balanceHistory);
 
 module.exports = router;

@@ -15,12 +15,25 @@ module.exports.jwtKeys = function () {
 //get port from the configuration file
 module.exports.serverConfig = function () {
   const port = config.get("port"),
-    host = config.get("host");
+    host = config.get("host")
   if (!(host && port)) {
-    throw new Error("FATAL ERROR: port or host is not defined.");
+    throw new Error("FATAL ERROR: one of server configurations is missed.");
   }
   return { host, port };
 };
+
+// Cache config
+module.exports.cacheConfig = () => {
+  const redisAzurelHost = process.env.CLAX_CACHE_HOSTNAME,
+    redisAzureKey = process.env.CLAX_CACHE_KEY,
+    redisSslPort = config.get("redis_ssl_port"),
+    redisLocalPort = config.get("redis_local_port"),
+    redisLocalHost = config.get("redis_local_host")
+  if (!(redisAzurelHost, redisAzureKey, redisSslPort, redisLocalPort, redisLocalHost)) {
+    throw new Error("FATAL ERROR: one of cache configurations is missed.");
+  }
+  return { redisAzurelHost, redisAzureKey, redisSslPort, redisLocalPort, redisLocalHost }
+}
 
 //get app-settings from the configuration file
 module.exports.appConfig = function () {

@@ -5,7 +5,7 @@ const {
 } = require("../../models/admins-model");
 const Joi = require("@hapi/joi");
 const _ = require("lodash");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 Joi.objectId = require("joi-objectid")(Joi);
 
 module.exports.adminLogin = async (req, res) => {

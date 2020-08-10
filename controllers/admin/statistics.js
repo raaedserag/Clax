@@ -1,7 +1,7 @@
 const { Passengers } = require("../../models/passengers-model");
 const { Drivers } = require("../../models/drivers-model");
 const { PastTrips } = require("../../models/past-trips-model");
-const { Log } = require("../../models/Log-model");
+const { Log } = require("../../models/log-model");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 

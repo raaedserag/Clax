@@ -52,26 +52,7 @@ const driverSchema = new mongoose.Schema({
   govern: {
     type: String,
     required: true,
-    enum: [
-      "الإسكندرية",
-      "الإسماعيلية",
-      "أسوان",
-      "أسيوط",
-      "الأقصر",
-      "البحيرة",
-      "بني سويف",
-      "بورسعيد",
-      "جنوب سيناء",
-      "الجيزة",
-      "الدقهلية",
-      "دمياط",
-      "سوهاج",
-      "السويس",
-      "الشرقية",
-      "الغربية",
-      "القاهرة",
-      "كفر الشيخ",
-    ],
+    enum: RegExps.governsList,
   },
   phone: {
     type: String,
@@ -180,6 +161,7 @@ const validationSchema = Joi.object().keys({
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
+  govern: Joi.string().required().trim().valid(...RegExps.governsList),
   fireBaseId: Joi.string().required().trim(),
 });
 module.exports.validateDriver = function (driver) {
@@ -195,7 +177,7 @@ const loginSchema = Joi.object().keys({
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
-  pass: Joi.string().required().min(8).max(30),
+  pass: Joi.string().required().min(8).max(30)
 });
 module.exports.validateDriverLogin = function (driverRequest) {
   return loginSchema.validate(driverRequest);

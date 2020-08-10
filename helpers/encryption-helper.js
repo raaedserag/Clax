@@ -1,6 +1,6 @@
 // Modules
 const CryptoJS = require("crypto-js");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 // Secrets
 const cryptoKey = require("../startup/config").cryptoKey();
 const { tempJwt } = require("../startup/config").jwtKeys();

@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const _ = require("lodash");
 // Configuration & Secrets
 const { host, port } = require("../../startup/config").serverConfig();
