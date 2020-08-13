@@ -25,7 +25,7 @@ module.exports.pushPassengerComplain = async function (
         $push: { _complaints: newComplain[0]._id },
       },
       { session }
-    );
+    ).lean();
     if (updatingResult.n == 0) throw new Error("User Not found");
     // If completed successfully
     await session.commitTransaction();

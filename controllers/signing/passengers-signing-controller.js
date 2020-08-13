@@ -122,9 +122,9 @@ module.exports.passengerForgottenPass = async (req, res) => {
     if (!passenger.phone_verified)
       return res.status(401).send("This phone hasn't been activated yet");
 
-    // Create verification code and send it to the phone
-    const sendingResult = await sms.sendVerificationCode(req.body.user, code);
-    if (sendingResult != true) throw new Error("Sms Sending Failed !");
+    // // Create verification code and send it to the phone
+    // const sendingResult = await sms.sendVerificationCode(req.body.user, code);
+    // if (sendingResult != true) throw new Error("Sms Sending Failed !");
   }
   // value = flase => user is a mail
   else {
@@ -145,9 +145,8 @@ module.exports.passengerForgottenPass = async (req, res) => {
   }
 
   // Respond with the verification code and give temp token as a header
-  res
-    .header("x-login-token", generateTempToken(passenger._id))
-    .send(await hashing(code));
+  res.header("x-login-token", generateTempToken(passenger._id)).send(code);
+  // .send(await hashing(code));
 };
 
 // Set new password
