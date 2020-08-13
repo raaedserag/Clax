@@ -4,7 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "jest",
+    "testCon": "jest --watchAll"
   },
   "keywords": [],
   "author": "",
@@ -43,6 +45,7 @@
     "winston-mongodb": "^5.0.1"
   },
   "devDependencies": {
+    "jest": "^26.3.0",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.4"
   }
