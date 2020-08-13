@@ -26,11 +26,13 @@ module.exports.updateMe = async (req, res) => {
   // Format update request
   if (request.mail) {
     request.mail_verified = false;
-    if (await Passengers.findOne({ mail: request.mail })) return res.send("هذا الرقم مستخدم من قبل").status(499)
+    if (await Passengers.findOne({ mail: request.mail }))
+      return res.status(499).send("هذا البريد الالكتروني مستخدم من قبل");
   }
   if (request.phone) {
     request.phone_verified = false;
-    if (await Passengers.findOne({ phone: request.phone })) return res.send("هذا البريد الالكتروني مستخدم من قبل").status(499)
+    if (await Passengers.findOne({ phone: request.phone }))
+      return res.status(499).send("هذا الرقم مستخدم من قبل");
   }
   if (request.pass) request.pass = await hashing(request.pass);
 
