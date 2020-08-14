@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const _ = require("lodash");
 const fs = require("fs");
 // Configuration & Secrets
@@ -50,13 +50,19 @@ module.exports.driverRegister = async (req, res) => {
     "stripeId",
     "fireBaseId",
     "profilePic",
+    "license",
+    "criminalRecord",
     "govern",
   ]);
 
-  //save user to the database.
+  // Save user to the database.
   driver = new Drivers(driver);
-  //driver.profilePic.data = fs.readFileSync("driver.jpg");
+  // Driver.profilePic.data = fs.readFileSync("driver.jpg");
   driver.profilePic.contentType = "image/png";
+  // Driver.license.data = fs.readFileSync("driver.jpg");
+  driver.license.contentType = "image/png";
+  // Driver.criminalRecord.data = fs.readFileSync("driver.jpg");
+  driver.criminalRecord.contentType = "image/png";
 
   await driver.save();
 
@@ -71,20 +77,36 @@ module.exports.driverRegister = async (req, res) => {
 
 // Login
 module.exports.driverLogin = async (req, res) => {
-  //Validate the data of user
+  // Validate the data of user
   const { error, value } = validateDriverLogin(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  let driver = await Drivers.findOne({ phone: req.body.user });
+  let driver = await Drivers.findOne({ phone: req.body.phone });
   if (!driver) return res.status(401).send("Invalid login credentials");
   if (!driver.phone_verified)
     return res.status(401).send("This phone hasn't been activated yet");
 
- 
+  /**
+   * Verification Reconsiderd
+   */
+  // if (!driver.phone_verified)
+  //   return res.status(401).send("This phone hasn't been activated yet");
 
-  //Checkin if Password is correct
+  // value = flase => user is a mail
+  //   else {
+  //     //Checkin if the email exists
+  //     driver = await Drivers.findOne({ mail: req.body.user });
+  //     if (!passenger) return res.status(401).send("Invalid login credentials");
+  //     //if (!passenger.mail_verified) return res.status(401).send("This mail hasn't been activated yet")
+  //   }
+
+  // Checkin if Password is correct
   const validPassword = await bcrypt.compare(req.body.pass, driver.pass);
   if (!validPassword) return res.status(401).send("Invalid login credentials");
+
+  // Check if Driver has been yet
+  if (!driver.is_verified)
+    return res.status(401).send("Driver isn't verified yet.");
 
   // Change fireBaseId and respond with header token
   await Drivers.findByIdAndUpdate(driver._id, {
@@ -103,17 +125,16 @@ module.exports.driverForgottenPass = async (req, res) => {
   let code = Number.parseInt(
     Math.random() * (999999 - 100000) + 100000
   ).toString();
- 
-  
-    driver = await Drivers.findOne({ phone: req.body.user });
-    if (!driver) return res.status(401).send("Phone Number is not exist");
-    if (!driver.phone_verified)
-      return res.status(401).send("This phone hasn't been activated yet");
 
-    // Create verification code and send it to the phone
-    const sendingResult = await sms.sendVerificationCode(req.body.user, code);
-    if (sendingResult != true) throw new Error("Sms Sending Failed !");
-  
+  driver = await Drivers.findOne({ phone: req.body.user });
+  if (!driver) return res.status(401).send("Phone Number is not exist");
+  if (!driver.phone_verified)
+    return res.status(401).send("This phone hasn't been activated yet");
+
+  // Create verification code and send it to the phone
+  const sendingResult = await sms.sendVerificationCode(req.body.user, code);
+  if (sendingResult != true) throw new Error("Sms Sending Failed !");
+
   // Respond with the verification code and give temp token as a header
   res
     .header("x-login-token", generateTempToken(driver._id))

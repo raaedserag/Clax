@@ -2,6 +2,9 @@
   "name": "Clax",
   "host": "localhost",
   "port": "8080",
+  "redis_local_host": "127.0.0.1",
+  "redis_local_port": "6379",
+  "redis_ssl_port": "6380",
   "app_settings": {
     "pairing_process": {
       "permit_start": 30,

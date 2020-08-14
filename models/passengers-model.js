@@ -9,26 +9,6 @@ const jwtPassengerKey = require("../startup/config.js").jwtKeys().passengerJwt;
 const RegExps = require("../validators/regExps");
 
 //****************** Passenger Model ******************
-const governsList = [
-  "الإسكندرية",
-  "الإسماعيلية",
-  "أسوان",
-  "أسيوط",
-  "الأقصر",
-  "البحيرة",
-  "بني سويف",
-  "بورسعيد",
-  "جنوب سيناء",
-  "الجيزة",
-  "الدقهلية",
-  "دمياط",
-  "سوهاج",
-  "السويس",
-  "الشرقية",
-  "الغربية",
-  "القاهرة",
-  "كفر الشيخ",
-]
 // Schema
 const passengerSchema = new mongoose.Schema({
   name: {
@@ -81,7 +61,7 @@ const passengerSchema = new mongoose.Schema({
   govern: {
     type: String,
     required: true,
-    enum: governsList,
+    enum: RegExps.governsList,
   },
   phone_verified: { type: Boolean, default: false },
   tripsCount: {
@@ -211,7 +191,7 @@ const validationSchema = Joi.object().keys({
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
-  govern: Joi.string().required().trim().valid(...governsList),
+  govern: Joi.string().required().trim().valid(...RegExps.governsList),
   fireBaseId: Joi.string().required().trim(),
 
 });

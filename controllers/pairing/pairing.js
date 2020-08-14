@@ -1,13 +1,14 @@
 // Models
 const { PastTour } = require("../../models/past-tours-model");
 // Helpers
-const { getAvailableDrivers,
+const {
+  getAvailableDrivers,
   createNewTrip,
 } = require("../../helpers/pairing-helper");
 // Validators
 const {
   validateFindDriverRequest,
-  validateGetDriverInfo
+  validateGetDriverInfo,
 } = require("../../validators/pairing-validators");
 //-----------
 
@@ -34,9 +35,8 @@ module.exports.findDriver = async (req, res) => {
       },
       result.drivers,
       req.user._id
-    )
+    );
     res.send(tripId);
-
   } catch (error) {
     throw new Error(error.message);
   }
@@ -58,11 +58,11 @@ module.exports.getDriverInfo = async (req, res) => {
         select: "-_id color plateNumber",
       } */
     })
+    .lean();
   // To be commented
   result._driver._currentCar = {
     color: "0xff364c6e",
     plateNumber: "ل ع ب 6342",
-  }
-  res.send(result._driver)
+  };
+  res.send(result._driver);
 };
-

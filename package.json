@@ -4,7 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "jest",
+    "testCon": "jest --watchAll"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +17,8 @@
     "@hapi/joi": "^17.1.1",
     "@sendgrid/mail": "^6.5.5",
     "balanced-match": "^1.0.0",
-    "bcrypt": "^3.0.7",
+    "bcryptjs": "^2.4.3",
+    "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
     "common": "^0.2.5",
     "config": "^3.3.1",
@@ -35,12 +38,14 @@
     "nexmo": "^2.6.0",
     "paypal-rest-sdk": "^1.8.1",
     "pug": "^2.0.4",
+    "redis": "^3.0.2",
     "stripe": "^8.38.0",
     "twilio": "^3.41.1",
     "winston": "^3.2.1",
     "winston-mongodb": "^5.0.1"
   },
   "devDependencies": {
+    "jest": "^26.3.0",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.4"
   }

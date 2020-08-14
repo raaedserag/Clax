@@ -52,26 +52,7 @@ const driverSchema = new mongoose.Schema({
   govern: {
     type: String,
     required: true,
-    enum: [
-      "الإسكندرية",
-      "الإسماعيلية",
-      "أسوان",
-      "أسيوط",
-      "الأقصر",
-      "البحيرة",
-      "بني سويف",
-      "بورسعيد",
-      "جنوب سيناء",
-      "الجيزة",
-      "الدقهلية",
-      "دمياط",
-      "سوهاج",
-      "السويس",
-      "الشرقية",
-      "الغربية",
-      "القاهرة",
-      "كفر الشيخ",
-    ],
+    enum: RegExps.governsList,
   },
   phone: {
     type: String,
@@ -138,6 +119,7 @@ const driverSchema = new mongoose.Schema({
   _cars: [{ type: mongoose.ObjectId, ref: "Cars" }],
   _currentCar: { type: mongoose.ObjectId, ref: "Cars" },
   _payments: [{ type: mongoose.ObjectId, ref: "Payments" }],
+  _complaints: [{ type: mongoose.ObjectId, ref: "Complaints" }],
   _tours: [{ type: mongoose.ObjectId, ref: "PastTours", required: true }],
 });
 // JWT generation method
@@ -174,12 +156,23 @@ const validationSchema = Joi.object().keys({
   }),
   //mail: Joi.string().email().trim().lowercase().min(6).max(64),
   pass: passwordComplexity(complexityOptions),
+  passLength: Joi.number().min(8),
   phone: Joi.string()
     .required()
     .trim()
     .min(11)
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
+  profilePic: Joi.object({
+    data: Joi.string().required().trim().min(30),
+  }).required(),
+  license: Joi.object({
+    data: Joi.string().required().trim().min(30),
+  }).required(),
+  criminalRecord: Joi.object({
+    data: Joi.string().required().trim().min(30),
+  }).required(),
+  govern: Joi.string().required(),
   fireBaseId: Joi.string().required().trim(),
 });
 module.exports.validateDriver = function (driver) {
@@ -196,6 +189,7 @@ const loginSchema = Joi.object().keys({
     .max(11)
     .pattern(RegExps.phoneRegExp, "Phone Number"),
   pass: Joi.string().required().min(8).max(30),
+  fireBaseId: Joi.string().required().trim(),
 });
 module.exports.validateDriverLogin = function (driverRequest) {
   return loginSchema.validate(driverRequest);

@@ -10,6 +10,9 @@ require("./startup/logging")();
 //Data Base
 require("./db/db").connect(); //{connect, close}
 
+// Cache
+require("./db/cache").configureCache();
+
 //Routes
 require("./startup/routes")(app);
 
