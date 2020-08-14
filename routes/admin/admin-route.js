@@ -33,7 +33,7 @@ const express = require("express");
 const router = express.Router();
 
 //admin account routes
-router.post("/register", adminRegister);
+router.post("/register", authorizeAdmin, adminRegister);
 router.post("/login", adminLogin);
 router.get("/me", [authentication, authorizeAdmin], getAdminInfo);
 
