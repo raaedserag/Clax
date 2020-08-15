@@ -57,7 +57,7 @@ module.exports.claimOffer = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // check if code exists.
-  let offer = await Offers.findOne({ code: req.body.code }).lean();
+  let offer = await Offers.findOne({ code: req.body.code });
   if (!offer) return res.status(404).send("هذا العرض غير متاح حالياً.");
 
   //check if passenger already used the code.
