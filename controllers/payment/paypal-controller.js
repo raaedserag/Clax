@@ -27,7 +27,7 @@ paypal.configure({
 let ChargeOgra = async function (req, res) {
   try {
     //encryprion User id
-    const encryptId = encryption.encodeId(req.body._passenger);
+    const encryptId = encryption.encodeId(req.user._id);
     //create payment object
     var create_payment_json = {
       intent: "sale",
@@ -87,60 +87,31 @@ module.exports.ChargeOgra = ChargeOgra;
 
 let ChargeSuccess = async function (req, res) {
   let session = null;
+  session = await startTransaction();
 
-  try {
-    //Start Transaction
-    session = await startTransaction();
-    execute_payment_json = {
-      transactions: [
-        {
-          amount: {
-            total: parseInt(req.params.amount),
-            currency: "USD",
-          },
-        },
-      ],
-    };
-    const payerId = req.query.PayerID;
-    const paymentId = req.query.paymentId;
-    execute_payment_json.payer_id = payerId;
+  var payment = await Payments.create(
+    [
+      {
+        amount: parseInt(req.body.amount),
+        description: "Paypal",
+        type: "Charge",
+        _passenger: req.user._id,
+      },
+    ],
+    { session }
+  );
 
-    //decryprion User id
-    const decryptId = encryption.decodeId(req.params.id);
+  await Passengers.findByIdAndUpdate(
+    req.user._id,
+    {
+      $inc: { balance: request.amount },
+      $push: { _payments: payment[0].id },
+    },
+    { session }
+  ).lean();
 
-    //confirm paypal payment
-    paypal.payment.execute(paymentId, execute_payment_json, async function (
-      error,
-      payment
-    ) {
-      if (error) {
-        throw error;
-      } else {
-        addedBalance = parseInt(req.params.amount);
-        await Passengers.updateOne(
-          { _id: decryptId },
-          {
-            $inc: { balance: addedBalance },
-          },
-          { session }
-        );
-        var confirmedPayment = {
-          amount: parseInt(req.params.amount),
-          description: "Paypal",
-          type: "Charge",
-          _passenger: decryptId,
-        };
-        //Save payment in DB on success
-        confirmedPayment = new Payments(confirmedPayment);
-        confirmedPayment = await confirmedPayment.save();
-        await session.commitTransaction();
-        res.send(confirmedPayment);
-      }
-    });
-  } catch (error) {
-    await session.abortTransaction();
-    throw new Error("Tranaction Faild !\n" + error.message);
-  }
+  await session.commitTransaction();
+  res.send(confirmedPayment);
 };
 module.exports.ChargeSuccess = ChargeSuccess;
 

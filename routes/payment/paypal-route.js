@@ -9,14 +9,15 @@ const authrization = require("../../middlewares/authentication");
 const {
   ChargeOgra,
   ChargeSuccess,
-  ChargeCancel
+  ChargeCancel,
 } = require("../../controllers/payment/paypal-controller");
 
 //charge user balance
 router.post("/charge-paypal", authrization, ChargeOgra);
 
 // confirm charge process
-router.get("/success/:id/:amount", ChargeSuccess);
+router.post("/success/", authrization, ChargeSuccess);
+
 //cancel  charge process
 router.get("/cancel", ChargeCancel);
 

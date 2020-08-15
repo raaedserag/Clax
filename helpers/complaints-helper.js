@@ -15,7 +15,7 @@ module.exports.pushPassengerComplain = async function (
   let session = null;
   try {
     // Start Transaction Session
-    session = await startTransaction();
+    // session = await startTransaction();
     // Create new complain object
     newComplain = await Complaints.create([newComplain], { session });
     // Push complain to passenger account
@@ -28,7 +28,7 @@ module.exports.pushPassengerComplain = async function (
     ).lean();
     if (updatingResult.n == 0) throw new Error("User Not found");
     // If completed successfully
-    await session.commitTransaction();
+    // await session.commitTransaction();
     return _.map(
       newComplain,
       _.partialRight(_.pick, [
