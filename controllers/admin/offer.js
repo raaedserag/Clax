@@ -22,21 +22,12 @@ module.exports.addOffer = async (req, res) => {
     },
     {
       type: "offer",
-<<<<<<< HEAD
       offer: JSON.stringify({
         type: offer.offerType,
         value: offer.value
       })
     }
   )
-=======
-      offer: {
-        type: offer.offerType.toString(),
-        value: offer.value.toString(),
-      },
-    }
-  );
->>>>>>> 077a97d47435b54749a9dbd5bb369739ce66efa5
   res.status(200).send("Offer added.");
 };
 module.exports.getOffers = async (req, res) => {
