@@ -13,8 +13,8 @@ let pastTrips = async (req, res) => {
         select: "_line",
         populate: {
           path: "_line",
-          select: "_id from to"
-        }
+          select: "_id from to",
+        },
       },
     })
     .select("-_id _pastTrips")

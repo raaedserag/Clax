@@ -1,4 +1,5 @@
 // Modules
+const jwt = require("jsonwebtoken");
 const CryptoJS = require("crypto-js");
 const bcrypt = require("bcryptjs");
 // Secrets
