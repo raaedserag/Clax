@@ -80,6 +80,8 @@ module.exports.reqListenerCallback = function (tripRef, statusRef, timerId = { v
             setRequestStatus(tripRef, "waiting")
         }
         else if (data == "waiting") {
+            // Stop passenger timeout timer
+            clearTimeout(timerId.value)
             const trip = await statusRef.parent.once("value")
             timerId.value = setTimeout(setRequestStatus,
                 parseInt(trip.val().expectedTime * 1200),
