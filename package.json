@@ -34,7 +34,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "mongoose": "^5.9.6",
-    "nexmo": "^2.6.0",
+    "nexmo": "2.6.0",
     "paypal-rest-sdk": "^1.8.1",
     "pug": "^2.0.4",
     "redis": "^3.0.2",
