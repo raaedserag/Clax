@@ -96,7 +96,7 @@ const validateOffer = function (offer) {
 
 const validateOfferCode = function (offer) {
   const codeSchema = Joi.object().keys({
-    code: Joi.string().required().trim().min(3).max(6),
+    code: Joi.string().required().trim().min(3).max(30),
   });
   return codeSchema.validate(offer);
 };
