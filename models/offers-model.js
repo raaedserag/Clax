@@ -4,7 +4,7 @@ const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 
 //****************** Offers Model ******************
-// Schema
+// Offer Schema
 const offerSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -96,7 +96,7 @@ const validateOffer = function (offer) {
 
 const validateOfferCode = function (offer) {
   const codeSchema = Joi.object().keys({
-    code: Joi.string().required().trim().min(3).max(30),
+    code: Joi.string().required().trim().min(3).max(6),
   });
   return codeSchema.validate(offer);
 };
