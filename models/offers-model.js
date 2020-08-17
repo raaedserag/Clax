@@ -4,7 +4,7 @@ const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 
 //****************** Offers Model ******************
-// Schema
+// Offer Schema
 const offerSchema = new mongoose.Schema({
   title: {
     type: String,
