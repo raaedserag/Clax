@@ -132,13 +132,11 @@ module.exports.driverForgottenPass = async (req, res) => {
     return res.status(401).send("This phone hasn't been activated yet");
 
   // Create verification code and send it to the phone
-  const sendingResult = await sms.sendVerificationCode(req.body.user, code);
-  if (sendingResult != true) throw new Error("Sms Sending Failed !");
+  // const sendingResult = await sms.sendVerificationCode(req.body.user, code);
+  // if (sendingResult != true) throw new Error("Sms Sending Failed !");
 
   // Respond with the verification code and give temp token as a header
-  res
-    .header("x-login-token", generateTempToken(driver._id))
-    .send(await hashing(code));
+  res.header("x-login-token", generateTempToken(driver._id)).send(code);
 };
 
 // Set new password
