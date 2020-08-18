@@ -20,6 +20,7 @@ module.exports.getMe = async (req, res) => {
 // Update passenger info
 module.exports.updateMe = async (req, res) => {
   // Validate update reuest
+  console.log(req.body);
   const { error, value } = validateUpdateMe(req.body);
   if (error) return res.status(404).send(error.details[0].message);
   let request = value;
