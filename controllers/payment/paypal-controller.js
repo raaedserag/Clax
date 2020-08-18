@@ -104,14 +104,14 @@ let ChargeSuccess = async function (req, res) {
   await Passengers.findByIdAndUpdate(
     req.user._id,
     {
-      $inc: { balance: request.amount },
+      $inc: { balance: req.body.amount },
       $push: { _payments: payment[0].id },
     },
     { session }
   ).lean();
 
   await session.commitTransaction();
-  res.send(confirmedPayment);
+  res.send(payment);
 };
 module.exports.ChargeSuccess = ChargeSuccess;
 
