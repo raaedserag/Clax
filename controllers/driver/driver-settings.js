@@ -4,6 +4,7 @@ const _ = require("lodash");
 const { host, port } = require("../../startup/config").serverConfig();
 // Models & Validators
 const { Drivers } = require("../../models/drivers-model");
+const { hashing } = require("../../helpers/encryption-helper");
 const { Cars } = require("../../models/cars-model");
 const { PastTour } = require("../../models/past-tours-model");
 const {

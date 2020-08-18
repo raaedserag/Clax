@@ -24,7 +24,9 @@ module.exports.addOffer = async (req, res) => {
       type: "offer",
       offer: JSON.stringify({
         type: offer.offerType,
-        value: offer.value
+        value: offer.value,
+        title: offer.title,
+        description: offer.description
       })
     }
   )
