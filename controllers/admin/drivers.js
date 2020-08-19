@@ -16,7 +16,7 @@ module.exports.getDriversNames = async (req, res) => {
 
 module.exports.getDrivers = async (req, res) => {
   const drivers = await Drivers.find({}).select(
-    "name profilePic phone license criminalRecord govern is_verified rate balance"
+    "name phone govern is_verified rate balance"
   );
 
   res.send(drivers);
@@ -32,8 +32,8 @@ module.exports.getDriver = async (req, res) => {
   const driver = await Drivers.findOne({ _id: params.id })
     .select(
       "name profilePic phone license criminalRecord govern is_verified rate balance _tours phone_verified"
-    );
-    
+    )
+    .lean();
 
   res.send(driver);
 };
