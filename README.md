@@ -9,7 +9,7 @@
 1. MongoDB
 2. Redis
 3. NodeJs
-4. Your preferred editior. (VsCode / Android Studio)
+4. Your preferred editior. (VsCode)
 
 ## Installation
 1. install packages  
