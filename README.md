@@ -1,6 +1,7 @@
 ## Clax API
 [![Build Status](https://dev.azure.com/Not-Activists/Clax/_apis/build/status/clax%20-%202%20-%20CI?branchName=master)](https://dev.azure.com/Not-Activists/Clax/_build/latest?definitionId=3&branchName=master)
 
+  Made for public transporters, the app eases the communication with public microbus drivers for a faster reservation of ongoing rides.
 <p align="center">
   <img src="https://i.imgur.com/DZSnCUa.png" />
 </p>
