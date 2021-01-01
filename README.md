@@ -7,7 +7,7 @@
   <img src="https://imgur.com/A9wayy6.png" />
 </p>
 ## Technologies
-* NodeJs
+* NodeJs.
 ..* Express
 ..* Redis
 ..* MongoDB
