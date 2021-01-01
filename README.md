@@ -1,7 +1,7 @@
 ## Clax API
 [![Build Status](https://dev.azure.com/Not-Activists/Clax/_apis/build/status/clax%20-%202%20-%20CI?branchName=master)](https://dev.azure.com/Not-Activists/Clax/_build/latest?definitionId=3&branchName=master)
 
-  Clax Back-end repo, made to be integrated with [Clax Mobile App]: https://github.com/KareemAllam/Clax-Application
+  Clax Back-end repo, made to be integrated with [Clax Mobile App](https://github.com/KareemAllam/Clax-Application)
 
 <p align="center">
   <img src="https://imgur.com/A9wayy6.png" />
