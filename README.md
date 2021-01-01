@@ -11,11 +11,13 @@
 
 * NodeJs
 * Express
-* Redis
+* Redis 
 * MongoDB
 * FireBase Real Time DB
 * Firebase Cloud Messaging
-
+* CI/CD with Azure
 
 ## Admin Panel Demo Video
 https://drive.google.com/file/d/1-KeskIMt-TK_mT5JHiA5Ao8ehRh77mBG/view?usp=sharing
+
+## You can visit [Clax Mobile App](https://github.com/KareemAllam/Clax-Application)
