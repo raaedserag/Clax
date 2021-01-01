@@ -4,10 +4,10 @@
   Clax Back-end repo, made to be integrated with [Clax Mobile App]: https://github.com/KareemAllam/Clax-Application
 
 <p align="center">
-  <img src="https://imgur.com/A9wayy6" />
+  <img src="https://imgur.com/A9wayy6.png" />
 </p>
 ## Technologies
-..* NodeJs
+* NodeJs
 ..* Express
 ..* Redis
 ..* MongoDB
