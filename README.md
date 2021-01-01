@@ -8,10 +8,10 @@
 </p>
 
 ## Technologies
-+ NodeJs
-- Express
 
-+ Redis
+* NodeJs
+* Express
+* Redis
 * MongoDB
 * FireBase Real Time DB
 * Firebase Cloud Messaging
