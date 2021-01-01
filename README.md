@@ -17,6 +17,13 @@
 * Firebase Cloud Messaging
 * CI/CD with Azure
 
+## 3rd Parties
+* Stripe
+* Paypal
+* Google Maps APIs
+* Sendgrid
+* Nexmo
+
 ## Admin Panel Demo Video
 https://drive.google.com/file/d/1-KeskIMt-TK_mT5JHiA5Ao8ehRh77mBG/view?usp=sharing
 
